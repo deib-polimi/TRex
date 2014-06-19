@@ -1,0 +1,22 @@
+18.06.2014 11:41:00 Connection accepted from 127.0.0.1/37736
+18.06.2014 11:41:00 Subscription from 127.0.0.1/37736:
+  {event=2000, constraints={}
+18.06.2014 11:41:00 Subscription from 127.0.0.1/37736:
+  {event=2001, constraints={}
+18.06.2014 11:41:00 Subscription from 127.0.0.1/37736:
+  {event=2002, constraints={}
+18.06.2014 11:41:05 Connection accepted from 131.175.135.2/45921
+18.06.2014 11:41:05 Rule from 131.175.135.2/45921:
+  {event=2000, attributes={a}}
+18.06.2014 11:41:05 Connection error while receiving from 131.175.135.2/45921
+18.06.2014 11:41:05 Closed socket {local=131.175.135.3/50254, remote=131.175.135.2/45921}
+18.06.2014 11:41:06 Connection accepted from 131.175.135.2/45922
+18.06.2014 11:41:06 Publication from 131.175.135.2/45922:
+  {event=2002, attributes={a=4}{
+18.06.2014 11:41:06 Connection error while receiving from 131.175.135.2/45922
+18.06.2014 11:41:06 Closed socket {local=131.175.135.3/50254, remote=131.175.135.2/45922}
+18.06.2014 11:41:09 Connection accepted from 131.175.135.2/45923
+18.06.2014 11:41:09 Publication from 131.175.135.2/45923:
+  {event=2001, attributes={gb="pol"}{
+18.06.2014 11:41:09 Connection error while receiving from 131.175.135.2/45923
+18.06.2014 11:41:09 Closed socket {local=131.175.135.3/50254, remote=131.175.135.2/45923}

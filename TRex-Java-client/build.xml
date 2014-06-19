@@ -1,0 +1,77 @@
+<project name="TRex-client" default="compile" basedir=".">
+  <target name="init">
+    <mkdir dir="bin"/>
+  </target>
+
+  <target name="compileLib" depends="init" description="compile TRex client library">
+    <javac srcdir="src" destdir="bin"
+	   classpath="lib/antlr-runtime-4.2.2.jar"
+	   debug ="on" 
+	   excludes="polimi/trex/client/examples/**" />
+  </target>
+
+  <target name="compileClient" depends="init,compileLib" description="compile TRex client application">
+    <javac srcdir="src" destdir="bin" 
+           classpath="bin:lib/antlr-runtime-4.2.2.jar"
+	   debug ="on" 
+	   includes="polimi/trex/client/examples/**" />
+  </target>
+
+  <target name="compile" depends="compileLib,compileClient" description="compile all classes">
+    <javac srcdir="src" destdir="bin" 
+           classpath="lib/antlr-runtime-4.2.2.jar"
+	   debug ="on" />
+  </target>
+
+  <target name="jarLib" depends="compileLib" description="prepare TRex-client-lib.jar">
+    <jar destfile="${ant.project.name}-lib.jar" basedir="bin" 
+         excludes="polimi/trex/client/examples/**"
+	 update="true"/>
+  </target>
+
+  <target name="jarClient" depends="compileClient" description="prepare TRex-client.jar">
+    <jar destfile="${ant.project.name}.jar" basedir="bin" 
+         includes="polimi/trex/client/examples/**" 
+	 update="true">
+         <manifest>
+            <attribute name="Built-By" value="Gianpaolo Cugola"/>
+            <attribute name="Main-Class" value="polimi/trex/client/examples/CommandLineClient"/>
+            <attribute name="Class-Path" value="TRex-client-lib.jar"/>
+         </manifest>
+    </jar>
+  </target>
+
+  <target name="doc" description="create documentation">
+    <javadoc sourcepath="src"
+	     classpath="lib/antlr-runtime-4.2.2.jar"
+             packagenames="polimi.trex.*"
+             excludepackagenames="polimi.trex.client.examples.*"
+             defaultexcludes="yes"
+             destdir="doc"
+             author="true"
+             version="true"
+             use="true"
+             windowtitle="${ant.project.name} API"/>
+  </target>
+
+  <target name="jars" depends="jarLib, jarClient" description="prepare all jars">
+  </target>
+
+  <target name="dist" depends="jars, doc" description="prepare the files to be distributed">
+  	<zip destfile="${ant.project.name}-src.zip" basedir="." 
+	     includes="src/** lib/** build.xml licence.txt TESLA.g4" />
+  	<zip destfile="${ant.project.name}-doc.zip" basedir="." includes="doc/**" />
+  </target>
+
+  <target name="clean" description="clean up">
+    <delete dir="bin" />
+  </target>
+
+  <target name="distclean" depends="clean" description="clean up completely">
+    <delete dir="doc"/>
+    <delete file="${ant.project.name}.jar"/>
+    <delete file="${ant.project.name}-lib.jar"/>
+    <delete file="${ant.project.name}-src.zip"/>
+    <delete file="${ant.project.name}-doc.zip"/>
+  </target>
+ </project>
