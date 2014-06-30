@@ -69,7 +69,7 @@ inline int CompositeEventGenerator::computeIntValue(PartialEvent *partialEvent, 
 			PubPkt *pkt = partialEvent->indexes[index];
 			int attrIndex;
 			ValType type;
-			pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex, type);
+			if (pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex, type)==false) return 0;
 			if (type==INT) return pkt->getIntAttributeVal(attrIndex);
 			else if (type==FLOAT) return pkt->getFloatAttributeVal(attrIndex);
 		} else {
@@ -107,7 +107,7 @@ inline float CompositeEventGenerator::computeFloatValue(PartialEvent *partialEve
 			PubPkt *pkt = partialEvent->indexes[index];
 			int attrIndex;
 			ValType type;
-			pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex, type);
+			if (pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex, type)==false) return 0;
 			if (type==INT) return pkt->getIntAttributeVal(attrIndex);
 			else if (type==FLOAT) return pkt->getFloatAttributeVal(attrIndex);
 		} else {
@@ -148,7 +148,7 @@ inline bool CompositeEventGenerator::computeBoolValue(PartialEvent *partialEvent
 			PubPkt *pkt = partialEvent->indexes[index];
 			int attrIndex;
 			ValType type;
-			pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex, type);
+			if (pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex, type)==false) return false;
 			return pkt->getBoolAttributeVal(attrIndex);
 		} else {
 			// Aggregates not defines for type bool, up to now
@@ -180,7 +180,7 @@ inline void CompositeEventGenerator::computeStringValue(PartialEvent *partialEve
 		PubPkt *pkt = partialEvent->indexes[index];
 		int attrIndex;
 		ValType type;
-		pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex, type);
+		if (pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex, type)==false) return;
 		pkt->getStringAttributeVal(attrIndex, result);
 	} else {
 		// Aggregates not defines for type string, up to now
