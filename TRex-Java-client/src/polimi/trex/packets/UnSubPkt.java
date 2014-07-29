@@ -2,7 +2,7 @@
 // This file is part of T-Rex, a Complex Event Processing Middleware.
 // See http://home.dei.polimi.it/margara
 //
-// Authors: Alessandro Margara
+// Authors: Francesco Feltrinelli
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -18,20 +18,33 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package polimi.trex.communication;
+package polimi.trex.packets;
 
 import polimi.trex.packets.TRexPkt;
 
-/**
- * A PacketListener receives TRexPkts from the TransportManager. 
- */
-public interface PacketListener {
+
+public class UnSubPkt implements TRexPkt{
+
+	private SubPkt subPkt;
+
+	public UnSubPkt(SubPkt subPkt) {
+		super();
+		this.subPkt = subPkt;
+	}
+
+	public SubPkt getSubPkt() {
+		return subPkt;
+	}
 	
-	/**
-	 * Method used to receive TRexPkts
-	 */
-	void notifyPktReceived(TRexPkt pkt);
-	
-	void notifyConnectionError();
-	
+	public int getEventType(){
+		return subPkt.getEventType();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof UnSubPkt)) return false;
+		UnSubPkt other= (UnSubPkt) o;
+		return subPkt.equals(other.subPkt);
+	}
 }

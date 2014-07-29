@@ -2,7 +2,7 @@
 // This file is part of T-Rex, a Complex Event Processing Middleware.
 // See http://home.dei.polimi.it/margara
 //
-// Authors: Alessandro Margara
+// Authors: Francesco Feltrinelli
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -18,20 +18,10 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package polimi.trex.communication;
+package polimi.trex.packets;
 
 import polimi.trex.packets.TRexPkt;
 
-/**
- * A PacketListener receives TRexPkts from the TransportManager. 
- */
-public interface PacketListener {
-	
-	/**
-	 * Method used to receive TRexPkts
-	 */
-	void notifyPktReceived(TRexPkt pkt);
-	
-	void notifyConnectionError();
-	
+public class PingPkt implements TRexPkt {
+
 }

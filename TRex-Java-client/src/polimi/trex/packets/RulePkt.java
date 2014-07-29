@@ -2,7 +2,7 @@
 // This file is part of T-Rex, a Complex Event Processing Middleware.
 // See http://home.dei.polimi.it/margara
 //
-// Authors: Alessandro Margara
+// Authors: Alessandro Margara, Daniele Rogora
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -31,7 +31,6 @@ import polimi.trex.common.ComplexParameter;
 import polimi.trex.common.EventPredicate;
 import polimi.trex.common.EventTemplate;
 import polimi.trex.common.Negation;
-import polimi.trex.common.Parameter;
 
 
 /**
@@ -52,6 +51,10 @@ public class RulePkt implements TRexPkt {
 		negations = new HashMap<Integer, Negation>();
 		aggregates = new HashMap<Integer, TAggregate>();
 		consuming = new HashSet<Integer>();
+	}
+	
+	public RulePkt(RulePkt trexRulePkt) {
+		this(trexRulePkt.getEventTemplate());
 	}
 	
 	public int getPredicatesNum() {

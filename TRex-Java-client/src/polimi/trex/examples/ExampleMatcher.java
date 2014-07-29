@@ -18,18 +18,27 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
-package polimi.trex.common;
+package polimi.trex.examples;
 
-import polimi.trex.common.Consts.ValRefType;
+import java.util.Date;
 
-public abstract class OpValueReference {
-	private ValRefType refType;
+import polimi.trex.common.Matcher;
+import polimi.trex.packets.PubPkt;
 
-	public ValRefType getRefType() {
-		return refType;
+/**
+ * This is a simple example matcher; it checks that the packets to filter have been generated on Tuesday
+ * @author Daniele Rogora
+ *
+ */
+public class ExampleMatcher implements Matcher {
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public boolean match(PubPkt packet) {
+		Date date = new Date(packet.getTimeStamp());
+		//Matches only if the packet was generated on Tuesday
+		if (date.getDay()==2) return true;
+		else return false;
 	}
 
-	public void setRefType(ValRefType refType) {
-		this.refType = refType;
-	}
 }

@@ -2,7 +2,7 @@
 // This file is part of T-Rex, a Complex Event Processing Middleware.
 // See http://home.dei.polimi.it/margara
 //
-// Authors: Alessandro Margara
+// Authors: Alessandro Margara, Francesco Feltrinelli, Daniele Rogora
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -34,7 +34,6 @@ import polimi.trex.common.EventTemplate;
 import polimi.trex.common.EventTemplateAttr;
 import polimi.trex.common.Negation;
 import polimi.trex.common.OpTree;
-import polimi.trex.common.Parameter;
 import polimi.trex.common.RulePktValueReference;
 import polimi.trex.common.Consts.AggregateFun;
 import polimi.trex.common.Consts.CompKind;
@@ -45,10 +44,15 @@ import polimi.trex.common.Consts.StateType;
 import polimi.trex.common.Consts.ValType;
 import polimi.trex.packets.AdvPkt;
 import polimi.trex.packets.JoinPkt;
+import polimi.trex.packets.PingPkt;
 import polimi.trex.packets.PubPkt;
 import polimi.trex.packets.RulePkt;
 import polimi.trex.packets.SubPkt;
+import polimi.trex.packets.TRexPkt;
+import polimi.trex.packets.UnSubPkt;
+import polimi.trex.packets.TRexPkt.PacketType;
 import polimi.trex.packets.TRexPkt.PktType;
+import polimi.trex.utils.MutableInt;
 
 
 public class Unmarshaller {
@@ -490,4 +494,101 @@ public class Unmarshaller {
 			inc(1);
 		}
 	}
+	
+	public static PubPkt decodePubPkt(byte[] source, int startIndex) {
+		IndexWrapper index = new IndexWrapper();
+		index.inc(startIndex);
+		PubPkt trexPubPkt= decodePubPkt(source, index);
+		return new PubPkt(trexPubPkt);
+	}
+	
+	public static RulePkt decodeRulePkt(byte[] source, int startIndex) {
+		IndexWrapper index = new IndexWrapper();
+		index.inc(startIndex);
+		RulePkt trexRulePkt= decodeRulePkt(source, index);
+		return new RulePkt(trexRulePkt);
+	}
+	
+	public static SubPkt decodeSubPkt(byte[] source, int startIndex) {
+		IndexWrapper index = new IndexWrapper();
+		index.inc(startIndex);
+		SubPkt trexSubPkt= decodeSubPkt(source, index);
+		return new SubPkt(trexSubPkt);
+	}
+	
+	public static UnSubPkt decodeUnSubPkt(byte[] source, int startIndex) {
+		// skip SubPkt's type and length
+		startIndex += Marshaller.BYTENUM_PKTTYPE + Marshaller.BYTENUM_PKTLENGTH;
+		SubPkt subPkt= decodeSubPkt(source, startIndex);
+		return new UnSubPkt(subPkt);
+	}
+	
+	public static PingPkt decodePingPkt(byte[] source, int startIndex){
+		return new PingPkt();
+	}
+	
+	public static PacketType decodePktType(byte[] source, int startIndex){
+		return PacketType.fromValue(source[startIndex]);
+	}
+	
+	public static int decodePktLength(byte[] source, int startIndex){
+		IndexWrapper index= new IndexWrapper();
+		index.inc(startIndex);
+		return decodeInt(source, index);
+	}
+
+/**
+ * Tries to unmarshal a {@link Packet} from the given (supposed valid) byte array.
+ * If the bytes are not enough to decode the packet completely, {@code null}
+ * is returned.
+ * 
+ * @param buffer the bytes' buffer
+ * @param offset the index on the given buffer where to start the decoding from;
+ * this is a {@link MutableInt} so that the caller at the end can know how many 
+ * bytes of the buffer were actually read
+ * @return the decoded packet or {@code null} if the bytes were not enough to
+ * decode it completely
+ */
+public static TRexPkt unmarshal(byte[] buffer, MutableInt offset){
+	// Try to decode packet type
+	if (buffer.length-offset.get() < Marshaller.BYTENUM_PKTTYPE) return null;
+	PacketType type = decodePktType(buffer, offset.get());
+	offset.add(Marshaller.BYTENUM_PKTTYPE);
+	
+	// Try to decode packet length
+	if (buffer.length-offset.get() < Marshaller.BYTENUM_PKTLENGTH) return null;
+	int length = decodePktLength(buffer, offset.get());
+	offset.add(Marshaller.BYTENUM_PKTLENGTH);
+	
+	// Try to decode packet body
+	if (buffer.length-offset.get() < length) return null;
+	TRexPkt pkt = null;
+	switch (type) {
+	case PUB_PACKET: 
+		pkt= decodePubPkt(buffer, offset.get());
+		break;
+	case RULE_PACKET:
+		pkt= decodeRulePkt(buffer, offset.get());
+		break;
+	case SUB_PACKET: 
+		pkt= decodeSubPkt(buffer, offset.get());
+		break;
+	case UNSUB_PACKET: 
+		pkt= decodeUnSubPkt(buffer, offset.get());
+		break;
+	case PING_PACKET: 
+		pkt= decodePingPkt(buffer, offset.get());
+		break;
+	}
+	offset.add(length);
+	
+	return pkt;
+}
+
+/**
+ * As {@link #unmarshal(byte[], MutableInt)} with 0 as start index.
+ */
+public static TRexPkt unmarshal(byte[] buffer){
+	return unmarshal(buffer, new MutableInt(0));
+}
 }

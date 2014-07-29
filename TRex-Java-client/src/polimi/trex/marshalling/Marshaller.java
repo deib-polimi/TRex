@@ -2,7 +2,7 @@
 // This file is part of T-Rex, a Complex Event Processing Middleware.
 // See http://home.dei.polimi.it/margara
 //
-// Authors: Alessandro Margara
+// Authors: Alessandro Margara, Francesco Feltrinelli, Daniele Rogora
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -47,13 +47,26 @@ import polimi.trex.common.Consts.ValType;
 import polimi.trex.common.StaticValueReference;
 import polimi.trex.packets.AdvPkt;
 import polimi.trex.packets.JoinPkt;
+import polimi.trex.packets.PingPkt;
 import polimi.trex.packets.PubPkt;
 import polimi.trex.packets.RulePkt;
 import polimi.trex.packets.SubPkt;
+import polimi.trex.packets.TRexPkt;
+import polimi.trex.packets.UnSubPkt;
+import polimi.trex.packets.TRexPkt.PacketType;
 import polimi.trex.packets.TRexPkt.PktType;
 
 
 public class Marshaller {
+	
+	/**
+	 * Number of bytes used to store the packet type.
+	 */
+	public final static int BYTENUM_PKTTYPE= 1;
+	/**
+	 * Number of bytes used to store the packet length.
+	 */
+	public final static int BYTENUM_PKTLENGTH= 4;
 	
 	public static byte[] getByteArray(PubPkt pkt) {
 		byte[] dest = new byte[4+getNumBytes(PktType.PUB_PKT)+getNumBytes(pkt)];
@@ -636,4 +649,62 @@ public class Marshaller {
 		}
 		return startIndex;
 	}
+	
+	public static byte[] getByteArray(UnSubPkt pkt) {
+		int bodyLen= getNumBytes(pkt);
+		byte[] dest = new byte[BYTENUM_PKTTYPE + BYTENUM_PKTLENGTH + bodyLen];
+		
+		int startIndex= 0;
+		startIndex= encode(PacketType.UNSUB_PACKET, dest, startIndex);
+		startIndex= encode(bodyLen, dest, startIndex);
+		startIndex= encode(pkt.getSubPkt(), dest, startIndex);
+		
+		return dest;
+	}
+	
+	public static byte[] getByteArray(PingPkt pkt) {
+		int bodyLen= getNumBytes(pkt);
+		byte[] dest = new byte[BYTENUM_PKTTYPE + BYTENUM_PKTLENGTH + bodyLen];
+		
+		int startIndex= 0;
+		startIndex= encode(PacketType.PING_PACKET, dest, startIndex);
+		startIndex= encode(bodyLen, dest, startIndex);
+		
+		return dest;
+	}
+	
+	protected static int getSize(SubPkt subPkt){
+		return BYTENUM_PKTTYPE + BYTENUM_PKTLENGTH + Marshaller.getNumBytes(subPkt);
+	}
+	
+	protected static int getNumBytes(UnSubPkt pkt) {
+		return getSize(pkt.getSubPkt());
+	}
+	
+	protected static int getNumBytes(PingPkt pkt) {
+		return 0;
+	}
+
+	protected static int encode(PacketType source, byte[] dest, int startIndex) {
+		dest[startIndex++]= (byte) source.toValue(); 
+		return startIndex;
+	}
+
+/**
+ * Flattens the given packet to an array of bytes.
+ */
+public static byte[] marshalRule(TRexPkt pkt, EngineType eType) {
+	if (pkt instanceof RulePkt) return getByteArray((RulePkt) pkt, eType);
+	return null;
+}
+
+/**
+ * Flattens the given packet to an array of bytes.
+ */
+public static byte[] marshal(TRexPkt pkt) {
+	if (pkt instanceof PubPkt) return getByteArray((PubPkt) pkt);
+	else if (pkt instanceof SubPkt) return getByteArray((SubPkt) pkt);
+	else if (pkt instanceof UnSubPkt) return getByteArray((UnSubPkt) pkt);
+	else return getByteArray((PingPkt) pkt);
+}
 }

@@ -1,7 +1,3 @@
-/**
- * @author Daniele Rogora
- *
- */
 //
 // This file is part of T-Rex, a Complex Event Processing Middleware.
 // See http://home.dei.polimi.it/margara

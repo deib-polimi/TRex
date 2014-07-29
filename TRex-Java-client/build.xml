@@ -7,14 +7,14 @@
     <javac srcdir="src" destdir="bin"
 	   classpath="lib/antlr-runtime-4.2.2.jar"
 	   debug ="on" 
-	   excludes="polimi/trex/client/examples/**" />
+	   excludes="polimi/trex/examples/**" />
   </target>
 
   <target name="compileClient" depends="init,compileLib" description="compile TRex client application">
     <javac srcdir="src" destdir="bin" 
            classpath="bin:lib/antlr-runtime-4.2.2.jar"
 	   debug ="on" 
-	   includes="polimi/trex/client/examples/**" />
+	   includes="polimi/trex/examples/**" />
   </target>
 
   <target name="compile" depends="compileLib,compileClient" description="compile all classes">
@@ -25,17 +25,17 @@
 
   <target name="jarLib" depends="compileLib" description="prepare TRex-client-lib.jar">
     <jar destfile="${ant.project.name}-lib.jar" basedir="bin" 
-         excludes="polimi/trex/client/examples/**"
+         excludes="polimi/trex/examples/**"
 	 update="true"/>
   </target>
 
   <target name="jarClient" depends="compileClient" description="prepare TRex-client.jar">
     <jar destfile="${ant.project.name}.jar" basedir="bin" 
-         includes="polimi/trex/client/examples/**" 
+         includes="polimi/trex/examples/**" 
 	 update="true">
          <manifest>
             <attribute name="Built-By" value="Gianpaolo Cugola"/>
-            <attribute name="Main-Class" value="polimi/trex/client/examples/CommandLineClient"/>
+            <attribute name="Main-Class" value="polimi/trex/examples/CommandLineClient"/>
             <attribute name="Class-Path" value="TRex-client-lib.jar"/>
          </manifest>
     </jar>
@@ -45,7 +45,7 @@
     <javadoc sourcepath="src"
 	     classpath="lib/antlr-runtime-4.2.2.jar"
              packagenames="polimi.trex.*"
-             excludepackagenames="polimi.trex.client.examples.*"
+             excludepackagenames="polimi.trex.examples.*"
              defaultexcludes="yes"
              destdir="doc"
              author="true"

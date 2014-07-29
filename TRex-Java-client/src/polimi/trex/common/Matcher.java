@@ -20,16 +20,8 @@
 
 package polimi.trex.common;
 
-import polimi.trex.common.Consts.ValRefType;
+import polimi.trex.packets.PubPkt;
 
-public abstract class OpValueReference {
-	private ValRefType refType;
-
-	public ValRefType getRefType() {
-		return refType;
-	}
-
-	public void setRefType(ValRefType refType) {
-		this.refType = refType;
-	}
+public interface Matcher {
+	public boolean match(PubPkt packet);
 }

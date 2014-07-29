@@ -2,7 +2,7 @@
 // This file is part of T-Rex, a Complex Event Processing Middleware.
 // See http://home.dei.polimi.it/margara
 //
-// Authors: Alessandro Margara
+// Authors: Alessandro Margara, Francesco Feltrinelli
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -45,7 +45,17 @@ public class PubPkt implements TRexPkt {
 		this.timeStamp = timeStamp;
 		attributes = new ArrayList<Attribute>();
 	}
+	
+	public PubPkt(int eventType, long timeStamp, Collection<Attribute> attr) {
+		this.eventType = eventType;
+		this.timeStamp = timeStamp;
+		attributes = new ArrayList<Attribute>(attr);
+	}
 
+	public PubPkt(PubPkt trexPubPkt) {
+		this(trexPubPkt.getEventType(), trexPubPkt.getTimeStamp(), trexPubPkt.getAttributes());
+	}
+	
 	public int getEventType() {
 		return eventType;
 	}
