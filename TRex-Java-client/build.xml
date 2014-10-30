@@ -36,7 +36,7 @@
          <manifest>
             <attribute name="Built-By" value="Gianpaolo Cugola"/>
             <attribute name="Main-Class" value="polimi/trex/examples/CommandLineClient"/>
-            <attribute name="Class-Path" value="TRex-client-lib.jar"/>
+            <attribute name="Class-Path" value="TRex-client-lib.jar lib/antlr-runtime-4.2.2.jar"/>
          </manifest>
     </jar>
   </target>
