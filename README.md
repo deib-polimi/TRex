@@ -45,6 +45,10 @@ TRex2-Lib
 
 This is the core of the project, containing both the standard and the CUDA powered engine. 
 
+First of all build the configure script:
+
+    $ autoreconf --install
+
 To configure:
 
     $ ./configure
@@ -66,6 +70,10 @@ TRex-Server
 ===========
 
 This is a server built with the TRex2 library that handles the communication between the engine and the clients.
+
+First of all build the configure script:
+
+    $ autoreconf --install
 
 To configure:
 
