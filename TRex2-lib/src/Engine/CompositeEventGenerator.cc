@@ -180,6 +180,7 @@ inline void CompositeEventGenerator::computeStringValue(PartialEvent *partialEve
 		PubPkt *pkt = partialEvent->indexes[index];
 		int attrIndex;
 		ValType type;
+		strcpy(result, "");
 		if (pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex, type)==false) return;
 		pkt->getStringAttributeVal(attrIndex, result);
 	} else {
