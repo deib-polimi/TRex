@@ -34,7 +34,8 @@ SOEPServer::SOEPServer(int port, int thread_pool_size, bool usePingPar, bool use
 			newConnection(new Connection(ioService, tRexEngine, gtRexEngine, subTable, usePingPar, useGPUPar))
 {
 	acceptor.async_accept(newConnection->getSocket(),
-			boost::bind(&SOEPServer::handle_accept, this, boost::asio::placeholders::error));			
+			boost::bind(&SOEPServer::handle_accept, this, boost::asio::placeholders::error));
+        tRexEngine.finalize();
 }
 #else
 SOEPServer::SOEPServer(int port, int thread_pool_size, bool usePingPar, bool useGPUPar) :
@@ -48,6 +49,7 @@ SOEPServer::SOEPServer(int port, int thread_pool_size, bool usePingPar, bool use
 {
 	acceptor.async_accept(newConnection->getSocket(),
 			boost::bind(&SOEPServer::handle_accept, this, boost::asio::placeholders::error));
+        tRexEngine.finalize();
 }
 #endif
 
