@@ -289,6 +289,7 @@ EventInfo createEventInfo(PubPkt *event) {
 }
 
 int getFirstValidElementCircular(uint64_t *column, int lowIndex, int highIndex, uint64_t minTimeStamp) {
+    //minTimeStamp is not included in the selection; Jan 2015
     int size;
     if (highIndex>=lowIndex) size = highIndex-lowIndex;
     else size = ALLOC_SIZE+highIndex-lowIndex;
@@ -315,13 +316,14 @@ int getFirstValidElementCircular(uint64_t *column, int lowIndex, int highIndex, 
 }
 
 int getLastValidElementCircular(uint64_t *column, int lowIndex, int highIndex, uint64_t maxTimeStamp, int minIndex) {
+    //maxTimeStamp is not included in the selection; Jan 2015
     if (minIndex<0) return -1;
     int size;
     if (highIndex>=lowIndex) size = highIndex-lowIndex;
     else size = ALLOC_SIZE+highIndex-minIndex;
     int relativeMinValue = 0;
     int relativeMaxValue = size-1;
-    int minValue = lowIndex;//(lowIndex+minIndex)%ALLOC_SIZE;
+    int minValue = lowIndex;
     int maxValue = highIndex-1;
     if (maxValue<0) maxValue = ALLOC_SIZE - maxValue;
     if (column[minIndex]>=maxTimeStamp) {
@@ -339,7 +341,7 @@ int getLastValidElementCircular(uint64_t *column, int lowIndex, int highIndex, u
         }
     }
     if (relativeMaxValue==relativeMinValue) return minValue;
-    if (column[maxValue]<=maxTimeStamp) return maxValue;
+    if (column[maxValue]<maxTimeStamp) return maxValue;
     return minValue;
 }
 
@@ -348,7 +350,6 @@ int deleteInvalidElementsCircular(uint64_t *column, int &lowIndex, int highIndex
     if (highIndex-lowIndex>=0) columnSize = highIndex-lowIndex;
     else columnSize = ALLOC_SIZE+highIndex-lowIndex;
     int firstValidElement = getFirstValidElementCircular(column, lowIndex, highIndex, minTimeStamp);
-//  	cout << "FVEC returns " << firstValidElement << endl;
     if (firstValidElement<0) {
         lowIndex = highIndex;
         return 0;
@@ -372,6 +373,7 @@ Parameter * dupParameter(Parameter *param) {
 
 
 int getFirstValidElement(vector<PubPkt *> &column, int columnSize, TimeMs minTimeStamp) {
+    //minTimeStamp is not included in the selection; Jan 2015
     if (columnSize<=0) return -1;
     int minValue = 0;
     int maxValue = columnSize-1;
@@ -390,6 +392,7 @@ int getFirstValidElement(vector<PubPkt *> &column, int columnSize, TimeMs minTim
 }
 
 int getLastValidElement(vector<PubPkt *> &column, int columnSize, TimeMs maxTimeStamp, int minIndex) {
+    //maxTimeStamp is not included in the selection; Jan 2015
     int minValue = minIndex;
     int maxValue = columnSize-1;
     if (minIndex==-1) return -1;
@@ -403,7 +406,7 @@ int getLastValidElement(vector<PubPkt *> &column, int columnSize, TimeMs maxTime
         }
     }
     if (maxValue-minValue==0) return minValue;
-    if (column[maxValue]->getTimeStamp()<=maxTimeStamp) return maxValue;
+    if (column[maxValue]->getTimeStamp()<maxTimeStamp) return maxValue;
     return minValue;
 }
 

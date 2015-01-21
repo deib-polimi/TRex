@@ -408,10 +408,8 @@ void GPUProcessor::addParameter(GPUParameter *parameterp) {
 
     if (parameter->sType==STATE) {
         stateParamtersNum++;
-//         parameter->evIndex1 = sequenceLen - parameter->evIndex1 - 1;
-//         parameter->evIndex2 = sequenceLen - parameter->evIndex2 - 1;
 
-        int state = parameter->lastIndex;
+	int state = parameter->lastIndex;
 
         map<int, set<GPUParameter *> >::iterator it = parameters.find(state);
         if (it==parameters.end()) {
@@ -527,7 +525,6 @@ inline void GPUProcessor::addEventToStack(int stack, PubPkt *event) {
 	return;
     }
 
-    //FIXME: only if first!
     if (index == 0) {
         samples[stack] = event->copy();
     }
