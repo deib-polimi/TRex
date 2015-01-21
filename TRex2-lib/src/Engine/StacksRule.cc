@@ -282,7 +282,6 @@ void StacksRule::getWinEvents(list<PartialEvent *> *results, int index, TimeMs t
 	TimeMs minTimeStamp = tsUp-stacks[index]->getWindow();
 	int index1 = getFirstValidElement(receivedPkts[index], stacksSize[index], minTimeStamp);
 	if (index1<0) return;
-	// TODO: ws if (receivedPkts[index][index1]->getTimeStamp()>tsUp) return;
 	if (receivedPkts[index][index1]->getTimeStamp()>=tsUp) return;
 	int index2 = getLastValidElement(receivedPkts[index], stacksSize[index], tsUp, index1);
 	if (index2<0) index2 = index1;
@@ -353,11 +352,10 @@ bool StacksRule::checkNegation(int negIndex, PartialEvent *partialResult) {
 	// TODO: Aggiungere la seguente riga per avere uguaglianza semantica con TRex nel test Rain.
 	// if (receivedNegs[negIndex][0]->getTimeStamp()<=maxTS && receivedNegs[negIndex][0]->getTimeStamp()>=minTS) return true;
 	if (index1<0) return false;
-	if (receivedNegs[negIndex][index1]->getTimeStamp()>maxTS) return false;
-	int index2 = getLastValidElement(receivedNegs[negIndex], negsSize[negIndex], maxTS+1, index1);
+	//maxTS and minTS negation events are not valid; Jan 2015
+	if (receivedNegs[negIndex][index1]->getTimeStamp()>=maxTS) return false;
+	int index2 = getLastValidElement(receivedNegs[negIndex], negsSize[negIndex], maxTS, index1);
 	if (index2<0) index2 = index1;
-	// No parameters to check: return true
-// 	map<int, set<Parameter *> >::iterator it = negationParameters.find(negIndex);
 	
 	map<int, set<CPUParameter *> >::iterator itComplex = negationComplexParameters.find(negIndex);
 	if (itComplex==negationComplexParameters.end()) return true;

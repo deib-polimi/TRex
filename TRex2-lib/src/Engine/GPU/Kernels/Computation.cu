@@ -101,7 +101,8 @@ __device__ bool gcheckN(EventInfo *ev1, EventInfoSet prevResults, GPUNegation *n
 		maxTS = prevResults.infos[negations[n].upperId].timestamp;
                 minTS = ev1->timestamp; // partialResult->indexes[neg->lowerId]->getTimeStamp();
             }
-            if (negTimestamp <= maxTS && negTimestamp > minTS) {
+            //maxTS and minTS negation events are not valid; Jan 2015
+            if (negTimestamp < maxTS && negTimestamp > minTS) {
 	      int lres=1;
 		#pragma unroll
                 for (int p=0; p<MAX_PARAMETERS_NUM; p++) {
@@ -218,7 +219,8 @@ __global__ void checkN(passer stackpage, EventInfoSet *prevResults, uint8_t *ali
     } else {
         minTS = stack[id + offset].timestamp; // partialResult->indexes[neg->lowerId]->getTimeStamp();
     }
-    if (negTimestamp > maxTS || negTimestamp <= minTS) return;
+    //maxTS and minTS negation events are not valid; Jan 2015
+    if (negTimestamp >= maxTS || negTimestamp <= minTS) return;
 
     int lres=1;
 #pragma unroll
