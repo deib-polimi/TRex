@@ -35,7 +35,9 @@ public class Consts {
 		LT,
 		GT,
 		DF,
-		IN
+		IN, 
+		LE,
+		GE
 	}
 
 	/** Aggregate functions defined */

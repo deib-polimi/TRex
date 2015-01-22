@@ -95,7 +95,12 @@ public class SubPkt implements TRexPkt {
 						   		
 						   	case LT:
 						   		if (constr.getIntVal()>=at.getIntVal()) return 0;
+							
+						   	case LE:
+						   		if (constr.getIntVal()>at.getIntVal()) return 0;
 						   		
+							case GE:
+						   		if (constr.getIntVal()<at.getIntVal()) return 0;
 						   	default:
 						   		break;
 						   }
@@ -114,6 +119,12 @@ public class SubPkt implements TRexPkt {
 						   		
 						   	case LT:
 						   		if (constr.getFloatVal()>=at.getFloatVal()) return 0;
+						   		
+						   	case LE:
+						   		if (constr.getFloatVal()>at.getFloatVal()) return 0;
+						   		
+						   	case GE:
+						   		if (constr.getFloatVal()<at.getFloatVal()) return 0;
 						   		
 						   	default:
 						   		break;
@@ -136,16 +147,18 @@ public class SubPkt implements TRexPkt {
 					   case STRING:
 						   switch (constr.getOp()) {
 						   	case EQ:
-						   		if (constr.getFloatVal()!=at.getFloatVal()) return 0;
+						   		if (!constr.getStringVal().equals(at.getStringVal())) return 0;
 						   		
 						   	case DF:
-						   		if (constr.getFloatVal()==at.getFloatVal()) return 0;
+						   		if (constr.getStringVal().equals(at.getStringVal())) return 0;
 						   		
+						   	//Not defined for strings
 						   	case GT:
-						   		if (constr.getFloatVal()<=at.getFloatVal()) return 0;
-						   		
+						   		return 0;
+						   	
+						   	//Not defined for strings	
 						   	case LT:
-						   		if (constr.getFloatVal()>=at.getFloatVal()) return 0;
+						   		return 0;
 						   		
 						   	case IN:
 						   		//FROM SERVER CODE, TRexUtils.cpp

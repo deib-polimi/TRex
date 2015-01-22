@@ -42,6 +42,9 @@ typedef struct FloatOperatorsTable {
 	std::map<float, FloatTableConstraint *> lt;	// Value -> less than constraint
 	std::map<float, FloatTableConstraint *> gt;	// Value -> greater then constraint
 	std::map<float, FloatTableConstraint *> df;	// Value -> different from constraint
+	std::map<float, FloatTableConstraint *> le;	// Value -> less than or equal to constraint
+	std::map<float, FloatTableConstraint *> ge;	// Value -> greater than or equal to constraint
+
 	// Overriding
 	bool operator<(const FloatOperatorsTable &table) const { return eq<table.eq; }
 } FloatOps;

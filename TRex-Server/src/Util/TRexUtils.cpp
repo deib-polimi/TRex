@@ -50,6 +50,13 @@ bool util::matches(const Constraint& constr, const Attribute& attr){
 		case GT:
 			if (attr.intVal<=constr.intVal) return false;
 			break;
+		case LE:
+			if (attr.intVal>constr.intVal) return false;
+			break;
+		case GE:
+			if (attr.intVal<constr.intVal) return false;
+			break;
+		
 		case DF:
 			if (attr.intVal==constr.intVal) return false;
 			break;
@@ -69,6 +76,13 @@ bool util::matches(const Constraint& constr, const Attribute& attr){
 		case GT:
 			if (attr.floatVal<=constr.floatVal) return false;
 			break;
+		case LE:
+			if (attr.floatVal>constr.floatVal) return false;
+			break;
+		case GE:
+			if (attr.floatVal<constr.floatVal) return false;
+			break;
+
 		case DF:
 			if (attr.floatVal==constr.floatVal) return false;
 			break;
@@ -88,6 +102,13 @@ bool util::matches(const Constraint& constr, const Attribute& attr){
 		case GT:
 			throw invalid_argument("GT operation cannot be used with BOOL type");
 			break;
+		case LE:
+			throw invalid_argument("LE operation cannot be used with BOOL type");
+			break;
+		case GE:
+			throw invalid_argument("GE operation cannot be used with BOOL type");
+			break;
+
 		case DF:
 			if (attr.boolVal==constr.boolVal) return false;
 			break;
@@ -110,6 +131,13 @@ bool util::matches(const Constraint& constr, const Attribute& attr){
 		case DF:
 			if (strcmp(attr.stringVal, constr.stringVal)==0) return false;
 			break;
+		case LE:
+			if (strcmp(attr.stringVal, constr.stringVal)>0) return false;
+			break;
+		case GE:
+			if (strcmp(attr.stringVal, constr.stringVal)<0) return false;
+			break;
+			
 		case IN:
 			// The constraint's value should be a substring of the attribute's value:
 			// it is a filter specified for published events' attributes
@@ -218,6 +246,13 @@ std::string util::toString(const Constraint& constr){
 	case DF:
 		ss << "!=";
 		break;
+	case LE:
+		ss << "<=";
+		break;
+	case GE:
+		ss << ">=";
+		break;
+
 	case IN:
 		// set-membership ASCII symbol for Event-B language is used here for substrings
 		// see http://wiki.event-b.org/index.php/ASCII_Representations_of_the_Mathematical_Symbols_%28Rodin_User_Manual%29

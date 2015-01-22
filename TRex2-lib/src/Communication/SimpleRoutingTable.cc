@@ -138,11 +138,15 @@ bool SimpleRoutingTable::matches(PubPkt *pubPkt, SubPkt *subPkt) {
 			if (constr.op==LT && pubPkt->getIntAttributeVal(index)>=constr.intVal) return false;
 			if (constr.op==GT && pubPkt->getIntAttributeVal(index)<=constr.intVal) return false;
 			if (constr.op==DF && pubPkt->getIntAttributeVal(index)==constr.intVal) return false;
+			if (constr.op==LE && pubPkt->getIntAttributeVal(index)>constr.intVal) return false;
+			if (constr.op==GE && pubPkt->getIntAttributeVal(index)<constr.intVal) return false;
 		} else if (constr.type==FLOAT) {
 			if (constr.op==EQ && pubPkt->getFloatAttributeVal(index)!=constr.floatVal) return false;
 			if (constr.op==LT && pubPkt->getFloatAttributeVal(index)>=constr.floatVal) return false;
 			if (constr.op==GT && pubPkt->getFloatAttributeVal(index)<=constr.floatVal) return false;
 			if (constr.op==DF && pubPkt->getFloatAttributeVal(index)==constr.floatVal) return false;
+			if (constr.op==LE && pubPkt->getFloatAttributeVal(index)>constr.floatVal) return false;
+			if (constr.op==GE && pubPkt->getFloatAttributeVal(index)<constr.floatVal) return false;
 		} else if (constr.type==BOOL) {
 			if (constr.op==EQ && pubPkt->getBoolAttributeVal(index)!=constr.boolVal) return false;
 			if (constr.op==DF && pubPkt->getBoolAttributeVal(index)==constr.boolVal) return false;

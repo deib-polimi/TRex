@@ -336,6 +336,9 @@ public class Unmarshaller {
 		else if (source[pos]==1) return ConstraintOp.LT;
 		else if (source[pos]==2) return ConstraintOp.GT;
 		else if (source[pos]==3) return ConstraintOp.DF;
+		else if (source[pos]==4) return ConstraintOp.IN;
+		else if (source[pos]==5) return ConstraintOp.LE;
+		else if (source[pos]==6) return ConstraintOp.GE;
 		else return ConstraintOp.IN;
 	}
 

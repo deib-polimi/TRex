@@ -412,6 +412,8 @@ Op Unmarshaller::decodeConstraintOp(char *source, int &index) {
 	else if (source[index]==2) result = GT;
 	else if (source[index]==3) result = DF;
 	else if (source[index]==4) result = IN;
+	else if (source[index]==5) result = LE;
+	else if (source[index]==6) result = GE;
 	index++;
 	return result;
 }

@@ -52,6 +52,12 @@ bool checkConstraints(PubPkt* event, RulePkt* rule, int state)
             else if (o == LT) {
                 if (event->getAttribute(idx).intVal >= tempint) return false;
             }
+            else if (o == LE) {
+	      if (event->getAttribute(idx).intVal > tempint) return false;
+	    }
+	    else if (o == GE) {
+	      if (event->getAttribute(idx).intVal < tempint) return false;
+	    }
             break;
 
         case FLOAT:
@@ -65,6 +71,13 @@ bool checkConstraints(PubPkt* event, RulePkt* rule, int state)
             else if (o == LT) {
                 if (event->getAttribute(idx).floatVal >= tempfloat) return false;
             }
+            else if (o == LE) {
+		if (event->getAttribute(idx).floatVal > tempfloat) return false;
+	    }
+	    else if (o == GE) {
+		if (event->getAttribute(idx).floatVal < tempfloat) return false;
+	    }
+
             break;
 
         case BOOL:
@@ -122,6 +135,13 @@ bool checkAggregateConstraints(PubPkt* event, RulePkt* rule, int aggNum)
             else if (o == LT) {
                 if (event->getAttribute(idx).intVal >= tempint) return false;
             }
+            else if (o == LE) {
+		if (event->getAttribute(idx).intVal > tempint) return false;
+	    }
+	    else if (o == GE) {
+		if (event->getAttribute(idx).intVal < tempint) return false;
+	    }
+
             break;
 
         case FLOAT:
@@ -135,6 +155,13 @@ bool checkAggregateConstraints(PubPkt* event, RulePkt* rule, int aggNum)
             else if (o == LT) {
                 if (event->getAttribute(idx).floatVal >= tempfloat) return false;
             }
+            else if (o == LE) {
+		if (event->getAttribute(idx).floatVal > tempfloat) return false;
+	    }
+	    else if (o == GE) {
+		if (event->getAttribute(idx).floatVal < tempfloat) return false;
+	    }
+
             break;
 
         case BOOL:
@@ -192,6 +219,13 @@ bool checkNegationConstraints(PubPkt* event, RulePkt* rule, int negNum)
             else if (o == LT) {
                 if (event->getAttribute(idx).intVal >= tempint) return false;
             }
+            else if (o == LE) {
+		if (event->getAttribute(idx).intVal > tempint) return false;
+	    }
+	    else if (o == GE) {
+		if (event->getAttribute(idx).intVal < tempint) return false;
+	    }
+
             break;
 
         case FLOAT:
@@ -205,6 +239,12 @@ bool checkNegationConstraints(PubPkt* event, RulePkt* rule, int negNum)
             else if (o == LT) {
                 if (event->getAttribute(idx).floatVal >= tempfloat) return false;
             }
+            else if (o == LE) {
+		if (event->getAttribute(idx).floatVal > tempfloat) return false;
+	    }
+	    else if (o == GE) {
+		if (event->getAttribute(idx).floatVal < tempfloat) return false;
+	    }
             break;
 
         case BOOL:
@@ -585,6 +625,8 @@ bool checkComplexParameter(PubPkt* pkt, PartialEvent* partialEvent, CPUParameter
         if (operation==GT) return left>right;
         if (operation==LT) return left<right;
         if (operation==DF) return left!=right;
+	if (operation==LE) return left<=right;
+	if (operation==GE) return left>=right;
     }
     else if (type==FLOAT) {
         float left = computeFloatValueForParameters(pkt, partialEvent, parameter->leftTree, index, sType);
@@ -593,6 +635,8 @@ bool checkComplexParameter(PubPkt* pkt, PartialEvent* partialEvent, CPUParameter
         if (operation==GT) return left>right;
         if (operation==LT) return left<right;
         if (operation==DF) return left!=right;
+	if (operation==LE) return left<=right;
+	if (operation==GE) return left>=right;
     }
     else if (type==BOOL) {
         bool leftValue = computeBoolValueForParameters(pkt, partialEvent, parameter->leftTree, index, sType);

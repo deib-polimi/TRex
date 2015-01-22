@@ -190,7 +190,9 @@ enum Op {
 	LT=1,
 	GT=2,
 	DF=3,
-	IN=4
+	IN=4,
+	LE=5,
+	GE=6
 };
 
 #define OP_NUM 5

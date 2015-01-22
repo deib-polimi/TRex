@@ -56,15 +56,27 @@ void FloatConstraintIndex::processMessage(PubPkt *pkt, MatchingHandler &mh, map<
 			FloatTableConstraint *itc = it->second;
 			processConstraint(itc, mh, predCount);
 		}
-		// Less then constraints (iterating in descending order)
+		// Less than constraints (iterating in descending order)
 		for (map<float, FloatTableConstraint *>::reverse_iterator rit=indexes[name].lt.rbegin(); rit!=indexes[name].lt.rend(); ++rit) {
 			if (rit->first <= val) break;
+			FloatTableConstraint *itc = rit->second;
+			processConstraint(itc, mh, predCount);
+		}
+		// Less than or equal to constraints (iterating in descending order)
+		for (map<float, FloatTableConstraint *>::reverse_iterator rit=indexes[name].le.rbegin(); rit!=indexes[name].le.rend(); ++rit) {
+			if (rit->first < val) break;
 			FloatTableConstraint *itc = rit->second;
 			processConstraint(itc, mh, predCount);
 		}
 		// Greater than constraints (iterating in ascending order)
 		for (it=indexes[name].gt.begin(); it!=indexes[name].gt.end(); ++it) {
 			if (it->first >= val) break;
+			FloatTableConstraint *itc = it->second;
+			processConstraint(itc, mh, predCount);
+		}
+		// Greater than or equal to constraints (iterating in ascending order)
+		for (it=indexes[name].ge.begin(); it!=indexes[name].ge.end(); ++it) {
+			if (it->first > val) break;
 			FloatTableConstraint *itc = it->second;
 			processConstraint(itc, mh, predCount);
 		}
@@ -106,6 +118,8 @@ inline void FloatConstraintIndex::installConstraint(FloatTableConstraint *c) {
 	if (c->op==EQ) indexes[s].eq.insert(make_pair(c->val, c));
 	else if (c->op==LT) indexes[s].lt.insert(make_pair(c->val, c));
 	else if (c->op==GT) indexes[s].gt.insert(make_pair(c->val, c));
+	else if (c->op==LE) indexes[s].le.insert(make_pair(c->val, c));
+	else if (c->op==GE) indexes[s].ge.insert(make_pair(c->val, c));
 	else indexes[s].df.insert(make_pair(c->val, c));
 }
 

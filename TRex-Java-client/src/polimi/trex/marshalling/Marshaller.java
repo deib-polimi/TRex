@@ -521,6 +521,8 @@ public class Marshaller {
 		else if (source==ConstraintOp.GT) dest[startIndex++] = 2;
 		else if (source==ConstraintOp.DF) dest[startIndex++] = 3;
 		else if (source==ConstraintOp.IN) dest[startIndex++] = 4;
+		else if (source==ConstraintOp.LE) dest[startIndex++] = 5;
+		else if (source==ConstraintOp.GE) dest[startIndex++] = 6;
 		return startIndex;
 	}
 	
