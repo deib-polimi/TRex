@@ -57,7 +57,7 @@ bool util::matches(const Constraint& constr, const Attribute& attr){
 			if (attr.intVal<constr.intVal) return false;
 			break;
 		
-		case DF:
+		case NE:
 			if (attr.intVal==constr.intVal) return false;
 			break;
 		case IN:
@@ -83,7 +83,7 @@ bool util::matches(const Constraint& constr, const Attribute& attr){
 			if (attr.floatVal<constr.floatVal) return false;
 			break;
 
-		case DF:
+		case NE:
 			if (attr.floatVal==constr.floatVal) return false;
 			break;
 		case IN:
@@ -109,7 +109,7 @@ bool util::matches(const Constraint& constr, const Attribute& attr){
 			throw invalid_argument("GE operation cannot be used with BOOL type");
 			break;
 
-		case DF:
+		case NE:
 			if (attr.boolVal==constr.boolVal) return false;
 			break;
 		case IN:
@@ -128,7 +128,7 @@ bool util::matches(const Constraint& constr, const Attribute& attr){
 		case GT:
 			if (strcmp(attr.stringVal, constr.stringVal)<=0) return false;
 			break;
-		case DF:
+		case NE:
 			if (strcmp(attr.stringVal, constr.stringVal)==0) return false;
 			break;
 		case LE:
@@ -243,7 +243,7 @@ std::string util::toString(const Constraint& constr){
 	case GT:
 		ss << ">";
 		break;
-	case DF:
+	case NE:
 		ss << "!=";
 		break;
 	case LE:
