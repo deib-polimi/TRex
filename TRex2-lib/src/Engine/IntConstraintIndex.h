@@ -41,7 +41,7 @@ typedef struct IntOperatorsTable {
 	std::map<int, IntTableConstraint *> eq;	// Value -> equality constraint
 	std::map<int, IntTableConstraint *> lt;	// Value -> less than constraint
 	std::map<int, IntTableConstraint *> gt;	// Value -> greater then constraint
-	std::map<int, IntTableConstraint *> df;	// Value -> different from constraint
+	std::map<int, IntTableConstraint *> ne;	// Value -> different from constraint
 	std::map<int, IntTableConstraint *> le;	// Value -> less than or equal to constraint
 	std::map<int, IntTableConstraint *> ge;	// Value -> greater than or equal to constraint
 	// Overriding

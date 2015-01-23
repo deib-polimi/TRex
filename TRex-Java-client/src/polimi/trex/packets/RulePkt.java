@@ -169,4 +169,3 @@ public class RulePkt implements TRexPkt {
 		return true;
 	}
 }
-

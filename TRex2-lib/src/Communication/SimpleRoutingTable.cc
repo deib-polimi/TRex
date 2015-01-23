@@ -15,7 +15,7 @@
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with this program.  If not, see http://www.gnu.org/licenses/.
+// along with this progr		am.  If not, see http://www.gnu.org/licenses/.
 //
 
 #include "SimpleRoutingTable.h"
@@ -137,23 +137,24 @@ bool SimpleRoutingTable::matches(PubPkt *pubPkt, SubPkt *subPkt) {
 			if (constr.op==EQ && pubPkt->getIntAttributeVal(index)!=constr.intVal) return false;
 			if (constr.op==LT && pubPkt->getIntAttributeVal(index)>=constr.intVal) return false;
 			if (constr.op==GT && pubPkt->getIntAttributeVal(index)<=constr.intVal) return false;
-			if (constr.op==DF && pubPkt->getIntAttributeVal(index)==constr.intVal) return false;
+			if (constr.op==NE && pubPkt->getIntAttributeVal(index)==constr.intVal) return false;
 			if (constr.op==LE && pubPkt->getIntAttributeVal(index)>constr.intVal) return false;
 			if (constr.op==GE && pubPkt->getIntAttributeVal(index)<constr.intVal) return false;
 		} else if (constr.type==FLOAT) {
 			if (constr.op==EQ && pubPkt->getFloatAttributeVal(index)!=constr.floatVal) return false;
 			if (constr.op==LT && pubPkt->getFloatAttributeVal(index)>=constr.floatVal) return false;
 			if (constr.op==GT && pubPkt->getFloatAttributeVal(index)<=constr.floatVal) return false;
-			if (constr.op==DF && pubPkt->getFloatAttributeVal(index)==constr.floatVal) return false;
+			if (constr.op==NE && pubPkt->getFloatAttributeVal(index)==constr.floatVal) return false;
 			if (constr.op==LE && pubPkt->getFloatAttributeVal(index)>constr.floatVal) return false;
 			if (constr.op==GE && pubPkt->getFloatAttributeVal(index)<constr.floatVal) return false;
 		} else if (constr.type==BOOL) {
 			if (constr.op==EQ && pubPkt->getBoolAttributeVal(index)!=constr.boolVal) return false;
-			if (constr.op==DF && pubPkt->getBoolAttributeVal(index)==constr.boolVal) return false;
+			if (constr.op==NE && pubPkt->getBoolAttributeVal(index)==constr.boolVal) return false;
 		} else if (constr.type==STRING) {
 			char stringVal[STRING_VAL_LEN];
 			pubPkt->getStringAttributeVal(index, stringVal);
 			if (constr.op==EQ && strcmp(stringVal, constr.stringVal)!=0) return false;
+			if (constr.op==NE && strcmp(stringVal, constr.stringVal)==0) return false;
 			if (constr.op==IN) {
 				string s = stringVal;
 				if (s.find(constr.stringVal)==string::npos) return false;

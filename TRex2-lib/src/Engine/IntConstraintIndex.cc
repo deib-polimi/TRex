@@ -81,7 +81,7 @@ void IntConstraintIndex::processMessage(PubPkt *pkt, MatchingHandler &mh, map<Ta
 			processConstraint(itc, mh, predCount);
 		}
 		// Different from constraints (iterating in ascending order)
-		for (it=indexes[name].df.begin(); it!=indexes[name].df.end(); ++it) {
+		for (it=indexes[name].ne.begin(); it!=indexes[name].ne.end(); ++it) {
 			if (it->first == val) continue;
 			IntTableConstraint *itc = it->second;
 			processConstraint(itc, mh, predCount);
@@ -120,7 +120,7 @@ inline void IntConstraintIndex::installConstraint(IntTableConstraint *c) {
 	else if (c->op==GT) indexes[s].gt.insert(make_pair(c->val, c));
 	else if (c->op==LE) indexes[s].le.insert(make_pair(c->val, c));
 	else if (c->op==GE) indexes[s].ge.insert(make_pair(c->val, c));
-	else indexes[s].df.insert(make_pair(c->val, c));
+	else indexes[s].ne.insert(make_pair(c->val, c));
 }
 
 inline void IntConstraintIndex::processConstraint(IntTableConstraint *c, MatchingHandler &mh, map<TablePred *, int> &predCount) {

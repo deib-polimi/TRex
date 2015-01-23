@@ -87,7 +87,7 @@ public class SubPkt implements TRexPkt {
 						   	case EQ:
 						   		if (constr.getIntVal()!=at.getIntVal()) return 0;
 						   		
-						   	case DF:
+						   	case NE:
 						   		if (constr.getIntVal()==at.getIntVal()) return 0;
 						   		
 						   	case GT:
@@ -111,7 +111,7 @@ public class SubPkt implements TRexPkt {
 						   	case EQ:
 						   		if (constr.getFloatVal()!=at.getFloatVal()) return 0;
 						   		
-						   	case DF:
+						   	case NE:
 						   		if (constr.getFloatVal()==at.getFloatVal()) return 0;
 						   		
 						   	case GT:
@@ -136,7 +136,7 @@ public class SubPkt implements TRexPkt {
 						   	case EQ:
 						   		if (constr.getBoolVal()!=at.getBoolVal()) return 0;
 						   		
-						   	case DF:
+						   	case NE:
 						   		if (constr.getBoolVal()==at.getBoolVal()) return 0;
 						   		
 						   	default:
@@ -149,7 +149,7 @@ public class SubPkt implements TRexPkt {
 						   	case EQ:
 						   		if (!constr.getStringVal().equals(at.getStringVal())) return 0;
 						   		
-						   	case DF:
+						   	case NE:
 						   		if (constr.getStringVal().equals(at.getStringVal())) return 0;
 						   		
 						   	//Not defined for strings

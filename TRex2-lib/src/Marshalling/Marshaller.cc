@@ -600,7 +600,7 @@ int Marshaller::encode(Op source, char *dest, int startIndex) {
 	if (source==EQ) dest[startIndex++] = 0;
 	else if (source==LT) dest[startIndex++] = 1;
 	else if (source==GT) dest[startIndex++] = 2;
-	else if (source==DF) dest[startIndex++] = 3;
+	else if (source==NE) dest[startIndex++] = 3;
 	else if (source==IN) dest[startIndex++] = 4;
 	else if (source==LE) dest[startIndex++] = 5;
 	else if (source==GE) dest[startIndex++] = 6;

@@ -36,7 +36,7 @@ public class PubPkt implements TRexPkt {
 	
 	public PubPkt(int eventType) {
 		this.eventType = eventType;
-		this.timeStamp = System.currentTimeMillis();
+		this.timeStamp = 0;
 		attributes = new ArrayList<Attribute>();
 	}
 	

@@ -189,7 +189,7 @@ enum Op {
 	EQ=0,
 	LT=1,
 	GT=2,
-	DF=3,
+	NE=3,
 	IN=4,
 	LE=5,
 	GE=6

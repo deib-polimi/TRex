@@ -34,7 +34,7 @@ public class Consts {
 		EQ,
 		LT,
 		GT,
-		DF,
+		NE,
 		IN, 
 		LE,
 		GE

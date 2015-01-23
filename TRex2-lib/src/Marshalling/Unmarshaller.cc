@@ -146,13 +146,18 @@ RulePkt * Unmarshaller::decodeRulePkt(char *source, int &index) {
 
 PubPkt * Unmarshaller::decodePubPkt(char *source, int &index) {
 	int eventType = decodeInt(source, index);
+	TimeMs timeStamp = decodeLong(source, index);
 	int numAttributes = decodeInt(source, index);
 	Attribute attributes[numAttributes];
 	for (int i=0; i<numAttributes; i++) {
 		attributes[i] = decodeAttribute(source, index);
 	}
 	PubPkt *pkt = new PubPkt(eventType, attributes, numAttributes);
-	pkt->setCurrentTime();
+	//If timeStamp != 0 then it was specifically set by the client, and we keep it; otherwise we set it here on the server
+	if (timeStamp > 0)
+	  pkt->setTime(timeStamp);
+	else 
+	  pkt->setCurrentTime();
 	return pkt;
 }
 
@@ -409,7 +414,7 @@ Op Unmarshaller::decodeConstraintOp(char *source, int &index) {
 	if (source[index]==0) result = EQ;
 	else if (source[index]==1) result = LT;
 	else if (source[index]==2) result = GT;
-	else if (source[index]==3) result = DF;
+	else if (source[index]==3) result = NE;
 	else if (source[index]==4) result = IN;
 	else if (source[index]==5) result = LE;
 	else if (source[index]==6) result = GE;

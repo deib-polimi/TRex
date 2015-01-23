@@ -85,7 +85,7 @@ bool checkConstraints(PubPkt* event, RulePkt* rule, int state)
             if (o == EQ) {
                 if (event->getAttribute(idx).boolVal != tempbool) return false;
             }
-            if (o == DF) {
+            if (o == NE) {
                 if (event->getAttribute(idx).boolVal == tempbool) return false;
             }
             else {
@@ -99,7 +99,7 @@ bool checkConstraints(PubPkt* event, RulePkt* rule, int state)
             if (o == EQ) {
                 if (strcmp(event->getAttribute(idx).stringVal, tempString)!=0) return false;
             }
-            else if (o == DF) {
+            else if (o == NE) {
                 if (strcmp(event->getAttribute(idx).stringVal, tempString)==0) return false;
             }
             else {
@@ -169,7 +169,7 @@ bool checkAggregateConstraints(PubPkt* event, RulePkt* rule, int aggNum)
             if (o == EQ) {
                 if (event->getAttribute(idx).boolVal != tempbool) return false;
             }
-            if (o == DF) {
+            if (o == NE) {
                 if (event->getAttribute(idx).boolVal == tempbool) return false;
             }
             else {
@@ -183,7 +183,7 @@ bool checkAggregateConstraints(PubPkt* event, RulePkt* rule, int aggNum)
             if (o == EQ) {
                 if (strcmp(event->getAttribute(idx).stringVal, tempString)!=0) return false;
             }
-            else if (o == DF) {
+            else if (o == NE) {
                 if (strcmp(event->getAttribute(idx).stringVal, tempString)==0) return false;
             }
             else {
@@ -252,7 +252,7 @@ bool checkNegationConstraints(PubPkt* event, RulePkt* rule, int negNum)
             if (o == EQ) {
                 if (event->getAttribute(idx).boolVal != tempbool) return false;
             }
-            if (o == DF) {
+            if (o == NE) {
                 if (event->getAttribute(idx).boolVal == tempbool) return false;
             }
             else {
@@ -266,7 +266,7 @@ bool checkNegationConstraints(PubPkt* event, RulePkt* rule, int negNum)
             if (o == EQ) {
                 if (strcmp(event->getAttribute(idx).stringVal, tempString)!=0) return false;
             }
-            else if (o == DF) {
+            else if (o == NE) {
                 if (strcmp(event->getAttribute(idx).stringVal, tempString)==0) return false;
             }
             else {
@@ -624,7 +624,7 @@ bool checkComplexParameter(PubPkt* pkt, PartialEvent* partialEvent, CPUParameter
         if (operation==EQ) return left==right;
         if (operation==GT) return left>right;
         if (operation==LT) return left<right;
-        if (operation==DF) return left!=right;
+        if (operation==NE) return left!=right;
 	if (operation==LE) return left<=right;
 	if (operation==GE) return left>=right;
     }
@@ -634,7 +634,7 @@ bool checkComplexParameter(PubPkt* pkt, PartialEvent* partialEvent, CPUParameter
         if (operation==EQ) return left==right;
         if (operation==GT) return left>right;
         if (operation==LT) return left<right;
-        if (operation==DF) return left!=right;
+        if (operation==NE) return left!=right;
 	if (operation==LE) return left<=right;
 	if (operation==GE) return left>=right;
     }
@@ -642,14 +642,14 @@ bool checkComplexParameter(PubPkt* pkt, PartialEvent* partialEvent, CPUParameter
         bool leftValue = computeBoolValueForParameters(pkt, partialEvent, parameter->leftTree, index, sType);
         bool rightValue = computeBoolValueForParameters(pkt, partialEvent, parameter->rightTree, index, sType);
         if (operation==EQ) return leftValue && rightValue;
-        if (operation==DF) return leftValue || rightValue;
+        if (operation==NE) return leftValue || rightValue;
     }
     else if (type==STRING) {
         char strLeft[STRING_VAL_LEN], strRight[STRING_VAL_LEN];
         computeStringValueForParameters(pkt, partialEvent, parameter->leftTree, index, sType, strLeft);
         computeStringValueForParameters(pkt, partialEvent, parameter->rightTree, index, sType, strRight);
         if (operation==EQ) return (strcmp(strLeft, strRight)==0);
-        if (operation==DF) return (strcmp(strLeft, strRight)!=0);
+        if (operation==NE) return (strcmp(strLeft, strRight)!=0);
     }
     return false;
 }
