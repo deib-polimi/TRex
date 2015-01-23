@@ -136,7 +136,6 @@ public class Marshaller {
 	protected static int getNumBytes(PubPkt pkt) {
 		int size = 0;
 		size += getNumBytes(pkt.getEventType());
-		size += getNumBytes(pkt.getTimeStamp());
 		size += getNumBytes(pkt.getAttributes());
 		return size;
 	}
@@ -145,7 +144,6 @@ public class Marshaller {
 		startIndex = encode(PktType.PUB_PKT, dest, startIndex);
 		startIndex = encode(getNumBytes(source), dest, startIndex);
 		startIndex = encode(source.getEventType(), dest, startIndex);
-		startIndex = encode(source.getTimeStamp(), dest, startIndex);
 		startIndex = encode(source.getAttributes(), dest, startIndex);
 		return startIndex;
 	}

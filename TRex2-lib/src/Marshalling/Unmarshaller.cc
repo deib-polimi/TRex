@@ -146,14 +146,13 @@ RulePkt * Unmarshaller::decodeRulePkt(char *source, int &index) {
 
 PubPkt * Unmarshaller::decodePubPkt(char *source, int &index) {
 	int eventType = decodeInt(source, index);
-	TimeMs timeStamp = decodeLong(source, index);
 	int numAttributes = decodeInt(source, index);
 	Attribute attributes[numAttributes];
 	for (int i=0; i<numAttributes; i++) {
 		attributes[i] = decodeAttribute(source, index);
 	}
 	PubPkt *pkt = new PubPkt(eventType, attributes, numAttributes);
-	pkt->setTime(timeStamp);
+	pkt->setCurrentTime();
 	return pkt;
 }
 

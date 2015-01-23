@@ -23,8 +23,9 @@
 using namespace std;
 
 TimeMs::TimeMs() {
-	time_t currentTime = time(NULL);
-	timeVal = (uint64_t)currentTime*1000;
+	struct timeval tp;
+	gettimeofday(&tp, NULL);
+	timeVal = (uint64_t)tp.tv_sec * 1000 + tp.tv_usec / 1000;
 }
 
 TimeMs::TimeMs(const TimeMs &x) {
@@ -40,8 +41,9 @@ TimeMs::~TimeMs() {
 }
 
 bool TimeMs::elapsed() const {
-	time_t currentTime = time(NULL);
-	uint64_t currentTimeVal = (uint64_t) currentTime*1000;
+	struct timeval tp;
+	gettimeofday(&tp, NULL);
+	uint64_t currentTimeVal = (uint64_t)tp.tv_sec * 1000 + tp.tv_usec / 1000;
 	return timeVal < currentTimeVal;
 }
 

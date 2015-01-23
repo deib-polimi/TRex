@@ -21,11 +21,9 @@
 #ifndef TIMEMS_H_
 #define TIMEMS_H_
 
-#include <time.h>
+#include <sys/time.h>
 #include <stdint.h>
 #include <iostream>
-
-// TODO: current time granularity is second; class must be re-defined to handle finer-grained timings
 
 /**
  * This class represents time in millisecond and implements all methods to
