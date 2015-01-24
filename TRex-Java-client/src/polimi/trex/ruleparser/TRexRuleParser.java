@@ -128,10 +128,12 @@ public class TRexRuleParser extends TESLABaseListener {
 	private List<Integer> rule_consuming;
     
 	private ConstraintOp getConstrOp(String source) {
-		if (source.equals("=")) 		return ConstraintOp.EQ;
+		if (source.equals("=")) 	return ConstraintOp.EQ;
 		else if (source.equals(">"))	return ConstraintOp.GT;
 		else if (source.equals("<"))	return ConstraintOp.LT;
-		else if (source.equals("!=")) 	return ConstraintOp.DF;
+		else if (source.equals("<="))	return ConstraintOp.LE;
+		else if (source.equals(">="))	return ConstraintOp.GE;
+		else if (source.equals("!=")) 	return ConstraintOp.NE;
 		else return null;
 	}
 

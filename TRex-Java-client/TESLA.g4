@@ -18,7 +18,7 @@ CONSUMING  : 'Consuming';
 VALTYPE    : 'string' | 'int' | 'float' | 'bool' ;
 SEL_POLICY : 'each' | 'last' | 'first' ;
 AGGR_FUN   : 'AVG' | 'SUM' | 'MAX' | 'MIN' | 'COUNT' ;
-OPERATOR   : '=' | '>' | '<' | '!=' | '&' | '|' ;
+OPERATOR   : '=' | '>' | '<' | '>=' | '<=' | '!=' | '&' | '|' ;
 BINOP_MUL  : '*' | '/';
 BINOP_ADD  : '+' | '-' ;
 INT_VAL    : ('0' .. '9')+;

@@ -5,22 +5,25 @@
 
   <target name="compileLib" depends="init" description="compile TRex client library">
     <javac srcdir="src" destdir="bin"
-	   classpath="lib/antlr-runtime-4.2.2.jar"
+	   classpath="lib/antlr-runtime-4.5.jar"
 	   debug ="on" 
+	   includeantruntime="false"
 	   excludes="polimi/trex/examples/**" />
   </target>
 
   <target name="compileClient" depends="init,compileLib" description="compile TRex client application">
     <javac srcdir="src" destdir="bin" 
-           classpath="bin:lib/antlr-runtime-4.2.2.jar"
+           classpath="bin:lib/antlr-runtime-4.5.jar"
 	   debug ="on" 
+	   includeantruntime="false"
 	   includes="polimi/trex/examples/**" />
   </target>
 
   <target name="compile" depends="compileLib,compileClient" description="compile all classes">
     <javac srcdir="src" destdir="bin" 
-           classpath="lib/antlr-runtime-4.2.2.jar"
-	   debug ="on" />
+           classpath="lib/antlr-runtime-4.5.jar"
+	   debug ="on"
+	   includeantruntime="false" />
   </target>
 
   <target name="jarLib" depends="compileLib" description="prepare TRex-client-lib.jar">
@@ -36,14 +39,14 @@
          <manifest>
             <attribute name="Built-By" value="Gianpaolo Cugola"/>
             <attribute name="Main-Class" value="polimi/trex/examples/CommandLineClient"/>
-            <attribute name="Class-Path" value="TRex-client-lib.jar lib/antlr-runtime-4.2.2.jar"/>
+            <attribute name="Class-Path" value="TRex-client-lib.jar lib/antlr-runtime-4.5.jar"/>
          </manifest>
     </jar>
   </target>
 
   <target name="doc" description="create documentation">
     <javadoc sourcepath="src"
-	     classpath="lib/antlr-runtime-4.2.2.jar"
+	     classpath="lib/antlr-runtime-4.5.jar"
              packagenames="polimi.trex.*"
              excludepackagenames="polimi.trex.examples.*"
              defaultexcludes="yes"
