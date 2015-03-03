@@ -1,0 +1,20 @@
+<HTML>
+  <HEAD>
+    <META  http-equiv="Content-Type" content="text/html; 'charset=UTF-8" />
+  </HEAD>
+  <BODY>
+    <FORM action="/subscribe?clientID=$UUID" method="post">
+      <TEXTAREA name="subscription" rows="5" cols="60">
+{"evtType":222,"constraints":[["value",5,100],["room",4,"Office"]]}
+      </TEXTAREA>
+      <INPUT type="submit" value="Subscribe" />
+    </FORM>
+    <FORM action="/publish?clientID=$UUID" method="post">
+      <TEXTAREA name="event" rows="5" cols="60">
+{"evtType":222,"timeStamp":0,"attr":{"value":50,"room":"Paolo's Office","otherData":40.5}}
+      </TEXTAREA>
+      <INPUT type="submit" value="Publish" />
+    </FORM>
+    <a href="/getevent?clientID=$UUID">Get next event</a>
+  </BODY>
+</HTML>

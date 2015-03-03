@@ -1,0 +1,44 @@
+<HTML>
+  <HEAD>
+    <META  http-equiv="Content-Type" content="text/html; 'charset=UTF-8" />
+    <SCRIPT type="text/javascript" src="trex-client.js"></SCRIPT>
+    <SCRIPT type="text/javascript">
+      var myUUID = generateUUID();
+      
+      function mypub() {
+          var myAttr = new Object();
+          myAttr.room="Paolo's Office";
+          myAttr.value = 50;
+          myAttr.otherValue = 40.5;
+          var evt = new Evt(222, myAttr);
+          publish(myUUID, evt);
+      }
+      
+      function mysub() {
+          var sub = new Sub(222);
+          sub.addConstraint("value", Sub.op.LE, 100);
+          sub.addConstraint("room", Sub.op.IN, "Office");
+          subscribe(myUUID, sub);
+      }
+
+      function myget() {
+          var evt;
+          evt = getevent(myUUID);
+          if(typeof evt === 'undefined') alert("No events for me");
+          else alert("Got event: "+JSON.stringify(evt));
+          return evt;
+      }
+
+    </SCRIPT>
+  </HEAD>
+  <BODY>
+    <SCRIPT type="text/javascript">
+      document.write("My client ID is: "+myUUID);
+    </SCRIPT>
+    <P>
+      <INPUT type="button" value="Publish" onclick="mypub()" />
+      <INPUT type="button" value="Subscribe" onclick="mysub()" />
+      <INPUT type="button" value="Get next event" onclick="myget()" />
+    </P>
+  </BODY>
+</HTML>
