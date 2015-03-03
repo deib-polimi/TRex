@@ -73,7 +73,8 @@ void Connection::handleRead(const boost::system::error_code& error, std::size_t 
 		requestHandler.handleRequest<BUFFER_LENGTH>(buffer, bytes_transferred);
 		asyncReadSome();
 	} else {
-		LOG(warning) << "Connection error while receiving from " << printRemoteEndpoint();
+		if(error==boost::asio::error::eof) LOG(warning) << "Connection closed while receiving from " << printRemoteEndpoint();
+		else LOG(warning) << "Connection error '" << error.message() << (error==boost::asio::error::eof) << "' while receiving from " << printRemoteEndpoint();
 		closeSocket();
 		stopTimers= true;
 		if (usePing) {
@@ -90,7 +91,7 @@ void Connection::handleWrite(const boost::system::error_code& error, CharVectorP
 		}
 	}
 	else {
-		LOG(warning) << "Connection error while sending to " << printRemoteEndpoint();
+		LOG(warning) << "Connection error '" << error.message() << "' while sending from " << printRemoteEndpoint();
 		closeSocket();
 		stopTimers= true;
 		if (usePing) {
