@@ -111,7 +111,26 @@ Run with:
 Other options can be seen with:
 
     $ ant -p
-    
+
+TRex-HttpProxy
+================
+
+This project contains a very simple proxy written in node.js, which converts REST calls into calls to the T-Rex server.
+
+The proxy can be launched through the command:
+
+    $ nodejs trex-proxy.js
+
+waits connections on port 8888, and connects to the T-Rex server running on localhost:50254 (the default). Change file "handlers.js" to connect to a different server.
+
+The proxy exports three main REST services: one to publish events, one to subscribe to events, and one to get received events (which it stores, on behalf of clients). The first two are POST requests, the latter is a GET request.
+
+Clients are identified through the UUID they pass into the request (we know this is not secure, but it allows to easily debug and test the system).
+
+Files "test.html" (served through the URL: http://proxy.machine:8888/test) and testjs.html (served through the URL: http://proxy.machine:8888/testjs.html) provide two examples of usage (from pure HTML and Javascript, respectively).
+
+
+
 Contacts
 ========
 
