@@ -22,6 +22,7 @@ package polimi.trex.examples;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -192,7 +193,8 @@ public class CommandLineClient implements PacketListener {
 	    case STRING: System.out.print(" : string = "+att.getStringVal()+">"); break;
 	    }
 	}
-	System.out.println("}");
+	System.out.print("}@");
+	System.out.println(new Date(pub.getTimeStamp()).toLocaleString());
     }
     @Override
     public void notifyConnectionError() {
