@@ -1,0 +1,9 @@
+{
+    "name": "trex-proxy",
+    "description": "A REST proxy to the T-Rex CEP infrastructure",
+    "version": "0.1",
+    "dependencies": {
+	"express": "4.x"
+	"body-parser": "1.8.x"
+    }
+}

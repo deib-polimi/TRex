@@ -3,7 +3,7 @@
     <META  http-equiv="Content-Type" content="text/html; 'charset=UTF-8" />
     <SCRIPT type="text/javascript" src="trex-client.js"></SCRIPT>
     <SCRIPT type="text/javascript">
-      var myUUID = generateUUID();
+      var myUUID;
       
       function mypub() {
           var myAttr = new Object();
@@ -25,7 +25,7 @@
           var evt;
           evt = getevent(myUUID);
           if(typeof evt === 'undefined') alert("No events for me");
-          else alert("Got event: "+JSON.stringify(evt));
+          else alert("Got event: "+JSON.stringify(evt)+"\nat "+new Date(evt.timeStamp));
           return evt;
       }
 
@@ -33,6 +33,7 @@
   </HEAD>
   <BODY>
     <SCRIPT type="text/javascript">
+      myUUID = connect();
       document.write("My client ID is: "+myUUID);
     </SCRIPT>
     <P>

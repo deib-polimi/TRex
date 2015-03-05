@@ -2,18 +2,14 @@ var net = require('net');
 var events = require('events');
 
 //////////////////////////////////////////////////////////////////
-////// Auxiliary functions and constants
+//// Use the following environment variables to change defaults:
+//// TREX_PORT             (default: 50254)
+//// TREX_HOST             (default: 'localhost')
 //////////////////////////////////////////////////////////////////
 
-function generateUUID() {
-    var d = Date.now();
-    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = (d + Math.random()*16)%16 | 0;
-        d = Math.floor(d/16);
-        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
-    });
-    return uuid;
-};
+//////////////////////////////////////////////////////////////////
+////// Auxiliary functions and constants
+//////////////////////////////////////////////////////////////////
 
 var pktType = {
     PUB: 0,
@@ -215,15 +211,15 @@ function decodeEvt(buf, pos) {
 //////////////////////////////////////////////////////////////////
 
 function Connection(port, host, connListener) {
-    if (typeof port === 'undefined') this.port = 50254;
+    if (typeof port === 'undefined') this.port = process.env.TREX_PORT || 50254;
     else this.port = port;
-    if (typeof host === 'undefined') this.host = '127.0.0.1';
+    if (typeof host === 'undefined') this.host = process.env.TREX_HOST || '127.0.0.1';
     else this.host = host;
-    if (typeof connListener === 'undefined') this._sock = net.connect(this.port, this.host);
-    else this._sock = net.connect(this.port, this.host, connListener);
     var _events = new events.EventEmitter();
     this._events = _events;
-    this._sock.addListener('data', function(data) {
+    if (typeof connListener === 'undefined') this._sock = net.connect(this.port, this.host);
+    else this._sock = net.connect(this.port, this.host, connListener);
+    this._sock.on('data', function(data) {
 	_events.emit('event', parseEvtPkt(data));
     });
 }
@@ -279,7 +275,6 @@ function connect(port, host, connListener) {
     return new Connection(port, host, connListener);
 }
 
-exports.generateUUID = generateUUID;
 exports.Sub = Sub;
 exports.Evt = Evt;
 exports.Connection = Connection;

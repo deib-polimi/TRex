@@ -1,18 +1,4 @@
 //////////////////////////////////////////////////////////////////
-////// Auxiliary functions and constants
-//////////////////////////////////////////////////////////////////
-
-function generateUUID() {
-    var d = Date.now();
-    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = (d + Math.random()*16)%16 | 0;
-        d = Math.floor(d/16);
-        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
-    });
-    return uuid;
-};
-
-//////////////////////////////////////////////////////////////////
 //// Class Evt
 //////////////////////////////////////////////////////////////////
 
@@ -51,49 +37,64 @@ Sub.op = {
 //// Main functions
 //////////////////////////////////////////////////////////////////
 
-function publish(clientID, evt) {
+function getRequest() {
     var req;
     if(window.XMLHttpRequest) { // Chrome, FireFox, Safari, etc.
 	req = new XMLHttpRequest();
     } else if(window.ActiveXObject) { // MSIE
 	req = new ActiveXObject("Microsoft.XMLHTTP");
-    } else return;
-    req.open("PUT", "publish?clientID="+clientID, false);
-    req.setRequestHeader("Content-Type", "text/plain");
-    req.send("event="+JSON.stringify(evt));
-    if(req.status != 200) alert("The request did not succeed!\n\nThe response status was: " +
-				req.status + " " + req.statusText + ".");
+    }
+    return req;
 }
 
-function subscribe(clientID, sub) {
-    var req;
-    if(window.XMLHttpRequest) { // Chrome, FireFox, Safari, etc.
-	req = new XMLHttpRequest();
-    } else if(window.ActiveXObject) { // MSIE
-	req = new ActiveXObject("Microsoft.XMLHTTP");
-    } else return;
-    req.open("PUT", "subscribe?clientID="+clientID, false);
-    req.setRequestHeader("Content-Type", "text/plain");
-    req.send("subscription="+JSON.stringify(sub));
-    if(req.status != 200) alert("The request did not succeed!\n\nThe response status was: " +
-				req.status + " " + req.statusText + ".");
+function connect() {
+    var req = getRequest();
+    var connID;
+    req.open("GET", "/connections", false);
+    req.send();
+    if(req.status == 200 && req.responseText.length>0) {
+	connID = JSON.parse(req.responseText);
+    } else {
+	alert("The request did not succeed!\n\nThe response status was: " +
+	      req.status + " " + req.statusText + ".");
+    }
+    return connID;
+}    
+
+function subscribe(connID, sub) {
+    var req = getRequest();
+    req.open("POST", "/subscriptions/"+connID, false);
+    req.setRequestHeader("Content-Type", "application/json");
+    req.send(JSON.stringify(sub));
+    if(req.status != 200) {
+	alert("The request did not succeed!\n\nThe response status was: " + req.status + " " + req.statusText + ".");
+    }
+    return JSON.parse(req.responseText);    
 }
 
-function getevent(clientID) {
-    var req;
+function getevent(connID) {
+    var req = getRequest();
     var evt;
-    if(window.XMLHttpRequest) { // Chrome, FireFox, Safari, etc.
-	req = new XMLHttpRequest();
-    } else if(window.ActiveXObject) { // MSIE
-	req = new ActiveXObject("Microsoft.XMLHTTP");
-    } else return;
-    req.open("GET", "getevent?clientID="+clientID, false);
-    req.setRequestHeader("Content-Type", "text/plain");
-    req.send("subscription="+JSON.stringify(evt));
-    if(req.status == 200) {
-	if(req.responseText.length>0) evt = JSON.parse(req.responseText);
-    } else alert("The request did not succeed!\n\nThe response status was: " +
-		 req.status + " " + req.statusText + ".");
+    req.open("GET", "/events/"+connID, false);
+    req.send();
+    if(req.status == 200 && req.responseText.length>0) {
+	evt = JSON.parse(req.responseText);
+    } else if(req.status == 204) {
+	return ;
+    } else {
+	alert("The request did not succeed!\n\nThe response status was: " +
+	      req.status + " " + req.statusText + ".");
+    }
     return evt;
 }
 
+function publish(connID, evt) {
+    var req = getRequest();
+    req.open("POST", "/events/"+connID, false);
+    req.setRequestHeader("Content-Type", "application/json");
+    req.send(JSON.stringify(evt));
+    if(req.status != 200) {
+	alert("The request did not succeed!\n\nThe response status was: " + req.status + " " + req.statusText + ".");
+    }
+    return JSON.parse(req.responseText);
+}
