@@ -121,9 +121,9 @@ The proxy can be launched through the command:
 
     $ nodejs trex-proxy.js
 
-waits connections on port 8888, and connects to the T-Rex server running on localhost:50254 (the default). Change file "handlers.js" to connect to a different server.
+waits connections on port 8888, and connects to the T-Rex server running on localhost:50254 (the default). Use the following environment variables to change these defaults: TREX_HOST, TREX_PORT
 
-The proxy exports four main REST services: one to connect, one to publish events, one to subscribe to events, and one to get received events (which it stores, on behalf of clients). The first two are POST requests, the latter is a GET request.
+The proxy exports five main REST services: one to connect, one to publish events, one to subscribe to events, one to unsubscribe, and one to get received events (which it stores, on behalf of clients). The first is a GET request, those to publish and subscribe are POST requests, the one to unsubscribe is a DELETE request, the latter is a GET request.
 
 Clients are identified through an UUID they receive at connection time.
 

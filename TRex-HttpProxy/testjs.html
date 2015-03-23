@@ -21,6 +21,13 @@
           subscribe(myUUID, sub);
       }
 
+      function myunsub() {
+          var sub = new Sub(222);
+          sub.addConstraint("value", Sub.op.LE, 100);
+          sub.addConstraint("room", Sub.op.IN, "Office");
+          unsubscribe(myUUID, sub);
+      }
+
       function myget() {
           var evt;
           evt = getevent(myUUID);
@@ -39,6 +46,7 @@
     <P>
       <INPUT type="button" value="Publish" onclick="mypub()" />
       <INPUT type="button" value="Subscribe" onclick="mysub()" />
+      <INPUT type="button" value="Unsubscribe" onclick="myunsub()" />
       <INPUT type="button" value="Get next event" onclick="myget()" />
     </P>
   </BODY>

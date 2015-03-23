@@ -113,6 +113,19 @@ app.post('/subscriptions/:connID', function(req, res) {
     res.json(true);
 });
 
+app.delete('/subscriptions/:connID', function(req, res) {
+    console.log("DELETE /subscriptions");
+    console.log('\tclient '+req.params.connID+' sent "'+JSON.stringify(req.body)+'" data');
+    var conn = getConnection(req.params.connID);
+    if(typeof conn === 'undefined') {
+	res.status(404);
+	return res.send('Error 404: No connection ID found');
+    }
+    conn.unsubscribe(req.body);
+    res.status(200);
+    res.json(true);
+});
+
 app.get('/events/:connID', function(req, res) {
     console.log("GET /events");
     console.log('\tclient '+req.params.connID+' sent "'+JSON.stringify(req.body)+'" data');

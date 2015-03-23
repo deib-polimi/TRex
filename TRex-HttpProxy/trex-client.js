@@ -72,6 +72,17 @@ function subscribe(connID, sub) {
     return JSON.parse(req.responseText);    
 }
 
+function unsubscribe(connID, sub) {
+    var req = getRequest();
+    req.open("DELETE", "/subscriptions/"+connID, false);
+    req.setRequestHeader("Content-Type", "application/json");
+    req.send(JSON.stringify(sub));
+    if(req.status != 200) {
+	alert("The request did not succeed!\n\nThe response status was: " + req.status + " " + req.statusText + ".");
+    }
+    return JSON.parse(req.responseText);    
+}
+
 function getevent(connID) {
     var req = getRequest();
     var evt;
