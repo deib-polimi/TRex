@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var trex = require('./trex.js');
 
+var cors = require('cors');
 
 //////////////////////////////////////////////////////////////////
 //// Use the following environment variables to change defaults:
@@ -88,6 +89,8 @@ function cleanUp() {
 setInterval(cleanUp, 5000);
 
 var app = express();
+
+app.use(cors());
 
 console.log('Serving static content from '+__dirname);
 app.use(express.static(__dirname));
