@@ -26,8 +26,8 @@ import java.util.Date;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.File;
+import java.io.FileInputStream;
 
 import polimi.trex.common.Attribute;
 import polimi.trex.common.Consts.EngineType;
@@ -49,8 +49,12 @@ public class CommandLineClient implements PacketListener {
 	static String readFile(String path, Charset encoding) 
 			  throws IOException 
 			{
-			  byte[] encoded = Files.readAllBytes(Paths.get(path));
-			  return encoding.decode(ByteBuffer.wrap(encoded)).toString();
+			    File file = new File(path);
+			    FileInputStream fis = new FileInputStream(file);
+			    byte[] encoded = new byte[(int) file.length()];
+			    fis.read(encoded);
+			    fis.close();
+			    return encoding.decode(ByteBuffer.wrap(encoded)).toString();
 			}
 	
 	private TransportManager tManager = new TransportManager(true);
