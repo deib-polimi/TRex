@@ -21,9 +21,9 @@ AC_ARG_WITH(
     ]
 )
 CFLAGS="$CFLAGS -I${TRex2}/src -I/usr/include/TRex2 -I/usr/local/include/TRex2"
-CXXFLAGS="$CXXFLAGS -I${TRex2}/src -I/usr/include/TRex2 -I/usr/local/include/TRex2"
-CPPFLAGS="$CXXFLAGS -I${TRex2}/src -I/usr/include/TRex2 -I/usr/local/include/TRex2"
-LDFLAGS="$LDFLAGS -L/usr/lib -L/usr/local/lib -L${TRex2}/src/.libs"
+CXXFLAGS="$CXXFLAGS -I${TRex2}/src -I${TRex2}/include/TRex2 -I/usr/include/TRex2 -I/usr/local/include/TRex2"
+CPPFLAGS="$CXXFLAGS -I${TRex2}/src -I${TRex2}/include/TRex2 -I/usr/include/TRex2 -I/usr/local/include/TRex2"
+LDFLAGS="$LDFLAGS -L/usr/lib -L/usr/local/lib -L${TRex2}/src/.libs -L${TRex2}/lib"
 AC_SUBST(TRexServer_CPPFLAGS)
 AC_CHECK_HEADERS([Engine/TRexEngine.h], [], AC_MSG_ERROR([TRex headers not found (use --with-TRex2 option)]))
 AC_CHECK_LIB([TRex2], [libTRex2_is_present], [], AC_MSG_ERROR([TRex library not found]))
