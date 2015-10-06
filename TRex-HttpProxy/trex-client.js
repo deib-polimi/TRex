@@ -50,7 +50,7 @@ function getRequest() {
 function connect() {
     var req = getRequest();
     var connID;
-    req.open("GET", "/connections", false);
+    req.open("GET", "./connections", false);
     req.send();
     if(req.status == 200 && req.responseText.length>0) {
 	connID = JSON.parse(req.responseText);
@@ -63,7 +63,7 @@ function connect() {
 
 function subscribe(connID, sub) {
     var req = getRequest();
-    req.open("POST", "/subscriptions/"+connID, false);
+    req.open("POST", "./subscriptions/"+connID, false);
     req.setRequestHeader("Content-Type", "application/json");
     req.send(JSON.stringify(sub));
     if(req.status != 200) {
@@ -74,7 +74,7 @@ function subscribe(connID, sub) {
 
 function unsubscribe(connID, sub) {
     var req = getRequest();
-    req.open("DELETE", "/subscriptions/"+connID, false);
+    req.open("DELETE", "./subscriptions/"+connID, false);
     req.setRequestHeader("Content-Type", "application/json");
     req.send(JSON.stringify(sub));
     if(req.status != 200) {
@@ -86,7 +86,7 @@ function unsubscribe(connID, sub) {
 function getevent(connID) {
     var req = getRequest();
     var evt;
-    req.open("GET", "/events/"+connID, false);
+    req.open("GET", "./events/"+connID, false);
     req.send();
     if(req.status == 200 && req.responseText.length>0) {
 	evt = JSON.parse(req.responseText);
@@ -101,7 +101,7 @@ function getevent(connID) {
 
 function publish(connID, evt) {
     var req = getRequest();
-    req.open("POST", "/events/"+connID, false);
+    req.open("POST", "./events/"+connID, false);
     req.setRequestHeader("Content-Type", "application/json");
     req.send(JSON.stringify(evt));
     if(req.status != 200) {
