@@ -109,3 +109,17 @@ function publish(connID, evt) {
     }
     return JSON.parse(req.responseText);
 }
+
+////////
+// Special publish call for anonymous publishers
+////////
+function publish(evt) {
+    var req = getRequest();
+    req.open("POST", "./events", false);
+    req.setRequestHeader("Content-Type", "application/json");
+    req.send(JSON.stringify(evt));
+    if(req.status != 200) {
+	alert("The request did not succeed!\n\nThe response status was: " + req.status + " " + req.statusText + ".");
+    }
+    return JSON.parse(req.responseText);
+}

@@ -18,6 +18,7 @@ var leaseTime = process.env.TREX_PROXY_CONN_LEASE || 600; // timeout before remo
 var connections = [];
 var connectionsTS = [];
 var events = [];
+var defaultConnection;
 
 function generateUUID() {
     var d = Date.now();
@@ -73,6 +74,44 @@ function getConnection(connID) {
     } else {
 	connectionsTS[connID] = Date.now();
 	return connections[connID];
+    }
+}
+
+function getDefaultConnection() {
+    if(typeof defaultConnection === 'undefined') {
+	var conn;
+	try {
+	    conn = trex.connect(process.env.TREX_PORT || 50254, process.env.TREX_HOST || 'localhost', function() { //'connect' listener
+		console.log('Default client connected');
+	    });
+	} catch(err) {
+	    console.log('Error connecting to the TRex server :'+err);
+	    return;
+	}
+	conn.on('event', function(evt) {
+	    var stringifiedEvt = JSON.stringify(evt);
+	    console.log('Event for default client (dropping it): '+stringifiedEvt);
+	});
+
+	conn.on('error', function(err) {
+	    console.log(err+' on default connection.');
+	    defaultConnection=undefined;
+	});
+
+	conn.on('end', function() {
+	    console.log('Connection for default client ended.');
+	    defaultConnection=undefined;
+	});
+
+	conn.on('close', function() {
+	    console.log('Connection for default client closed.');
+	    defaultConnection=undefined;
+	});
+
+	defaultConnection = conn;
+	return defaultConnection;
+    } else {
+	return defaultConnection;
     }
 }
 
@@ -156,6 +195,22 @@ app.post('/events/:connID', function(req, res) {
     if(typeof conn === 'undefined') {
 	res.status(404);
 	return res.send('Error 404: No connection ID found');
+    }
+    conn.publish(req.body);
+    res.status(200);
+    res.json(true);
+});
+
+////////
+// Special publish service for anonymous publishers
+////////
+app.post('/events', function(req, res) {
+    console.log("POST /events");
+    console.log('\tanonymous client sent "'+JSON.stringify(req.body)+'" data');
+    var conn = getDefaultConnection();
+    if(typeof conn === 'undefined') {
+	res.status(404);
+	return res.send('Error 404: No default connection found');
     }
     conn.publish(req.body);
     res.status(200);

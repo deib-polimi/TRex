@@ -14,6 +14,15 @@
           publish(myUUID, evt);
       }
       
+      function myanonpub() {
+          var myAttr = new Object();
+          myAttr.room="Anon's Office";
+          myAttr.value = 50;
+          myAttr.otherValue = 40.5;
+          var evt = new Evt(222, myAttr);
+          publish(evt);
+      }
+
       function mysub() {
           var sub = new Sub(222);
           sub.addConstraint("value", Sub.op.LE, 100);
@@ -44,6 +53,7 @@
       document.write("My client ID is: "+myUUID);
     </SCRIPT>
     <P>
+      <INPUT type="button" value="Anonymous publish" onclick="myanonpub()" />
       <INPUT type="button" value="Publish" onclick="mypub()" />
       <INPUT type="button" value="Subscribe" onclick="mysub()" />
       <INPUT type="button" value="Unsubscribe" onclick="myunsub()" />
