@@ -176,7 +176,7 @@ std::string util::toString(PubPkt* pkt){
 		if (i<attrNum-1) ss << ", ";
 		else ss << "}";
 	}
-	ss << "{";
+	ss << "}";
 	return ss.str();
 }
 
