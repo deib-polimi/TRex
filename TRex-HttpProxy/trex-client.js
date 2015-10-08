@@ -113,7 +113,7 @@ function publish(connID, evt) {
 ////////
 // Special publish call for anonymous publishers
 ////////
-function publish(evt) {
+function anonpublish(evt) {
     var req = getRequest();
     req.open("POST", "./events", false);
     req.setRequestHeader("Content-Type", "application/json");
