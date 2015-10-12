@@ -72,7 +72,7 @@ function getConnection(connID) {
 	events[connID] = [];
 	return connID;
     } else {
-	connectionsTS[connID] = Date.now();
+	if(typeof connections[connID] !== 'undefined') connectionsTS[connID] = Date.now();
 	return connections[connID];
     }
 }
