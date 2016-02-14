@@ -1,0 +1,36 @@
+# Autotools
+/.autotools
+/.cproject
+/.project
+
+/ar-lib
+/aclocal.m4
+/autom4te.cache/
+/compile
+/config.*
+/configure
+/depcomp
+/install-sh
+/libtool
+/ltmain.sh
+/m4/
+/missing
+/stamp-h?
+
+Makefile
+Makefile.in
+
+.deps/
+.dirstamp
+.libs/
+
+*.l[ao]
+*.o
+
+# IDE
+/.settings
+/.idea
+
+# General
+*~
+*.log

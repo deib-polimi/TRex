@@ -1,0 +1,11 @@
+# Build
+/bin
+
+# IDE
+/.settings
+/.idea
+
+# General
+*~
+*.class
+*.jar
