@@ -28,24 +28,34 @@
  * Represents an integer constraint stored in the index table
  */
 typedef struct IntTableConstraintStruct {
-	char name[NAME_LEN];													// Attribute name
-	Op op;																				// Operator
-	int val;																			// Attribute value
-	std::set<TablePred *> connectedPredicates;		// Set of predicates using the constraint
+  // Attribute name
+  char name[NAME_LEN];
+  // Operator
+  Op op;
+  // Attribute value
+  int val;
+  // Set of predicates using the constraint
+  std::set<TablePred*> connectedPredicates;
 } IntTableConstraint;
 
 /**
  * Contains a Value -> Constraint index for each defined operator
  */
 typedef struct IntOperatorsTable {
-	std::map<int, IntTableConstraint *> eq;	// Value -> equality constraint
-	std::map<int, IntTableConstraint *> lt;	// Value -> less than constraint
-	std::map<int, IntTableConstraint *> gt;	// Value -> greater then constraint
-	std::map<int, IntTableConstraint *> ne;	// Value -> different from constraint
-	std::map<int, IntTableConstraint *> le;	// Value -> less than or equal to constraint
-	std::map<int, IntTableConstraint *> ge;	// Value -> greater than or equal to constraint
-	// Overriding
-	bool operator<(const IntOperatorsTable &table) const { return eq<table.eq; }
+  // Value -> equality constraint
+  std::map<int, IntTableConstraint*> eq;
+  // Value -> less than constraint
+  std::map<int, IntTableConstraint*> lt;
+  // Value -> greater then constraint
+  std::map<int, IntTableConstraint*> gt;
+  // Value -> different from constraint
+  std::map<int, IntTableConstraint*> ne;
+  // Value -> less than or equal to constraint
+  std::map<int, IntTableConstraint*> le;
+  // Value -> greater than or equal to constraint
+  std::map<int, IntTableConstraint*> ge;
+  // Overriding
+  bool operator<(const IntOperatorsTable& table) const { return eq < table.eq; }
 } IntOps;
 
 /**
@@ -53,54 +63,57 @@ typedef struct IntOperatorsTable {
  */
 class IntConstraintIndex : AbstractConstraintIndex {
 public:
+  IntConstraintIndex();
 
-	IntConstraintIndex();
+  /**
+   * Frees dynamic memory
+   */
+  virtual ~IntConstraintIndex();
 
-	/**
-	 * Frees dynamic memory
-	 */
-	virtual ~IntConstraintIndex();
+  /**
+   * Creates or gets the IntTableConstraint C representing the constraint
+   * given as parameter. Then it installs the predicate in C.
+   */
+  void installConstraint(Constraint& constraints, TablePred* predicate);
 
-	/**
-	 * Creates or gets the IntTableConstraint C representing the constraint
-	 * given as parameter. Then it installs the predicate in C.
-	 */
-	void installConstraint(Constraint &constraints, TablePred *predicate);
-
-	/**
-	 * Processes the given message, using the partial results stored in predCount.
-	 * It updates predCount and fills mh with the matching states.
-	 */
-	void processMessage(PubPkt *pkt, MatchingHandler &mh, std::map<TablePred *, int> &predCount);
+  /**
+   * Processes the given message, using the partial results stored in predCount.
+   * It updates predCount and fills mh with the matching states.
+   */
+  void processMessage(PubPkt* pkt, MatchingHandler& mh,
+                      std::map<TablePred*, int>& predCount);
 
 private:
+  // Name -> indexes for that name
+  std::map<std::string, IntOps> indexes;
+  // Set of all constraints used in the table
+  std::set<IntTableConstraint*> usedConstraints;
 
-	std::map<std::string, IntOps> indexes;					// Name -> indexes for that name
-	std::set<IntTableConstraint *> usedConstraints;	// Set of all constraints used in the table
+  /**
+   * Checks if there already exists an IntTableConstraints which is
+   * compatible with the constraint c.
+   * If it finds a valid IntTableConstraints, return a pointer to it,
+   * otherwise returns null.
+   */
+  IntTableConstraint* getConstraint(Constraint& c);
 
-	/**
-	 * Checks if there already exists an IntTableConstraints which is
-	 * compatible with the constraint c.
-	 * If it finds a valid IntTableConstraints, return a pointer to it,
-	 * otherwise returns null.
-	 */
-	IntTableConstraint * getConstraint(Constraint &c);
+  /**
+   * Creates a new IntTableConstraint using the information stored in the
+   * parameter constraint
+   */
+  IntTableConstraint* createConstraint(Constraint& c);
 
-	/**
-	 * Creates a new IntTableConstraint using the information stored in the parameter constraint
-	 */
-	IntTableConstraint * createConstraint(Constraint &c);
+  /**
+   * Installs the given constraint to the appropriate table
+   */
+  inline void installConstraint(IntTableConstraint* c);
 
-	/**
-	 * Installs the given constraint to the appropriate table
-	 */
-	inline void installConstraint(IntTableConstraint *c);
-
-	/**
-	 * Processes the given constraint by updating the predCount and, if needed, the mh structures
-	 */
-	inline void processConstraint(IntTableConstraint *c, MatchingHandler &mh, std::map<TablePred *, int> &predCount);
-
+  /**
+   * Processes the given constraint by updating the predCount
+   * and, if needed, the mh structures
+   */
+  inline void processConstraint(IntTableConstraint* c, MatchingHandler& mh,
+                                std::map<TablePred*, int>& predCount);
 };
 
 #endif

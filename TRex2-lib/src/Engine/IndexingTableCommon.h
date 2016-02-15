@@ -29,10 +29,14 @@
  * Represents a predicate stored in the index table
  */
 typedef struct TablePredicateStruct {
-	int ruleId; 					// Id of the sequence in the automaton
-	int stateId;					// Index of the state in the sequence
-	int constraintsNum;		// Number of constraints in the predicate
-	StateType stateType;	// State, negation, or aggregate
+  // Id of the sequence in the automaton
+  int ruleId;
+  // Index of the state in the sequence
+  int stateId;
+  // Number of constraints in the predicate
+  int constraintsNum;
+  // State, negation, or aggregate
+  StateType stateType;
 } TablePred;
 
 /**
@@ -40,9 +44,9 @@ typedef struct TablePredicateStruct {
  * It is filled with the set of matching states, aggregates, and negations.
  */
 typedef struct MatchingHandlerStruct {
-	std::map<int, std::set<int> > matchingStates;
-	std::map<int, std::set<int> > matchingAggregates;
-	std::map<int, std::set<int> > matchingNegations;
+  std::map<int, std::set<int>> matchingStates;
+  std::map<int, std::set<int>> matchingAggregates;
+  std::map<int, std::set<int>> matchingNegations;
 } MatchingHandler;
 
 #endif

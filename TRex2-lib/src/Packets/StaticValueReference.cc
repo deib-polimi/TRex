@@ -21,71 +21,55 @@
 #include "StaticValueReference.h"
 
 StaticValueReference::StaticValueReference(int pValue) {
-      type = INT;
-      value.intVal = pValue;
-      vrtype = STATIC;
+  type = INT;
+  value.intVal = pValue;
+  vrtype = STATIC;
 }
 
 StaticValueReference::StaticValueReference(float pValue) {
-      type = FLOAT;
-      value.floatVal = pValue;
-      vrtype = STATIC;
+  type = FLOAT;
+  value.floatVal = pValue;
+  vrtype = STATIC;
 }
 
 StaticValueReference::StaticValueReference(bool pValue) {
-      type = BOOL;
-      value.boolVal = pValue;
-      vrtype = STATIC;
+  type = BOOL;
+  value.boolVal = pValue;
+  vrtype = STATIC;
 }
 
-StaticValueReference::StaticValueReference(char *pValue) {
-      type = STRING;
-      strcpy(value.stringVal, pValue);
-      vrtype = STATIC;
+StaticValueReference::StaticValueReference(char* pValue) {
+  type = STRING;
+  strcpy(value.stringVal, pValue);
+  vrtype = STATIC;
 }
 
-StaticValueReference::~StaticValueReference() {
-	
+StaticValueReference::~StaticValueReference() {}
+
+ValType StaticValueReference::getType() { return type; }
+
+int StaticValueReference::getIntValue() { return value.intVal; }
+
+bool StaticValueReference::getBoolValue() { return value.boolVal; }
+
+float StaticValueReference::getFloatValue() { return value.floatVal; }
+
+void StaticValueReference::getStringValue(char* pValue) {
+  strcpy(pValue, value.stringVal);
 }
 
-ValType StaticValueReference::getType()
-{
-      return type;
-}
+OpValueReference* StaticValueReference::dup() {
+  switch (type) {
+    case INT:
+      return new StaticValueReference(value.intVal);
 
-int StaticValueReference::getIntValue()
-{
-      return value.intVal;
-}
+    case FLOAT:
+      return new StaticValueReference(value.floatVal);
 
-bool StaticValueReference::getBoolValue()
-{
-      return value.boolVal;
-}
+    case BOOL:
+      return new StaticValueReference(value.boolVal);
 
-float StaticValueReference::getFloatValue()
-{
-      return value.floatVal;
-}
-
-void StaticValueReference::getStringValue(char* pValue)
-{
-      strcpy(pValue, value.stringVal);
-}
-
-
-OpValueReference * StaticValueReference::dup() {
-      switch (type) {
-	case INT:
-	  return new StaticValueReference(value.intVal);
-	  
-	case FLOAT:
-	  return new StaticValueReference(value.floatVal);
-	  
-	case BOOL:
-	  return new StaticValueReference(value.boolVal);
-	  
-	case STRING:
-	  return new StaticValueReference(value.stringVal);
-      }
+    case STRING:
+      return new StaticValueReference(value.stringVal);
+  }
 }

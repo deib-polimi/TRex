@@ -21,18 +21,14 @@
 #include "JoinPkt.h"
 
 JoinPkt::JoinPkt(int parAddress, int parPort) {
-	address = parAddress;
-	port = parPort;
+  address = parAddress;
+  port = parPort;
 }
 
 JoinPkt::~JoinPkt() {
-	// Nothing to do
+  // Nothing to do
 }
 
-long JoinPkt::getAddress() {
-	return address;
-}
+long JoinPkt::getAddress() { return address; }
 
-int JoinPkt::getPort() {
-	return port;
-}
+int JoinPkt::getPort() { return port; }

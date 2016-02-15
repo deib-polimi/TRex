@@ -30,48 +30,51 @@
  */
 class SubPkt {
 public:
+  /**
+   * Constructor.
+   * Parameters:
+   * parEventType: eventType.
+   * Builds a new subscription packet without constraints.
+   */
+  SubPkt(int parEventType);
 
-	/**
-	 * Constructor.
-	 * Parameters:
-	 * parEventType: eventType.
-	 * Builds a new subscription packet without constraints.
-	 */
-	SubPkt(int parEventType);
+  /**
+   * Constructor.
+   * Parameters:
+   * parEventType: event type
+   * parConstraints: array of constraints
+   * parConstraintsNum: size of the parConstraints array
+   */
+  SubPkt(int parEventType, Constraint* parConstraints, int parConstraintsNum);
 
-	/**
-	 * Constructor.
-	 * Parameters:
-	 * parEventType: event type
-	 * parConstraints: array of constraints
-	 * parConstraintsNum: size of the parConstraints array
-	 */
-	SubPkt(int parEventType, Constraint *parConstraints, int parConstraintsNum);
+  /**
+   * Copy constructor
+   */
+  SubPkt(const SubPkt& pkt);
 
-	/**
-	 * Copy constructor
-	 */
-	SubPkt(const SubPkt &pkt);
+  /**
+   * Destructor
+   */
+  virtual ~SubPkt();
 
-	/**
-	 * Destructor
-	 */
-	virtual ~SubPkt();
+  /**
+   * Getter methods
+   */
+  int getEventType() { return eventType; }
 
-	/**
-	 * Getter methods
-	 */
-	int getEventType() { return eventType; }
+  int getConstraintsNum() { return constraintsNum; }
 
-	int getConstraintsNum() { return constraintsNum; }
-
-	Constraint getConstraint(int constraintsNum) { return constraints[constraintsNum]; }
+  Constraint getConstraint(int constraintsNum) {
+    return constraints[constraintsNum];
+  }
 
 private:
-
-	int eventType;						// Type of the event
-	Constraint *constraints;	// Set of constraints
-	int constraintsNum;				// Number of attributes
+  // Type of the event
+  int eventType;
+  // Set of constraints
+  Constraint* constraints;
+  // Number of attributes
+  int constraintsNum;
 };
 
 #endif /* SUBPKT_H_ */

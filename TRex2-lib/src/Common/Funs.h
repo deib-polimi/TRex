@@ -38,13 +38,12 @@ using namespace std;
  * Partial sequence of events, as used during processing
  */
 typedef struct PartialEventStruct {
-	PubPkt *indexes[MAX_RULE_FIELDS];
+  PubPkt* indexes[MAX_RULE_FIELDS];
 } PartialEvent;
-
 
 bool checkNegationConstraints(PubPkt* event, RulePkt* rule, int negNum);
 bool checkAggregateConstraints(PubPkt* event, RulePkt* rule, int aggNum);
-bool checkConstraints(PubPkt *event, RulePkt *rule, int state);
+bool checkConstraints(PubPkt* event, RulePkt* rule, int state);
 
 /**
  * This file contains all the common functions used during event computation.
@@ -54,9 +53,9 @@ bool checkConstraints(PubPkt *event, RulePkt *rule, int state);
  * Returns all the columns matching the incoming event e.
  * Columns indexes are added to the given results list.
  */
-void getMatchingColumns(PubPkt *e, map<int, set<int> > &topics, list<int> &results);
-void getMatchingColumns(int e, map<int, set<int> > &topics, list<int> &results);
-
+void getMatchingColumns(PubPkt* e, map<int, set<int>>& topics,
+                        list<int>& results);
+void getMatchingColumns(int e, map<int, set<int>>& topics, list<int>& results);
 
 /**
  * Returns the id of the first element in the given column having a
@@ -66,7 +65,8 @@ void getMatchingColumns(int e, map<int, set<int> > &topics, list<int> &results);
  * Returns -1 if such an element cannot be found.
  * The search is performed in logaritmic time, using a binary search.
  */
-int getFirstValidElementCircular(uint64_t *column, int lowIndex, int highIndex, uint64_t minTimeStamp);
+int getFirstValidElementCircular(uint64_t* column, int lowIndex, int highIndex,
+                                 uint64_t minTimeStamp);
 
 /**
  * Returns the id of the last element in the given column having a
@@ -76,7 +76,8 @@ int getFirstValidElementCircular(uint64_t *column, int lowIndex, int highIndex, 
  * Returns -1 if such an element cannot be found.
  * The search is performed in logaritmic time, using a binary search.
  */
-int getLastValidElementCircular(uint64_t *column, int lowIndex, int highIndex, uint64_t maxTimeStamp, int minIndex);
+int getLastValidElementCircular(uint64_t* column, int lowIndex, int highIndex,
+                                uint64_t maxTimeStamp, int minIndex);
 
 /**
  * Deletes all elements having a value greater or equal than minTimeStamp
@@ -85,18 +86,18 @@ int getLastValidElementCircular(uint64_t *column, int lowIndex, int highIndex, u
  * lowIndex.
  * Returns the new size of the column.
  */
-int deleteInvalidElementsCircular(uint64_t *column, int &lowIndex, int highIndex, uint64_t minTimeStamp);
+int deleteInvalidElementsCircular(uint64_t* column, int& lowIndex,
+                                  int highIndex, uint64_t minTimeStamp);
 
 /**
  * Creates a new event info starting from the given event
  */
-EventInfo createEventInfo(PubPkt *event);
+EventInfo createEventInfo(PubPkt* event);
 
 /**
  * Creates an exact copy of the given parameter
  */
-Parameter * dupParameter(Parameter *param);
-
+Parameter* dupParameter(Parameter* param);
 
 /**
  * Returns the id of the first element in the given column having a
@@ -104,7 +105,8 @@ Parameter * dupParameter(Parameter *param);
  * Returns -1 if such an element cannot be found.
  * The search is performed in logarithmic time, using a binary search.
  */
-int getFirstValidElement(std::vector<PubPkt *> &column, int columnSize, TimeMs minTimeStamp);
+int getFirstValidElement(std::vector<PubPkt*>& column, int columnSize,
+                         TimeMs minTimeStamp);
 
 /**
  * Returns the id of the last element in the given column having a
@@ -112,18 +114,26 @@ int getFirstValidElement(std::vector<PubPkt *> &column, int columnSize, TimeMs m
  * Returns -1 if such an element cannot be found.
  * The search is performed in logarithmic time, using a binary search.
  */
-int getLastValidElement(std::vector<PubPkt *> &column, int columnSize, TimeMs maxTimeStamp, int minIndex);
+int getLastValidElement(std::vector<PubPkt*>& column, int columnSize,
+                        TimeMs maxTimeStamp, int minIndex);
 
 /**
  * Returns the new size of the column.
  */
-int deleteInvalidElements(std::vector<PubPkt *> &column, int columnSize, TimeMs minTimeStamp);
+int deleteInvalidElements(std::vector<PubPkt*>& column, int columnSize,
+                          TimeMs minTimeStamp);
 
-float computeFloatValueForParameters(PubPkt *pkt, PartialEvent *partialEvent, OpTree *opTree, int index, StateType sType);
-int computeIntValueForParameters(PubPkt *pkt, PartialEvent *partialEvent, OpTree *opTree, int index, StateType sType);
-bool computeBoolValueForParameters(PubPkt *pkt, PartialEvent *partialEvent, OpTree *opTree, int index, StateType sType);
-bool checkComplexParameter(PubPkt* pkt, PartialEvent* partialEvent, CPUParameter* parameter, int index, StateType sType);
-void computeStringValueForParameters(PubPkt *pkt, PartialEvent *partialEvent, OpTree *opTree, int index, StateType sType, char *res);
-
+float computeFloatValueForParameters(PubPkt* pkt, PartialEvent* partialEvent,
+                                     OpTree* opTree, int index,
+                                     StateType sType);
+int computeIntValueForParameters(PubPkt* pkt, PartialEvent* partialEvent,
+                                 OpTree* opTree, int index, StateType sType);
+bool computeBoolValueForParameters(PubPkt* pkt, PartialEvent* partialEvent,
+                                   OpTree* opTree, int index, StateType sType);
+bool checkComplexParameter(PubPkt* pkt, PartialEvent* partialEvent,
+                           CPUParameter* parameter, int index, StateType sType);
+void computeStringValueForParameters(PubPkt* pkt, PartialEvent* partialEvent,
+                                     OpTree* opTree, int index, StateType sType,
+                                     char* res);
 
 #endif /* FUNS_H_ */

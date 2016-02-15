@@ -32,84 +32,82 @@
 #include "../Packets/RulePktValueReference.h"
 
 /**
- * This file contains all the functions used to decode packets from arrays of bytes.
+ * This file contains all the functions used
+ * to decode packets from arrays of bytes.
  */
 class Unmarshaller {
 
 public:
-
-	RulePkt * decodeRulePkt(char *source);
-	PubPkt * decodePubPkt(char *source);
-	SubPkt * decodeSubPkt(char *source);
-	AdvPkt * decodeAdvPkt(char *source);
-	JoinPkt * decodeJoinPkt(char *source);
-	int decodeInt(char *source);
-	PktType decodePktType(char *source);
+  RulePkt* decodeRulePkt(char* source);
+  PubPkt* decodePubPkt(char* source);
+  SubPkt* decodeSubPkt(char* source);
+  AdvPkt* decodeAdvPkt(char* source);
+  JoinPkt* decodeJoinPkt(char* source);
+  int decodeInt(char* source);
+  PktType decodePktType(char* source);
 
 protected:
+  RulePkt* decodeRulePkt(char* source, int& index);
 
-	RulePkt * decodeRulePkt(char *source, int &index);
+  PubPkt* decodePubPkt(char* source, int& index);
 
-	PubPkt * decodePubPkt(char *source, int &index);
+  SubPkt* decodeSubPkt(char* source, int& index);
 
-	SubPkt * decodeSubPkt(char *source, int &index);
+  AdvPkt* decodeAdvPkt(char* source, int& index);
 
-	AdvPkt * decodeAdvPkt(char *source, int &index);
+  JoinPkt* decodeJoinPkt(char* source, int& index);
 
-	JoinPkt * decodeJoinPkt(char *source, int &index);
+  Constraint decodeConstraint(char* source, int& index);
 
-	Constraint decodeConstraint(char *source, int &index);
+  Attribute decodeAttribute(char* source, int& index);
 
-	Attribute decodeAttribute(char *source, int &index);
+  Predicate decodeEventPredicate(char* source, int& index);
 
-	Predicate decodeEventPredicate(char *source, int &index);
+  ComplexParameter decodeParameter(char* source, int& index);
 
-	ComplexParameter decodeParameter(char *source, int &index);
+  Negation decodeNegation(char* source, int& index);
 
-	Negation decodeNegation(char *source, int &index);
+  Aggregate decodeAggregate(char* source, int& index);
 
-	Aggregate decodeAggregate(char *source, int &index);
+  CompositeEventTemplate* decodeEventTemplate(char* source, int& index);
 
-	CompositeEventTemplate * decodeEventTemplate(char *source, int &index);
+  OpTree* decodeOpTree(char* source, int& index);
 
-	OpTree * decodeOpTree(char *source, int &index);
+  OpValueReference* decodeValueReference(char* source, int& index);
 
-	OpValueReference * decodeValueReference(char *source, int &index);
-	
-	RulePktValueReference * decodeRulePktReference(char *source, int &index);
-	
-	StaticValueReference * decodeStaticValueReference(char *source, int &index);
+  RulePktValueReference* decodeRulePktReference(char* source, int& index);
 
-	std::set<int> decodeIntSet(char *source, int &index);
+  StaticValueReference* decodeStaticValueReference(char* source, int& index);
 
-	bool decodeBoolean(char *source, int &index);
+  std::set<int> decodeIntSet(char* source, int& index);
 
-	int decodeInt(char *source, int &index);
+  bool decodeBoolean(char* source, int& index);
 
-	float decodeFloat(char *source, int &index);
+  int decodeInt(char* source, int& index);
 
-	long decodeLong(char *source, int &index);
+  float decodeFloat(char* source, int& index);
 
-	char * decodeString(char *source, int &index);
+  long decodeLong(char* source, int& index);
 
-	CompKind decodeCompKind(char *source, int &index);
+  char* decodeString(char* source, int& index);
 
-	Op decodeConstraintOp(char *source, int &index);
+  CompKind decodeCompKind(char* source, int& index);
 
-	StateType decodeStateType(char *source, int &index);
+  Op decodeConstraintOp(char* source, int& index);
 
-	ValType decodeValType(char *source, int &index);
-	
-	ValRefType decodeValRefType(char *source, int &index);
+  StateType decodeStateType(char* source, int& index);
 
-	AggregateFun decodeAggregateFun(char *source, int &index);
+  ValType decodeValType(char* source, int& index);
 
-	OpTreeType decodeOpTreeType(char *source, int &index);
+  ValRefType decodeValRefType(char* source, int& index);
 
-	OpTreeOperation decodeOpTreeOperation(char *source, int &index);
+  AggregateFun decodeAggregateFun(char* source, int& index);
 
-	PktType decodePktType(char *source, int &index);
+  OpTreeType decodeOpTreeType(char* source, int& index);
 
+  OpTreeOperation decodeOpTreeOperation(char* source, int& index);
+
+  PktType decodePktType(char* source, int& index);
 };
 
 #endif /* UNMARSHALLER_H_ */

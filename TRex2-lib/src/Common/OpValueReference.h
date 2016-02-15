@@ -24,24 +24,24 @@
 #include "Consts.h"
 
 /**
- * This interface represents a reference to an actual value, used inside an OpTree.
+ * This interface represents a reference to an actual value, used inside an
+ * OpTree.
  * By re-defining the inner data structure in concrete subclasses, it allows the
  * OpTree structure to be used in different contexts.
  */
 class OpValueReference {
 public:
+  virtual ~OpValueReference() {}
 
-	virtual ~OpValueReference() { }
+  /**
+   * Creates an exact copy (deep copy) of the data structure
+   */
+  virtual OpValueReference* dup() = 0;
 
-	/**
-	 * Creates an exact copy (deep copy) of the data structure
-	 */
-	virtual OpValueReference * dup() = 0;
-	
-	/**
-	 * This describes the type of the reference
-	 */
-	ValRefType vrtype;
+  /**
+   * This describes the type of the reference
+   */
+  ValRefType vrtype;
 };
 
 #endif /* OPVALUEREFERENCE_H_ */

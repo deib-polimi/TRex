@@ -21,26 +21,30 @@
 #include "SubPkt.h"
 
 SubPkt::SubPkt(int parEventType) {
-	eventType = parEventType;
-	constraintsNum = 0;
+  eventType = parEventType;
+  constraintsNum = 0;
 }
 
-SubPkt::SubPkt(int parEventType, Constraint *parConstraints, int parConstraintsNum) {
-	eventType = parEventType;
-	constraintsNum = parConstraintsNum;
-	constraints = new Constraint[constraintsNum];
-	for (int i=0; i<constraintsNum; i++) constraints[i]=parConstraints[i];
+SubPkt::SubPkt(int parEventType, Constraint* parConstraints,
+               int parConstraintsNum) {
+  eventType = parEventType;
+  constraintsNum = parConstraintsNum;
+  constraints = new Constraint[constraintsNum];
+  for (int i = 0; i < constraintsNum; i++)
+    constraints[i] = parConstraints[i];
 }
 
-SubPkt::SubPkt(const SubPkt &pkt) {
-	eventType = pkt.eventType;
-	constraintsNum = pkt.constraintsNum;
-	if (constraintsNum>0) {
-		constraints = new Constraint[constraintsNum];
-		for (int i=0; i<constraintsNum; i++) constraints[i]=pkt.constraints[i];
-	}
+SubPkt::SubPkt(const SubPkt& pkt) {
+  eventType = pkt.eventType;
+  constraintsNum = pkt.constraintsNum;
+  if (constraintsNum > 0) {
+    constraints = new Constraint[constraintsNum];
+    for (int i = 0; i < constraintsNum; i++)
+      constraints[i] = pkt.constraints[i];
+  }
 }
 
 SubPkt::~SubPkt() {
-	if (constraintsNum>0) delete [] constraints;
+  if (constraintsNum > 0)
+    delete[] constraints;
 }

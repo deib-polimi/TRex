@@ -20,49 +20,40 @@
 
 #include "RulePktValueReference.h"
 
-RulePktValueReference::RulePktValueReference(int stateIndex, char *parAttrName, StateType sType) {
-	index = stateIndex;
-	attrName = new char[strlen(parAttrName)+1];
-	strcpy(attrName, parAttrName);
-	type = sType;
-	vrtype = RULEPKT;
+RulePktValueReference::RulePktValueReference(int stateIndex, char* parAttrName,
+                                             StateType sType) {
+  index = stateIndex;
+  attrName = new char[strlen(parAttrName) + 1];
+  strcpy(attrName, parAttrName);
+  type = sType;
+  vrtype = RULEPKT;
 }
 
 RulePktValueReference::RulePktValueReference(int aggregateIndex) {
-	index = aggregateIndex;
-	attrName = NULL;
-	type = AGG;
-	vrtype = RULEPKT;
+  index = aggregateIndex;
+  attrName = NULL;
+  type = AGG;
+  vrtype = RULEPKT;
 }
 
 RulePktValueReference::~RulePktValueReference() {
-	if (attrName != NULL) delete [] attrName;
+  if (attrName != NULL)
+    delete[] attrName;
 }
 
-OpValueReference * RulePktValueReference::dup() {
-	if (attrName != NULL) return new RulePktValueReference(index, attrName, type);
-	else return new RulePktValueReference(index);
+OpValueReference* RulePktValueReference::dup() {
+  if (attrName != NULL)
+    return new RulePktValueReference(index, attrName, type);
+  else
+    return new RulePktValueReference(index);
 }
 
-int RulePktValueReference::getIndex() {
-	return index;
-}
+int RulePktValueReference::getIndex() { return index; }
 
-bool RulePktValueReference::refersToAgg() {
-	return type==AGG;
-}
+bool RulePktValueReference::refersToAgg() { return type == AGG; }
 
-bool RulePktValueReference::refersToNeg()
-{
-      return type==NEG;
-}
+bool RulePktValueReference::refersToNeg() { return type == NEG; }
 
-char * RulePktValueReference::getName() {
-	return attrName;
-}
+char* RulePktValueReference::getName() { return attrName; }
 
-StateType RulePktValueReference::getSType()
-{
-  return type;
-}
-
+StateType RulePktValueReference::getSType() { return type; }

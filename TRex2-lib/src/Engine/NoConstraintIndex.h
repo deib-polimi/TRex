@@ -29,29 +29,28 @@
  */
 class NoConstraintIndex : AbstractConstraintIndex {
 public:
+  NoConstraintIndex();
 
-	NoConstraintIndex();
+  /**
+   * Frees dynamic memory
+   */
+  virtual ~NoConstraintIndex();
 
-	/**
-	 * Frees dynamic memory
-	 */
-	virtual ~NoConstraintIndex();
+  /**
+   * Creates or gets the IntTableConstraint C representing the constraint
+   * given as parameter. Then it installs the predicate in C.
+   */
+  void installPredicate(TablePred* predicate);
 
-	/**
-	 * Creates or gets the IntTableConstraint C representing the constraint
-	 * given as parameter. Then it installs the predicate in C.
-	 */
-	void installPredicate(TablePred *predicate);
-
-	/**
-	 * Processes the given message, using the partial results stored in predCount.
-	 * It updates predCount and fills mh with the matching states.
-	 */
-	void processMessage(PubPkt *pkt, MatchingHandler &mh, std::map<TablePred *, int> &predCount);
+  /**
+   * Processes the given message, using the partial results stored in predCount.
+   * It updates predCount and fills mh with the matching states.
+   */
+  void processMessage(PubPkt* pkt, MatchingHandler& mh,
+                      std::map<TablePred*, int>& predCount);
 
 private:
-
-	std::set<TablePred *> predicates;
+  std::set<TablePred*> predicates;
 };
 
 #endif

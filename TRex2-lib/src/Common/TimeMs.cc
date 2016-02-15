@@ -23,83 +23,66 @@
 using namespace std;
 
 TimeMs::TimeMs() {
-	struct timeval tp;
-	gettimeofday(&tp, NULL);
-	timeVal = (uint64_t)tp.tv_sec * 1000 + tp.tv_usec / 1000;
+  struct timeval tp;
+  gettimeofday(&tp, NULL);
+  timeVal = (uint64_t)tp.tv_sec * 1000 + tp.tv_usec / 1000;
 }
 
-TimeMs::TimeMs(const TimeMs &x) {
-	timeVal = x.timeVal;
-}
+TimeMs::TimeMs(const TimeMs& x) { timeVal = x.timeVal; }
 
-TimeMs::TimeMs(uint64_t partimeVal) {
-	timeVal = partimeVal;
-}
+TimeMs::TimeMs(uint64_t partimeVal) { timeVal = partimeVal; }
 
 TimeMs::~TimeMs() {
-	// Nothing to do
+  // Nothing to do
 }
 
 bool TimeMs::elapsed() const {
-	struct timeval tp;
-	gettimeofday(&tp, NULL);
-	uint64_t currentTimeVal = (uint64_t)tp.tv_sec * 1000 + tp.tv_usec / 1000;
-	return timeVal < currentTimeVal;
+  struct timeval tp;
+  gettimeofday(&tp, NULL);
+  uint64_t currentTimeVal = (uint64_t)tp.tv_sec * 1000 + tp.tv_usec / 1000;
+  return timeVal < currentTimeVal;
 }
 
-uint64_t TimeMs::getTimeVal() const {
-	return timeVal;
+uint64_t TimeMs::getTimeVal() const { return timeVal; }
+
+TimeMs TimeMs::operator+(const TimeMs& x) {
+  return TimeMs(x.timeVal + timeVal);
 }
 
-TimeMs TimeMs::operator+(const TimeMs &x) {
-	return TimeMs(x.timeVal+timeVal);
+TimeMs TimeMs::operator-(const TimeMs& x) {
+  if (timeVal > x.timeVal)
+    return TimeMs(timeVal - x.timeVal);
+  return TimeMs(0);
 }
 
-TimeMs TimeMs::operator-(const TimeMs &x) {
-	if (timeVal>x.timeVal) return TimeMs(timeVal-x.timeVal);
-	return TimeMs(0);
+TimeMs& TimeMs::operator=(const TimeMs& x) {
+  timeVal = x.timeVal;
+  return *this;
 }
 
-TimeMs &TimeMs::operator=(const TimeMs &x) {
-	timeVal=x.timeVal;
-	return *this;
+TimeMs& TimeMs::operator+=(const TimeMs& x) {
+  timeVal += x.timeVal;
+  return *this;
 }
 
-TimeMs &TimeMs::operator+=(const TimeMs &x) {
-	timeVal+=x.timeVal;
-	return *this;
+TimeMs& TimeMs::operator-=(const TimeMs& x) {
+  timeVal -= x.timeVal;
+  return *this;
 }
 
-TimeMs &TimeMs::operator-=(const TimeMs &x) {
-	timeVal-=x.timeVal;
-	return *this;
-}
+bool TimeMs::operator==(const TimeMs& x) const { return timeVal == x.timeVal; }
 
-bool TimeMs::operator==(const TimeMs &x) const {
-	return timeVal==x.timeVal;
-}
+bool TimeMs::operator!=(const TimeMs& x) const { return timeVal != x.timeVal; }
 
-bool TimeMs::operator!=(const TimeMs &x) const {
-	return timeVal!=x.timeVal;
-}
+bool TimeMs::operator<(const TimeMs& x) const { return timeVal < x.timeVal; }
 
-bool TimeMs::operator<(const TimeMs &x) const {
-	return timeVal<x.timeVal;
-}
+bool TimeMs::operator>(const TimeMs& x) const { return timeVal > x.timeVal; }
 
-bool TimeMs::operator>(const TimeMs &x) const {
-	return timeVal>x.timeVal;
-}
+bool TimeMs::operator<=(const TimeMs& x) const { return timeVal <= x.timeVal; }
 
-bool TimeMs::operator<=(const TimeMs &x) const {
-	return timeVal<=x.timeVal;
-}
+bool TimeMs::operator>=(const TimeMs& x) const { return timeVal >= x.timeVal; }
 
-bool TimeMs::operator>=(const TimeMs &x) const {
-	return timeVal>=x.timeVal;
-}
-
-ostream& operator<<(ostream &out, const TimeMs &x) {
-	out << x.getTimeVal();
-	return out;
+ostream& operator<<(ostream& out, const TimeMs& x) {
+  out << x.getTimeVal();
+  return out;
 }

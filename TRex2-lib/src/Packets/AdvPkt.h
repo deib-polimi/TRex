@@ -24,35 +24,35 @@
 #include <set>
 
 /**
- * This class represents an advertisement packet, which is composed by a set of types.
+ * This class represents an advertisement packet,
+ * which is composed by a set of types.
  */
 class AdvPkt {
 
 public:
+  /**
+   * Constructor with parameters
+   */
+  AdvPkt(std::set<int> parAdvertisements);
 
-	/**
-	 * Constructor with parameters
-	 */
-	AdvPkt(std::set<int> parAdvertisements);
+  /**
+   * Copy constructor
+   */
+  AdvPkt(const AdvPkt& pkt);
 
-	/**
-	 * Copy constructor
-	 */
-	AdvPkt(const AdvPkt &pkt);
+  /**
+   * Destructor
+   */
+  virtual ~AdvPkt();
 
-	/**
-	 * Destructor
-	 */
-	virtual ~AdvPkt();
-
-	/**
-	 * Getter methods
-	 */
-	std::set<int> getAdvertisements() { return advertisements; }
+  /**
+   * Getter methods
+   */
+  std::set<int> getAdvertisements() { return advertisements; }
 
 private:
-
-	std::set<int> advertisements;	// Set of advertised event types
+  // Set of advertised event types
+  std::set<int> advertisements;
 };
 
 #endif /* ADVPKT_H_ */

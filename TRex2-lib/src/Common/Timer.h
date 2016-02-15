@@ -29,48 +29,50 @@
 class Timer {
 
 public:
+  /**
+   * Empty constructoy
+   */
+  Timer();
 
-		/**
-     * Empty constructoy
-     */
-		Timer();
+  /**
+   * Destructor
+   */
+  ~Timer();
 
-		/**
-		 * Destructor
-		 */
-		~Timer();
+  /**
+   * Start the timer
+   */
+  void start();
 
-    /**
-     * Start the timer
-     */
-		void   start();
+  /**
+   * Stop the timer
+   */
+  void stop();
 
-		/**
-		 * Stop the timer
-		 */
-		void   stop();
+  /**
+   * Get elapsed time in seconds
+   */
+  double getElapsedTimeInSec();
 
-    /**
-     * Get elapsed time in seconds
-     */
-    double getElapsedTimeInSec();
+  /**
+   * Get elapsed time in milliseconds
+   */
+  double getElapsedTimeInMilliSec();
 
-    /**
-     * Get elapsed time in milliseconds
-     */
-    double getElapsedTimeInMilliSec();
-
-    /**
-     * Get the elapsed time in microseconds
-     */
-    double getElapsedTimeInMicroSec();
+  /**
+   * Get the elapsed time in microseconds
+   */
+  double getElapsedTimeInMicroSec();
 
 private:
-    double startTimeInMicroSec;					// starting time in micro-second
-    double endTimeInMicroSec;						// ending time in micro-second
-    int stopped;												// stop flag
-    timeval startCount;
-    timeval endCount;
+  // starting time in micro-second
+  double startTimeInMicroSec;
+  // ending time in micro-second
+  double endTimeInMicroSec;
+  // stop flag
+  int stopped;
+  timeval startCount;
+  timeval endCount;
 };
 
 #endif /* TIMER_H */

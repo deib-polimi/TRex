@@ -30,39 +30,40 @@
 /**
  * This class represents a simple routing table. It stores subscriptions coming
  * from clients and uses them to compute recipients of events.
- * As the name suggests, it implements a trivial processing approach that iterates
- * through all stored subscriptions.
+ * As the name suggests, it implements a trivial processing approach that
+ * iterates through all stored subscriptions.
  * This implementation is thread-safe.
  */
 class SimpleRoutingTable : public GenericRoutingTable {
 
 public:
-	SimpleRoutingTable();
+  SimpleRoutingTable();
 
-	virtual ~SimpleRoutingTable();
+  virtual ~SimpleRoutingTable();
 
-	void installSubscription(int clientId, SubPkt *subscription);
+  void installSubscription(int clientId, SubPkt* subscription);
 
-	void deleteSubscription(int clientId, SubPkt *subscription);
+  void deleteSubscription(int clientId, SubPkt* subscription);
 
-	void removeClient(int clientId);
+  void removeClient(int clientId);
 
-	void getMatchingClients(PubPkt *pubPkt, std::set<int> &clients);
+  void getMatchingClients(PubPkt* pubPkt, std::set<int>& clients);
 
 private:
-	std::map<int, std::map<int, std::list<SubPkt *> > > subscriptions;		// Event Type -> Client -> Subscriptions
-	pthread_mutex_t *mutex;																								// Mutex to make the access to the class thread-safe
+  // Event Type -> Client -> Subscriptions
+  std::map<int, std::map<int, std::list<SubPkt*>>> subscriptions;
+  // Mutex to make the access to the class thread-safe
+  pthread_mutex_t* mutex;
 
-	/**
-	 * Return true if and only if s1 and s2 represent the same subscription
-	 */
-	inline bool sameSubscription(SubPkt *s1, SubPkt *s2);
+  /**
+   * Return true if and only if s1 and s2 represent the same subscription
+   */
+  inline bool sameSubscription(SubPkt* s1, SubPkt* s2);
 
-	/**
-	 * Return true if and only if pubPkt matches subPkt.
-	 */
-	inline bool matches(PubPkt *pubPkt, SubPkt *subPkt);
-
+  /**
+   * Return true if and only if pubPkt matches subPkt.
+   */
+  inline bool matches(PubPkt* pubPkt, SubPkt* subPkt);
 };
 
 #endif /* SIMPLEROUTINGTABLE_H_ */
