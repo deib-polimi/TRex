@@ -30,14 +30,13 @@ int RulePkt::lastId = 0;
  */
 RulePkt* RulePkt::copy() {
   RulePkt* copy = new RulePkt(false);
-  copy->addRootPredicate(this->getPredicate(0).eventType,
-                         this->getPredicate(0).constraints,
-                         this->getPredicate(0).constraintsNum);
+  Predicate& root = this->getPredicate(0);
+  copy->addRootPredicate(root.eventType, root.constraints, root.constraintsNum);
   for (int i = 1; i < this->getPredicatesNum(); i++) {
-    copy->addPredicate(
-        this->getPredicate(i).eventType, this->getPredicate(i).constraints,
-        this->getPredicate(i).constraintsNum, this->getPredicate(i).refersTo,
-        this->getPredicate(i).win, this->getPredicate(i).kind);
+    Predicate& predicate = this->getPredicate(i);
+    copy->addPredicate(predicate.eventType, predicate.constraints,
+                       predicate.constraintsNum, predicate.refersTo,
+                       predicate.win, predicate.kind);
   }
   copy->setCompositeEventTemplate(this->getCompositeEventTemplate());
   return copy;
@@ -46,33 +45,33 @@ RulePkt* RulePkt::copy() {
 //#endif
 
 RulePkt::RulePkt(bool resetCount) {
-  if (resetCount)
+  if (resetCount) {
     lastId = 0;
+  }
   ruleId = lastId++;
   ceTemplate = NULL;
 }
 
 RulePkt::~RulePkt() {
-  for (map<int, Predicate>::iterator it = predicates.begin();
-       it != predicates.end(); ++it) {
-    delete it->second.constraints;
+  for (const auto& it : predicates) {
+    delete it.second.constraints;
   }
-  for (map<int, Negation>::iterator it = negations.begin();
-       it != negations.end(); ++it) {
-    delete it->second.constraints;
+  for (const auto& it : negations) {
+    delete it.second.constraints;
   }
-  for (map<int, Aggregate>::iterator it = aggregates.begin();
-       it != aggregates.end(); ++it) {
-    delete it->second.constraints;
+  for (const auto& it : aggregates) {
+    delete it.second.constraints;
   }
-  if (ceTemplate != NULL)
+  if (ceTemplate != NULL) {
     delete ceTemplate;
+  }
 }
 
 bool RulePkt::addRootPredicate(int eventType, Constraint constr[],
                                int constrLen) {
-  if (predicates.size() > 0)
+  if (predicates.size() > 0) {
     return false;
+  }
   Predicate p;
   p.eventType = eventType;
   p.refersTo = -1;
@@ -80,8 +79,9 @@ bool RulePkt::addRootPredicate(int eventType, Constraint constr[],
   p.kind = EACH_WITHIN;
   p.constraintsNum = constrLen;
   p.constraints = new Constraint[constrLen];
-  for (int i = 0; i < constrLen; i++)
+  for (int i = 0; i < constrLen; i++) {
     p.constraints[i] = constr[i];
+  }
   predicates.insert(make_pair(predicates.size(), p));
   return true;
 }
@@ -89,8 +89,9 @@ bool RulePkt::addRootPredicate(int eventType, Constraint constr[],
 bool RulePkt::addPredicate(int eventType, Constraint constr[], int constrLen,
                            int refersTo, TimeMs& win, CompKind kind) {
   int numPredicates = predicates.size();
-  if (numPredicates <= 0 || refersTo >= numPredicates)
+  if (numPredicates <= 0 || refersTo >= numPredicates) {
     return false;
+  }
   Predicate p;
   p.eventType = eventType;
   p.refersTo = refersTo;
@@ -98,8 +99,9 @@ bool RulePkt::addPredicate(int eventType, Constraint constr[], int constrLen,
   p.kind = kind;
   p.constraintsNum = constrLen;
   p.constraints = new Constraint[constrLen];
-  for (int i = 0; i < constrLen; i++)
+  for (int i = 0; i < constrLen; i++) {
     p.constraints[i] = constr[i];
+  }
   predicates.insert(make_pair(predicates.size(), p));
   return true;
 }
@@ -322,19 +324,19 @@ void RulePkt::serializeNode(OpTree* tree, int& idx, Node serialized[]) {
           case INT:
             serialized[idx].intVal = sReference->getIntValue();
             break;
-
           case FLOAT:
             serialized[idx].floatVal = sReference->getFloatValue();
             break;
         }
       }
     } else {
-      if (pktReference->refersToAgg())
+      if (pktReference->refersToAgg()) {
         serialized[idx].sType = AGG;
-      else if (pktReference->refersToNeg())
+      } else if (pktReference->refersToNeg()) {
         serialized[idx].sType = NEG;
-      else
+      } else {
         serialized[idx].sType = STATE;
+      }
       serialized[idx].isStatic = false;
       // inversion needed for the GPU
       if (serialized[idx].sType == STATE) {
@@ -430,42 +432,42 @@ bool RulePkt::addConsuming(int eventIndex) {
 void RulePkt::getLeaves(set<int>& leaves) {
   map<int, int> referenceCount;
   getReferenceCount(referenceCount);
-  for (map<int, int>::iterator it = referenceCount.begin();
-       it != referenceCount.end(); it++) {
-    if (it->second == 0)
-      leaves.insert(it->first);
+  for (const auto& it : referenceCount) {
+    if (it.second == 0) {
+      leaves.insert(it.first);
+    }
   }
 }
 
 void RulePkt::getJoinPoints(set<int>& joinPoints) {
   map<int, int> referenceCount;
   getReferenceCount(referenceCount);
-  for (map<int, int>::iterator it = referenceCount.begin();
-       it != referenceCount.end(); it++)
-    if (it->second > 0)
-      joinPoints.insert(it->first);
+  for (const auto& it : referenceCount) {
+    if (it.second > 0) {
+      joinPoints.insert(it.first);
+    }
+  }
 }
 
 bool RulePkt::containsEventType(int eventType, bool includeNegations) {
-  for (map<int, Predicate>::iterator it = predicates.begin();
-       it != predicates.end(); ++it) {
-    if (it->second.eventType == eventType)
+  for (const auto& it : predicates) {
+    if (it.second.eventType == eventType) {
       return true;
+    }
   }
   if (includeNegations) {
-    for (map<int, Negation>::iterator it = negations.begin();
-         it != negations.end(); ++it) {
-      if (it->second.eventType == eventType)
+    for (const auto& it : negations) {
+      if (it.second.eventType == eventType) {
         return true;
+      }
     }
   }
   return false;
 }
 
 void RulePkt::getContainedEventTypes(set<int>& evTypes) {
-  for (map<int, Predicate>::iterator it = predicates.begin();
-       it != predicates.end(); ++it) {
-    evTypes.insert(it->second.eventType);
+  for (const auto& it : predicates) {
+    evTypes.insert(it.second.eventType);
   }
 }
 
@@ -473,11 +475,11 @@ TimeMs RulePkt::getMaxWin() {
   set<int> leaves;
   getLeaves(leaves);
   TimeMs returnTime = 0;
-  for (set<int>::iterator it = leaves.begin(); it != leaves.end(); it++) {
-    int leaf = *it;
+  for (const auto& leaf : leaves) {
     TimeMs currentTime = getWinBetween(0, leaf);
-    if (currentTime > returnTime)
+    if (currentTime > returnTime) {
       returnTime = currentTime;
+    }
   }
   return returnTime;
 }
@@ -495,18 +497,21 @@ TimeMs RulePkt::getWinBetween(int lowerId, int upperId) {
 bool RulePkt::isDirectlyConnected(int id1, int id2) {
   int numPredicates = predicates.size();
   if (id1 == id2 || id1 < 0 || id2 < 0 || id1 > numPredicates ||
-      id2 > numPredicates)
+      id2 > numPredicates) {
     return false;
-  if (predicates[id2].refersTo == id1 || predicates[id1].refersTo == id2)
+  }
+  if (predicates[id2].refersTo == id1 || predicates[id1].refersTo == id2) {
     return true;
+  }
   return false;
 }
 
 bool RulePkt::isInTheSameSequence(int id1, int id2) {
   int numPredicates = predicates.size();
   if (id1 == id2 || id1 < 0 || id2 < 0 || id1 > numPredicates ||
-      id2 > numPredicates)
+      id2 > numPredicates) {
     return false;
+  }
   int min, max;
   if (id1 < id2) {
     min = id1;
@@ -518,8 +523,9 @@ bool RulePkt::isInTheSameSequence(int id1, int id2) {
   int i = max;
   while (i > 0) {
     i = predicates[i].refersTo;
-    if (i == min)
+    if (i == min) {
       return true;
+    }
   }
   return false;
 }
@@ -539,22 +545,27 @@ bool RulePkt::operator!=(const RulePkt& pkt) const {
 bool RulePkt::addNegation(int eventType, Constraint* constr, int constrLen,
                           int lowerId, TimeMs& lowerTime, int upperId) {
   int numPredicates = predicates.size();
-  if (lowerId > numPredicates)
+  if (lowerId > numPredicates) {
     return false;
-  if (upperId < 0 || upperId > numPredicates)
+  }
+  if (upperId < 0 || upperId > numPredicates) {
     return false;
-  if (lowerId >= 0 && lowerId <= upperId)
+  }
+  if (lowerId >= 0 && lowerId <= upperId) {
     return false;
+  }
   Negation n;
   n.eventType = eventType;
   n.lowerId = lowerId;
-  if (lowerId < 0)
+  if (lowerId < 0) {
     n.lowerTime = lowerTime;
+  }
   n.upperId = upperId;
   n.constraintsNum = constrLen;
   n.constraints = new Constraint[constrLen];
-  for (int i = 0; i < constrLen; i++)
+  for (int i = 0; i < constrLen; i++) {
     n.constraints[i] = constr[i];
+  }
   negations.insert(make_pair(negations.size(), n));
   return true;
 }
@@ -564,16 +575,21 @@ bool RulePkt::addParameter(int index1, char* name1, int index2, char* name2,
   int numPredicates = predicates.size();
   int numAggregates = aggregates.size();
   int numNegations = negations.size();
-  if (index1 < 0 || index1 > numPredicates)
+  if (index1 < 0 || index1 > numPredicates) {
     return false;
-  if (index2 < 0)
+  }
+  if (index2 < 0) {
     return false;
-  if (type == STATE && index2 > numPredicates)
+  }
+  if (type == STATE && index2 > numPredicates) {
     return false;
-  if (type == AGG && index2 > numAggregates)
+  }
+  if (type == AGG && index2 > numAggregates) {
     return false;
-  if (type == NEG && index2 > numNegations)
+  }
+  if (type == NEG && index2 > numNegations) {
     return false;
+  }
   Parameter p;
   p.evIndex1 = index1;
   p.evIndex2 = index2;
@@ -588,12 +604,15 @@ bool RulePkt::addAggregate(int eventType, Constraint* constr, int constrLen,
                            int lowerId, TimeMs& lowerTime, int upperId,
                            char* name, AggregateFun fun) {
   int numPredicates = predicates.size();
-  if (lowerId > numPredicates)
+  if (lowerId > numPredicates) {
     return false;
-  if (upperId < 0 || upperId > numPredicates)
+  }
+  if (upperId < 0 || upperId > numPredicates) {
     return false;
-  if (lowerId >= 0 && lowerId <= upperId)
+  }
+  if (lowerId >= 0 && lowerId <= upperId) {
     return false;
+  }
   Aggregate a;
   a.eventType = eventType;
   a.lowerId = lowerId;
@@ -602,8 +621,9 @@ bool RulePkt::addAggregate(int eventType, Constraint* constr, int constrLen,
   a.upperId = upperId;
   a.constraintsNum = constrLen;
   a.constraints = new Constraint[constrLen];
-  for (int i = 0; i < constrLen; i++)
+  for (int i = 0; i < constrLen; i++) {
     a.constraints[i] = constr[i];
+  }
   strcpy(a.name, name);
   a.fun = fun;
   aggregates.insert(make_pair(aggregates.size(), a));
@@ -612,8 +632,9 @@ bool RulePkt::addAggregate(int eventType, Constraint* constr, int constrLen,
 
 void RulePkt::getReferenceCount(map<int, int>& referenceCount) {
   int numPredicates = predicates.size();
-  for (int i = 0; i < numPredicates; i++)
+  for (int i = 0; i < numPredicates; i++) {
     referenceCount.insert(make_pair(i, 0));
+  }
   for (int i = 1; i < numPredicates; i++) {
     int referredIndex = predicates[i].refersTo;
     map<int, int>::iterator it = referenceCount.find(referredIndex);
