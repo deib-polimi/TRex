@@ -152,11 +152,7 @@ int RulePkt::findLastState(OpTree* tree) {
     RulePktValueReference* pktReference =
         dynamic_cast<RulePktValueReference*>(reference);
     if (pktReference == NULL) {
-      StaticValueReference* sReference =
-          dynamic_cast<StaticValueReference*>(reference);
-      if (sReference != NULL) {
-        return -1;
-      }
+      return -1;
     } else {
       if (pktReference->refersToAgg() || pktReference->refersToNeg()) {
         return -1;
@@ -175,11 +171,7 @@ int RulePkt::findAggregate(OpTree* tree) {
     RulePktValueReference* pktReference =
         dynamic_cast<RulePktValueReference*>(reference);
     if (pktReference == NULL) {
-      StaticValueReference* sReference =
-          dynamic_cast<StaticValueReference*>(reference);
-      if (sReference != NULL) {
-        return -1;
-      }
+      return -1;
     } else {
       if (pktReference->refersToAgg()) {
         return pktReference->getIndex();
@@ -198,11 +190,7 @@ int RulePkt::findNegation(OpTree* tree) {
     RulePktValueReference* pktReference =
         dynamic_cast<RulePktValueReference*>(reference);
     if (pktReference == NULL) {
-      StaticValueReference* sReference =
-          dynamic_cast<StaticValueReference*>(reference);
-      if (sReference != NULL) {
-        return -1;
-      }
+      return -1;
     } else {
       if (pktReference->refersToNeg()) {
         return pktReference->getIndex();
