@@ -1,6 +1,7 @@
 AC_INIT([TRex2], [1.0], [daniele.rogora@gmail.com])
 AM_INIT_AUTOMAKE([subdir-objects foreign -Wall])
 CXXFLAGS="-O3"
+AX_CXX_COMPILE_STDCXX(11, noext, mandatory)
 AM_PROG_AR
 AC_PROG_CC
 AC_PROG_CXX
