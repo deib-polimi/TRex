@@ -54,13 +54,13 @@ RulePkt::RulePkt(bool resetCount) {
 
 RulePkt::~RulePkt() {
   for (const auto& it : predicates) {
-    delete it.second.constraints;
+    delete[] it.constraints;
   }
   for (const auto& it : negations) {
-    delete it.second.constraints;
+    delete[] it.constraints;
   }
   for (const auto& it : aggregates) {
-    delete it.second.constraints;
+    delete[] it.constraints;
   }
   if (ceTemplate != NULL) {
     delete ceTemplate;
@@ -82,7 +82,7 @@ bool RulePkt::addRootPredicate(int eventType, Constraint constr[],
   for (int i = 0; i < constrLen; i++) {
     p.constraints[i] = constr[i];
   }
-  predicates.insert(make_pair(predicates.size(), p));
+  predicates.push_back(std::move(p));
   return true;
 }
 
@@ -102,7 +102,7 @@ bool RulePkt::addPredicate(int eventType, Constraint constr[], int constrLen,
   for (int i = 0; i < constrLen; i++) {
     p.constraints[i] = constr[i];
   }
-  predicates.insert(make_pair(predicates.size(), p));
+  predicates.push_back(std::move(p));
   return true;
 }
 
@@ -217,7 +217,7 @@ bool RulePkt::addComplexParameterForAggregate(Op pOperation, ValType type,
     return false;
   }
   p.lastIndex = lIndex;
-  complexParameters.insert(make_pair(complexParameters.size(), p));
+  complexParameters.push_back(std::move(p));
 
   int depth = 2;
   GPUParameter gp;
@@ -230,7 +230,7 @@ bool RulePkt::addComplexParameterForAggregate(Op pOperation, ValType type,
   gp.vType = type;
   gp.operation = pOperation;
   serializeTrees(leftTree, rightTree, depth, gp);
-  complexGPUParameters.insert(make_pair(complexGPUParameters.size(), gp));
+  complexGPUParameters.push_back(std::move(gp));
   return true;
 }
 
@@ -248,7 +248,7 @@ bool RulePkt::addComplexParameterForNegation(Op pOperation, ValType type,
     return false;
   }
   p.lastIndex = lIndex;
-  complexParameters.insert(make_pair(complexParameters.size(), p));
+  complexParameters.push_back(std::move(p));
 
   int depth = 2;
   GPUParameter gp;
@@ -262,7 +262,7 @@ bool RulePkt::addComplexParameterForNegation(Op pOperation, ValType type,
   gp.vType = type;
   gp.operation = pOperation;
   serializeTrees(leftTree, rightTree, depth, gp);
-  complexGPUParameters.insert(make_pair(complexGPUParameters.size(), gp));
+  complexGPUParameters.push_back(std::move(gp));
   return true;
 }
 
@@ -360,7 +360,7 @@ bool RulePkt::addComplexParameter(Op pOperation, ValType type, OpTree* leftTree,
     return false;
   }
   p.lastIndex = lIndex;
-  complexParameters.insert(make_pair(complexParameters.size(), p));
+  complexParameters.push_back(std::move(p));
 
   int depth = 2;
   GPUParameter gp;
@@ -372,7 +372,7 @@ bool RulePkt::addComplexParameter(Op pOperation, ValType type, OpTree* leftTree,
   gp.vType = type;
   gp.operation = pOperation;
   serializeTrees(leftTree, rightTree, depth, gp);
-  complexGPUParameters.insert(make_pair(complexGPUParameters.size(), gp));
+  complexGPUParameters.push_back(std::move(gp));
   return true;
 }
 
@@ -439,13 +439,13 @@ void RulePkt::getJoinPoints(set<int>& joinPoints) {
 
 bool RulePkt::containsEventType(int eventType, bool includeNegations) {
   for (const auto& it : predicates) {
-    if (it.second.eventType == eventType) {
+    if (it.eventType == eventType) {
       return true;
     }
   }
   if (includeNegations) {
     for (const auto& it : negations) {
-      if (it.second.eventType == eventType) {
+      if (it.eventType == eventType) {
         return true;
       }
     }
@@ -455,7 +455,7 @@ bool RulePkt::containsEventType(int eventType, bool includeNegations) {
 
 void RulePkt::getContainedEventTypes(set<int>& evTypes) {
   for (const auto& it : predicates) {
-    evTypes.insert(it.second.eventType);
+    evTypes.insert(it.eventType);
   }
 }
 
@@ -554,7 +554,7 @@ bool RulePkt::addNegation(int eventType, Constraint* constr, int constrLen,
   for (int i = 0; i < constrLen; i++) {
     n.constraints[i] = constr[i];
   }
-  negations.insert(make_pair(negations.size(), n));
+  negations.push_back(std::move(n));
   return true;
 }
 
@@ -584,7 +584,7 @@ bool RulePkt::addParameter(int index1, char* name1, int index2, char* name2,
   p.type = type;
   strcpy(p.name1, name1);
   strcpy(p.name2, name2);
-  parameters.insert(make_pair(parameters.size(), p));
+  parameters.push_back(std::move(p));
   return true;
 }
 
@@ -614,7 +614,7 @@ bool RulePkt::addAggregate(int eventType, Constraint* constr, int constrLen,
   }
   strcpy(a.name, name);
   a.fun = fun;
-  aggregates.insert(make_pair(aggregates.size(), a));
+  aggregates.push_back(std::move(a));
   return true;
 }
 

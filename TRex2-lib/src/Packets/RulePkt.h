@@ -28,7 +28,7 @@
 #include "../Packets/RulePktValueReference.h"
 #include "../Packets/StaticValueReference.h"
 #include <set>
-#include <map>
+#include <vector>
 
 /**
  * A basic event predicate
@@ -320,17 +320,17 @@ private:
   // Identifier of the rule
   int ruleId;
   // Array of event predicates
-  std::map<int, Predicate> predicates;
+  std::vector<Predicate> predicates;
   // Parameters between different predicates (map identifier -> data structure)
-  std::map<int, Parameter> parameters;
+  std::vector<Parameter> parameters;
   // Negations defined for the rule (map identifier -> data structure)
-  std::map<int, Negation> negations;
+  std::vector<Negation> negations;
   // Aggregates defined for the rule (map identifier -> data structure)
-  std::map<int, Aggregate> aggregates;
+  std::vector<Aggregate> aggregates;
   // Set of indexes of events that are consumed after detection
   std::set<int> consuming;
-  std::map<int, CPUParameter> complexParameters;
-  std::map<int, GPUParameter> complexGPUParameters;
+  std::vector<CPUParameter> complexParameters;
+  std::vector<GPUParameter> complexGPUParameters;
   // Template of the composite event
   CompositeEventTemplate* ceTemplate;
 
