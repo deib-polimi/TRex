@@ -193,13 +193,13 @@ public:
   /**
    * Fills leaves with the set of indexes that are leaves in the ordering graph
    */
-  void getLeaves(std::set<int>& leaves);
+  std::set<int> getLeaves();
 
   /**
    * Fills joinPoints with the set of indexes that are shared
    * among more than one sequence
    */
-  void getJoinPoints(std::set<int>& joinPoints);
+  std::set<int> getJoinPoints();
 
   /**
    * Returns the number of predicates in the rule
@@ -282,7 +282,7 @@ public:
   /**
    * Returns the set of all contained event types
    */
-  void getContainedEventTypes(std::set<int>& eventTypes);
+  std::set<int> getContainedEventTypes();
 
   /**
    * Get the maximum time window between the two events
@@ -341,7 +341,7 @@ private:
    * Returns false if an error occurs
    */
   bool addNegation(int eventType, Constraint* constr, int constrLen,
-                   int lowerId, TimeMs& lowerTime, int upperId);
+                   int lowerId, const TimeMs& lowerTime, int upperId);
 
   /**
    * Adds the parameter with the given attributes
@@ -358,13 +358,13 @@ private:
    * Returns false if an error occurs
    */
   bool addAggregate(int eventType, Constraint* constr, int constrLen,
-                    int lowerId, TimeMs& lowerTime, int upperId, char* name,
-                    AggregateFun fun);
+                    int lowerId, const TimeMs& lowerTime, int upperId,
+                    char* name, AggregateFun fun);
 
   /**
    * Fills referenceCount with the number of times each index is referenced
    */
-  void getReferenceCount(std::map<int, int>& referenceCount);
+  std::map<int, int> getReferenceCount();
 
   /**
    * Returns the index of the last state in a given tree
