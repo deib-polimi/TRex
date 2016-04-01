@@ -27,6 +27,10 @@ namespace attrs = boost::log::attributes;
 namespace keywords = boost::log::keywords;
 namespace expr = boost::log::expressions;
 
+#	if BOOST_VERSION < 105500
+	using boost::empty_deleter = boost::log::utility::empty_deleter;
+#	endif
+
 // init static logger
 src::severity_logger< severity_level > Logging::logger;
 
@@ -42,7 +46,7 @@ void Logging::init(){
 	pBackend->auto_flush(true);
 
 	// Add a stream to log to console
-	boost::shared_ptr< std::ostream > pConsoleStream(&std::cout, boost::log::empty_deleter());
+	boost::shared_ptr< std::ostream > pConsoleStream(&std::cout, boost::empty_deleter());
 	pBackend->add_stream(pConsoleStream);
 
 	// Add a stream to log to file
@@ -58,11 +62,11 @@ void Logging::init(){
 	logging::core::get()->add_global_attribute("TimeStamp", attrs::local_clock());
 	// Describe how to format logs
 	pSink->set_formatter(
-	    expr::format("%1% %2%") 
+	    expr::format("%1% %2%")
 		% expr::format_date_time<boost::posix_time::ptime>("TimeStamp", "%d.%m.%Y %H:%M:%S")
 		% expr::smessage
 	);
-	
+
 
 	// Add a filter on severity level:
 	// Write all records with "info" severity or higher
