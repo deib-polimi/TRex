@@ -131,6 +131,13 @@ File "testjs.html" (served through the URL: http://proxy.machine:8888/testjs.htm
 
 
 
+License
+=======
+
+The license is usually specified at the beginning of each source file; where not explicitly stated assume GPLv3.
+
+
+
 Contacts
 ========
 
