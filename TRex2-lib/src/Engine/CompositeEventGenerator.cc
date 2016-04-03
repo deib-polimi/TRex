@@ -30,10 +30,10 @@ CompositeEventGenerator::CompositeEventGenerator(
 CompositeEventGenerator::~CompositeEventGenerator() { delete ceTemplate; }
 
 PubPkt* CompositeEventGenerator::generateCompositeEvent(
-    PartialEvent* partialEvent, map<int, Aggregate*>& aggregates,
-    int aggsSize[MAX_RULE_FIELDS], map<int, vector<PubPkt*>>& receivedPkts,
-    map<int, vector<PubPkt*>>& receivedAggs,
-    map<int, set<CPUParameter*>>& aggregateParameters) {
+    PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
+    std::vector<int>& aggsSize, std::vector<std::vector<PubPkt*>>& receivedPkts,
+    std::vector<std::vector<PubPkt*>>& receivedAggs,
+    std::map<int, std::vector<CPUParameter>>& aggregateParameters) {
   int eventType = ceTemplate->getEventType();
   int attributesNum = ceTemplate->getAttributesNum();
   int staticAttributesNum = ceTemplate->getStaticAttributesNum();
@@ -65,15 +65,16 @@ PubPkt* CompositeEventGenerator::generateCompositeEvent(
   }
   PubPkt* result =
       new PubPkt(eventType, attributes, attributesNum + staticAttributesNum);
-  result->setTime(partialEvent->indexes[0]->getTimeStamp());
+  result->setTime(partialEvent.indexes[0]->getTimeStamp());
   return result;
 }
 
 inline int CompositeEventGenerator::computeIntValue(
-    PartialEvent* partialEvent, map<int, Aggregate*>& aggregates,
-    int aggsSize[MAX_RULE_FIELDS], map<int, vector<PubPkt*>>& receivedPkts,
-    map<int, vector<PubPkt*>>& receivedAggs,
-    map<int, set<CPUParameter*>>& aggregateParameters, OpTree* opTree) {
+    PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
+    std::vector<int>& aggsSize, std::vector<std::vector<PubPkt*>>& receivedPkts,
+    std::vector<std::vector<PubPkt*>>& receivedAggs,
+    std::map<int, std::vector<CPUParameter>>& aggregateParameters,
+    OpTree* opTree) {
   OpTreeType type = opTree->getType();
   if (type == LEAF) {
     OpValueReference* reference = opTree->getValueReference();
@@ -92,7 +93,7 @@ inline int CompositeEventGenerator::computeIntValue(
     int index = pktReference->getIndex();
     bool refersToAgg = pktReference->refersToAgg();
     if (!refersToAgg) {
-      PubPkt* pkt = partialEvent->indexes[index];
+      PubPkt* pkt = partialEvent.indexes[index];
       int attrIndex;
       ValType type;
       if (pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex,
@@ -131,10 +132,11 @@ inline int CompositeEventGenerator::computeIntValue(
 }
 
 inline float CompositeEventGenerator::computeFloatValue(
-    PartialEvent* partialEvent, map<int, Aggregate*>& aggregates,
-    int aggsSize[MAX_RULE_FIELDS], map<int, vector<PubPkt*>>& receivedPkts,
-    map<int, vector<PubPkt*>>& receivedAggs,
-    map<int, set<CPUParameter*>>& aggregateParameters, OpTree* opTree) {
+    PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
+    std::vector<int>& aggsSize, std::vector<std::vector<PubPkt*>>& receivedPkts,
+    std::vector<std::vector<PubPkt*>>& receivedAggs,
+    std::map<int, std::vector<CPUParameter>>& aggregateParameters,
+    OpTree* opTree) {
   OpTreeType type = opTree->getType();
   if (type == LEAF) {
     OpValueReference* reference = opTree->getValueReference();
@@ -154,7 +156,7 @@ inline float CompositeEventGenerator::computeFloatValue(
     int index = pktReference->getIndex();
     bool refersToAgg = pktReference->refersToAgg();
     if (!refersToAgg) {
-      PubPkt* pkt = partialEvent->indexes[index];
+      PubPkt* pkt = partialEvent.indexes[index];
       int attrIndex;
       ValType type;
       if (pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex,
@@ -203,10 +205,11 @@ inline float CompositeEventGenerator::computeFloatValue(
 }
 
 inline bool CompositeEventGenerator::computeBoolValue(
-    PartialEvent* partialEvent, map<int, Aggregate*>& aggregates,
-    int aggsSize[MAX_RULE_FIELDS], map<int, vector<PubPkt*>>& receivedPkts,
-    map<int, vector<PubPkt*>>& receivedAggs,
-    map<int, set<CPUParameter*>>& aggregateParameters, OpTree* opTree) {
+    PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
+    std::vector<int>& aggsSize, std::vector<std::vector<PubPkt*>>& receivedPkts,
+    std::vector<std::vector<PubPkt*>>& receivedAggs,
+    std::map<int, std::vector<CPUParameter>>& aggregateParameters,
+    OpTree* opTree) {
   OpTreeType type = opTree->getType();
   if (type == LEAF) {
     OpValueReference* reference = opTree->getValueReference();
@@ -226,7 +229,7 @@ inline bool CompositeEventGenerator::computeBoolValue(
     int index = pktReference->getIndex();
     bool refersToAgg = pktReference->refersToAgg();
     if (!refersToAgg) {
-      PubPkt* pkt = partialEvent->indexes[index];
+      PubPkt* pkt = partialEvent.indexes[index];
       int attrIndex;
       ValType type;
       if (pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex,
@@ -256,11 +259,11 @@ inline bool CompositeEventGenerator::computeBoolValue(
 }
 
 inline void CompositeEventGenerator::computeStringValue(
-    PartialEvent* partialEvent, map<int, Aggregate*>& aggregates,
-    int aggsSize[MAX_RULE_FIELDS], map<int, vector<PubPkt*>>& receivedPkts,
-    map<int, vector<PubPkt*>>& receivedAggs,
-    map<int, set<CPUParameter*>>& aggregateParameters, OpTree* opTree,
-    char* result) {
+    PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
+    std::vector<int>& aggsSize, std::vector<std::vector<PubPkt*>>& receivedPkts,
+    std::vector<std::vector<PubPkt*>>& receivedAggs,
+    std::map<int, std::vector<CPUParameter>>& aggregateParameters,
+    OpTree* opTree, char* result) {
   // No operator is defined for strings: type can only be LEAF
   OpValueReference* reference = opTree->getValueReference();
   RulePktValueReference* pktReference =
@@ -274,7 +277,7 @@ inline void CompositeEventGenerator::computeStringValue(
   int index = pktReference->getIndex();
   bool refersToAgg = pktReference->refersToAgg();
   if (!refersToAgg) {
-    PubPkt* pkt = partialEvent->indexes[index];
+    PubPkt* pkt = partialEvent.indexes[index];
     int attrIndex;
     ValType type;
     strcpy(result, "");
@@ -288,17 +291,17 @@ inline void CompositeEventGenerator::computeStringValue(
 }
 
 inline float CompositeEventGenerator::computeAggregate(
-    int index, PartialEvent* partialEvent, map<int, Aggregate*>& aggregates,
-    int aggsSize[MAX_RULE_FIELDS], map<int, vector<PubPkt*>>& receivedPkts,
-    map<int, vector<PubPkt*>>& receivedAggs,
-    map<int, set<CPUParameter*>>& aggregateParameters) {
-  Aggregate* agg = aggregates[index];
-  TimeMs maxTS = partialEvent->indexes[agg->upperId]->getTimeStamp();
+    int index, PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
+    std::vector<int>& aggsSize, std::vector<std::vector<PubPkt*>>& receivedPkts,
+    std::vector<std::vector<PubPkt*>>& receivedAggs,
+    std::map<int, std::vector<CPUParameter>>& aggregateParameters) {
+  Aggregate& agg = aggregates[index];
+  TimeMs maxTS = partialEvent.indexes[agg.upperId]->getTimeStamp();
   TimeMs minTS = 0;
-  if (agg->lowerId < 0) {
-    minTS = maxTS - agg->lowerTime;
+  if (agg.lowerId < 0) {
+    minTS = maxTS - agg.lowerTime;
   } else {
-    minTS = partialEvent->indexes[agg->lowerId]->getTimeStamp();
+    minTS = partialEvent.indexes[agg.lowerId]->getTimeStamp();
   }
   int index1 =
       getFirstValidElement(receivedAggs[index], aggsSize[index], minTS);
@@ -308,8 +311,8 @@ inline float CompositeEventGenerator::computeAggregate(
       getLastValidElement(receivedAggs[index], aggsSize[index], maxTS, index1);
   if (index2 < 0)
     index2 = index1;
-  AggregateFun fun = agg->fun;
-  char* name = agg->name;
+  AggregateFun fun = agg.fun;
+  char* name = agg.name;
   float sum = 0;
   int count = 0;
   float min = 0;
@@ -318,7 +321,7 @@ inline float CompositeEventGenerator::computeAggregate(
   ValType type;
   bool checkParams = false;
   bool firstValue = true;
-  map<int, set<CPUParameter*>>::iterator paramIt =
+  map<int, vector<CPUParameter>>::iterator paramIt =
       aggregateParameters.find(index);
   if (paramIt != aggregateParameters.end())
     checkParams = true;
@@ -371,13 +374,12 @@ inline float CompositeEventGenerator::computeAggregate(
   return 0;
 }
 
-bool CompositeEventGenerator::checkParameters(PubPkt* pkt,
-                                              PartialEvent* partialEvent,
-                                              set<CPUParameter*>& parameters) {
-  for (set<CPUParameter*>::iterator it = parameters.begin();
+bool CompositeEventGenerator::checkParameters(
+    PubPkt* pkt, PartialEvent& partialEvent, vector<CPUParameter>& parameters) {
+  for (vector<CPUParameter>::iterator it = parameters.begin();
        it != parameters.end(); ++it) {
     // cout << "Agg par" << endl;
-    if (!checkComplexParameter(pkt, partialEvent, *it, -1, AGG))
+    if (!checkComplexParameter(pkt, &partialEvent, &(*it), -1, AGG))
       return false;
   }
   return true;

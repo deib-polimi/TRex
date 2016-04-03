@@ -31,6 +31,12 @@ public:
    */
   Stack(int refersTo, TimeMs window, CompKind kind);
 
+  Stack(const Stack& other);
+
+  Stack(Stack&& other);
+
+  Stack& operator=(Stack other);
+
   /**
    * Destructor
    */

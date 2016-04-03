@@ -53,11 +53,11 @@ public:
    * from the set of events given as input parameter.
    */
   PubPkt* generateCompositeEvent(
-      PartialEvent* partialEvent, std::map<int, Aggregate*>& aggregates,
-      int aggsSize[MAX_RULE_FIELDS],
-      std::map<int, std::vector<PubPkt*>>& receivedPkts,
-      std::map<int, std::vector<PubPkt*>>& receivedAggs,
-      std::map<int, std::set<CPUParameter*>>& aggregateParameters);
+      PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
+      std::vector<int>& aggsSize,
+      std::vector<std::vector<PubPkt*>>& receivedPkts,
+      std::vector<std::vector<PubPkt*>>& receivedAggs,
+      std::map<int, std::vector<CPUParameter>>& aggregateParameters);
 
 private:
   int loccount;
@@ -74,11 +74,11 @@ private:
    * Requires the type to be INT
    */
   inline int computeIntValue(
-      PartialEvent* partialEvent, std::map<int, Aggregate*>& aggregates,
-      int aggsSize[MAX_RULE_FIELDS],
-      std::map<int, std::vector<PubPkt*>>& receivedPkts,
-      std::map<int, std::vector<PubPkt*>>& receivedAggs,
-      std::map<int, std::set<CPUParameter*>>& aggregateParameters,
+      PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
+      std::vector<int>& aggsSize,
+      std::vector<std::vector<PubPkt*>>& receivedPkts,
+      std::vector<std::vector<PubPkt*>>& receivedAggs,
+      std::map<int, std::vector<CPUParameter>>& aggregateParameters,
       OpTree* opTree);
 
   /**
@@ -86,11 +86,11 @@ private:
    * Requires the type to be FLOAT
    */
   inline float computeFloatValue(
-      PartialEvent* partialEvent, std::map<int, Aggregate*>& aggregates,
-      int aggsSize[MAX_RULE_FIELDS],
-      std::map<int, std::vector<PubPkt*>>& receivedPkts,
-      std::map<int, std::vector<PubPkt*>>& receivedAggs,
-      std::map<int, std::set<CPUParameter*>>& aggregateParameters,
+      PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
+      std::vector<int>& aggsSize,
+      std::vector<std::vector<PubPkt*>>& receivedPkts,
+      std::vector<std::vector<PubPkt*>>& receivedAggs,
+      std::map<int, std::vector<CPUParameter>>& aggregateParameters,
       OpTree* opTree);
 
   /**
@@ -98,11 +98,11 @@ private:
    * Requires the type to be BOOL
    */
   inline bool computeBoolValue(
-      PartialEvent* partialEvent, std::map<int, Aggregate*>& aggregates,
-      int aggsSize[MAX_RULE_FIELDS],
-      std::map<int, std::vector<PubPkt*>>& receivedPkts,
-      std::map<int, std::vector<PubPkt*>>& receivedAggs,
-      std::map<int, std::set<CPUParameter*>>& aggregateParameters,
+      PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
+      std::vector<int>& aggsSize,
+      std::vector<std::vector<PubPkt*>>& receivedPkts,
+      std::vector<std::vector<PubPkt*>>& receivedAggs,
+      std::map<int, std::vector<CPUParameter>>& aggregateParameters,
       OpTree* opTree);
 
   /**
@@ -110,11 +110,11 @@ private:
    * Requires the type to be STRING
    */
   inline void computeStringValue(
-      PartialEvent* partialEvent, std::map<int, Aggregate*>& aggregates,
-      int aggsSize[MAX_RULE_FIELDS],
-      std::map<int, std::vector<PubPkt*>>& receivedPkts,
-      std::map<int, std::vector<PubPkt*>>& receivedAggs,
-      std::map<int, std::set<CPUParameter*>>& aggregateParameters,
+      PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
+      std::vector<int>& aggsSize,
+      std::vector<std::vector<PubPkt*>>& receivedPkts,
+      std::vector<std::vector<PubPkt*>>& receivedAggs,
+      std::map<int, std::vector<CPUParameter>>& aggregateParameters,
       OpTree* opTree, char* result);
 
   /**
@@ -124,17 +124,17 @@ private:
    * for computing the aggregate.
    */
   inline float computeAggregate(
-      int index, PartialEvent* partialEvent,
-      std::map<int, Aggregate*>& aggregates, int aggsSize[MAX_RULE_FIELDS],
-      std::map<int, std::vector<PubPkt*>>& receivedPkts,
-      std::map<int, std::vector<PubPkt*>>& receivedAggs,
-      std::map<int, std::set<CPUParameter*>>& aggregateParameters);
+      int index, PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
+      std::vector<int>& aggsSize,
+      std::vector<std::vector<PubPkt*>>& receivedPkts,
+      std::vector<std::vector<PubPkt*>>& receivedAggs,
+      std::map<int, std::vector<CPUParameter>>& aggregateParameters);
 
   /**
    * Returns true if the packet satisfies all parameters, and false otherwise
    */
-  inline bool checkParameters(PubPkt* pkt, PartialEvent* partialEvent,
-                              std::set<CPUParameter*>& parameters);
+  inline bool checkParameters(PubPkt* pkt, PartialEvent& partialEvent,
+                              std::vector<CPUParameter>& parameters);
 };
 
 #endif /* COMPOSITEEVENTGENERATOR_H_ */

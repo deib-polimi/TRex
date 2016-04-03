@@ -91,10 +91,11 @@ private:
   RulePkt* rulePkt;
 
   // Stacks in the rule (stack id -> data structure)
-  std::map<int, Stack*> stacks;
+  std::vector<Stack> stacks;
   // Set of parameters to check at the end
-  std::set<Parameter*> endStackParameters;
-  std::map<int, std::set<CPUParameter*>> branchStackComplexParameters;
+  std::vector<Parameter> endStackParameters;
+  // Parameters in the rule to check in the meantime
+  std::map<int, std::vector<CPUParameter>> branchStackComplexParameters;
   // Parameters in the rule to check in the meantime
   // (stack id -> data structure)
   // std::map<int, std::set<Parameter *> > branchStackParameters;
@@ -104,14 +105,14 @@ private:
 
   // Parameters in the rule to check in the meantime
   // (negation id -> data structure)
-  std::map<int, std::set<CPUParameter*>> negationComplexParameters;
+  std::map<int, std::vector<CPUParameter>> negationComplexParameters;
   // Parameters in the rule to check in the meantime
   // (aggregate id -> data structure)
-  std::map<int, std::set<CPUParameter*>> aggregateComplexParameters;
+  std::map<int, std::vector<CPUParameter>> aggregateComplexParameters;
   // Aggregate in the rule (aggregate id -> data structure)
-  std::map<int, Aggregate*> aggregates;
+  std::vector<Aggregate> aggregates;
   // Negations in the rule (negation id -> data structure)
-  std::map<int, Negation*> negations;
+  std::vector<Negation> negations;
   // Number of stacks in the rule
   int stacksNum;
   // Number of aggregates in the rule
@@ -120,21 +121,21 @@ private:
   int negsNum;
 
   // Stack id -> state it refers to in the rule
-  std::map<int, int> referenceState;
+  std::vector<int> referenceState;
 
   // Number of pkts stored for each stack in the rule
-  int stacksSize[MAX_RULE_FIELDS];
+  std::vector<int> stacksSize;
   // Number of pkts stored for each negation in the rule
-  int negsSize[MAX_RULE_FIELDS];
+  std::vector<int> negsSize;
   // Number of pkts stored for each aggregate in the sequence
-  int aggsSize[MAX_RULE_FIELDS];
+  std::vector<int> aggsSize;
 
   // Aggregate index -> set of all matching PubPkt
-  std::map<int, std::vector<PubPkt*>> receivedAggs;
+  std::vector<std::vector<PubPkt*>> receivedAggs;
   // Stack index -> set of all matching PubPkt
-  std::map<int, std::vector<PubPkt*>> receivedPkts;
+  std::vector<std::vector<PubPkt*>> receivedPkts;
   // Negation index -> set of all matching PubPkt
-  std::map<int, std::vector<PubPkt*>> receivedNegs;
+  std::vector<std::vector<PubPkt*>> receivedNegs;
 
   // Indexes of events in the consuming clause (set of stack ids)
   std::set<int> consumingIndexes;
@@ -222,7 +223,7 @@ private:
    * Returns true if all parameters are satisfied by the packet
    */
   inline bool checkParameters(PubPkt* pkt, PartialEvent* partialEvent,
-                              std::set<CPUParameter*>& complexParameters,
+                              std::vector<CPUParameter>& complexParameters,
                               int index, StateType sType);
 
   /**
@@ -230,7 +231,7 @@ private:
    */
   inline void removePartialEventsNotMatchingParameters(
       std::list<PartialEvent*>* partialEvents,
-      std::set<Parameter*>& parameters);
+      std::vector<Parameter>& parameters);
 
   /**
    * Remove packets invalidated by timing constraints.
