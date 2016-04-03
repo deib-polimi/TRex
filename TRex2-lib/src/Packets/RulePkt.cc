@@ -68,7 +68,7 @@ RulePkt::~RulePkt() {
   }
 }
 
-bool RulePkt::addRootPredicate(int eventType, Constraint constr[],
+bool RulePkt::addRootPredicate(int eventType, Constraint constraints[],
                                int constrLen) {
   if (predicates.size() > 0) {
     return false;
@@ -81,14 +81,15 @@ bool RulePkt::addRootPredicate(int eventType, Constraint constr[],
   p.constraintsNum = constrLen;
   p.constraints = new Constraint[constrLen];
   for (int i = 0; i < constrLen; ++i) {
-    p.constraints[i] = constr[i];
+    p.constraints[i] = constraints[i];
   }
   predicates.push_back(std::move(p));
   return true;
 }
 
-bool RulePkt::addPredicate(int eventType, Constraint constr[], int constrLen,
-                           int refersTo, TimeMs& win, CompKind kind) {
+bool RulePkt::addPredicate(int eventType, Constraint constraints[],
+                           int constrLen, int refersTo, const TimeMs& win,
+                           CompKind kind) {
   int numPredicates = predicates.size();
   if (numPredicates <= 0 || refersTo >= numPredicates) {
     return false;
@@ -101,19 +102,19 @@ bool RulePkt::addPredicate(int eventType, Constraint constr[], int constrLen,
   p.constraintsNum = constrLen;
   p.constraints = new Constraint[constrLen];
   for (int i = 0; i < constrLen; ++i) {
-    p.constraints[i] = constr[i];
+    p.constraints[i] = constraints[i];
   }
   predicates.push_back(std::move(p));
   return true;
 }
 
-bool RulePkt::addTimeBasedNegation(int eventType, Constraint* constraints,
+bool RulePkt::addTimeBasedNegation(int eventType, Constraint constraints[],
                                    int constrLen, int referenceId,
-                                   TimeMs& win) {
+                                   const TimeMs& win) {
   return addNegation(eventType, constraints, constrLen, -1, win, referenceId);
 }
 
-bool RulePkt::addNegationBetweenStates(int eventType, Constraint* constraints,
+bool RulePkt::addNegationBetweenStates(int eventType, Constraint constraints[],
                                        int constrLen, int id1, int id2) {
   if (id1 < id2) {
     std::swap(id1, id2);
@@ -130,7 +131,7 @@ bool RulePkt::addParameterBetweenStates(int id1, char* name1, int id2,
   return addParameter(id1, name1, id2, name2, STATE);
 }
 
-int RulePkt::findLastState(OpTree* tree) {
+int RulePkt::findLastState(OpTree* tree) const {
   if (tree->getType() == LEAF) {
     OpValueReference* reference = tree->getValueReference();
     RulePktValueReference* pktReference =
@@ -149,7 +150,7 @@ int RulePkt::findLastState(OpTree* tree) {
   }
 }
 
-int RulePkt::findAggregate(OpTree* tree) {
+int RulePkt::findAggregate(OpTree* tree) const {
   if (tree->getType() == LEAF) {
     OpValueReference* reference = tree->getValueReference();
     RulePktValueReference* pktReference =
@@ -168,7 +169,7 @@ int RulePkt::findAggregate(OpTree* tree) {
   }
 }
 
-int RulePkt::findNegation(OpTree* tree) {
+int RulePkt::findNegation(OpTree* tree) const {
   if (tree->getType() == LEAF) {
     OpValueReference* reference = tree->getValueReference();
     RulePktValueReference* pktReference =
@@ -261,7 +262,7 @@ int RulePkt::findDepth(OpTree* tree, int depth) {
 }
 
 void RulePkt::serializeTrees(OpTree* ltree, OpTree* rtree, int depth,
-                             GPUParameter& gp) {
+                             GPUParameter& gp) const {
   // clear the array
   for (int i = 0; i < (1 << depth) - 1; ++i) {
     gp.rightTree[i].empty = gp.leftTree[i].empty = true;
@@ -280,7 +281,7 @@ void RulePkt::serializeTrees(OpTree* ltree, OpTree* rtree, int depth,
   gp.rSize = cnt;
 }
 
-void RulePkt::serializeNode(OpTree* tree, int& idx, Node serialized[]) {
+void RulePkt::serializeNode(OpTree* tree, int& idx, Node serialized[]) const {
   serialized[idx].empty = false;
   if (tree->getType() == LEAF) {
     serialized[idx].type = LEAF;
@@ -371,14 +372,15 @@ bool RulePkt::addParameterForAggregate(int id, char* name, int aggId,
   return addParameter(id, name, aggId, aggName, AGG);
 }
 
-bool RulePkt::addTimeBasedAggregate(int eventType, Constraint* constraints,
-                                    int constrLen, int referenceId, TimeMs& win,
-                                    char* name, AggregateFun fun) {
+bool RulePkt::addTimeBasedAggregate(int eventType, Constraint constraints[],
+                                    int constrLen, int referenceId,
+                                    const TimeMs& win, char* name,
+                                    AggregateFun fun) {
   return addAggregate(eventType, constraints, constrLen, -1, win, referenceId,
                       name, fun);
 }
 
-bool RulePkt::addAggregateBetweenStates(int eventType, Constraint* constraints,
+bool RulePkt::addAggregateBetweenStates(int eventType, Constraint constraints[],
                                         int constrLen, int id1, int id2,
                                         char* name, AggregateFun fun) {
   if (id1 < id2) {
@@ -397,7 +399,7 @@ bool RulePkt::addConsuming(int eventIndex) {
   return true;
 }
 
-set<int> RulePkt::getLeaves() {
+set<int> RulePkt::getLeaves() const {
   set<int> leaves;
   for (const auto& it : getReferenceCount()) {
     if (it.second == 0) {
@@ -407,7 +409,7 @@ set<int> RulePkt::getLeaves() {
   return leaves;
 }
 
-set<int> RulePkt::getJoinPoints() {
+set<int> RulePkt::getJoinPoints() const {
   set<int> joinPoints;
   for (const auto& it : getReferenceCount()) {
     if (it.second > 0) {
@@ -417,7 +419,7 @@ set<int> RulePkt::getJoinPoints() {
   return joinPoints;
 }
 
-bool RulePkt::containsEventType(int eventType, bool includeNegations) {
+bool RulePkt::containsEventType(int eventType, bool includeNegations) const {
   auto checkPredicate =
       [this](const Predicate& it) { return it.eventType == eventType; };
   auto checkNegation =
@@ -428,7 +430,7 @@ bool RulePkt::containsEventType(int eventType, bool includeNegations) {
           std::any_of(negations.begin(), negations.end(), checkNegation));
 }
 
-set<int> RulePkt::getContainedEventTypes() {
+set<int> RulePkt::getContainedEventTypes() const {
   set<int> eventTypes;
   for (const auto& it : predicates) {
     eventTypes.insert(it.eventType);
@@ -436,7 +438,7 @@ set<int> RulePkt::getContainedEventTypes() {
   return eventTypes;
 }
 
-TimeMs RulePkt::getMaxWin() {
+TimeMs RulePkt::getMaxWin() const {
   TimeMs returnTime = 0;
   for (const auto& leaf : getLeaves()) {
     TimeMs currentTime = getWinBetween(0, leaf);
@@ -447,7 +449,7 @@ TimeMs RulePkt::getMaxWin() {
   return returnTime;
 }
 
-TimeMs RulePkt::getWinBetween(int lowerId, int upperId) {
+TimeMs RulePkt::getWinBetween(int lowerId, int upperId) const {
   int currentIndex = upperId;
   TimeMs timeBetween = 0;
   while (currentIndex != lowerId) {
@@ -457,7 +459,7 @@ TimeMs RulePkt::getWinBetween(int lowerId, int upperId) {
   return timeBetween;
 }
 
-bool RulePkt::isDirectlyConnected(int id1, int id2) {
+bool RulePkt::isDirectlyConnected(int id1, int id2) const {
   int numPred = predicates.size();
   if (id1 == id2 || id1 < 0 || id2 < 0 || id1 >= numPred || id2 >= numPred) {
     return false;
@@ -465,7 +467,7 @@ bool RulePkt::isDirectlyConnected(int id1, int id2) {
   return (predicates[id2].refersTo == id1 || predicates[id1].refersTo == id2);
 }
 
-bool RulePkt::isInTheSameSequence(int id1, int id2) {
+bool RulePkt::isInTheSameSequence(int id1, int id2) const {
   int numPred = predicates.size();
   if (id1 == id2 || id1 < 0 || id2 < 0 || id1 >= numPred || id2 >= numPred) {
     return false;
@@ -491,8 +493,9 @@ bool RulePkt::operator==(const RulePkt& pkt) const {
 
 bool RulePkt::operator!=(const RulePkt& pkt) const { return !(*this == pkt); }
 
-bool RulePkt::addNegation(int eventType, Constraint* constr, int constrLen,
-                          int lowerId, const TimeMs& lowerTime, int upperId) {
+bool RulePkt::addNegation(int eventType, Constraint constraints[],
+                          int constrLen, int lowerId, const TimeMs& lowerTime,
+                          int upperId) {
   int numPredicates = predicates.size();
   if (lowerId >= numPredicates) {
     return false;
@@ -511,7 +514,7 @@ bool RulePkt::addNegation(int eventType, Constraint* constr, int constrLen,
   n.constraintsNum = constrLen;
   n.constraints = new Constraint[constrLen];
   for (int i = 0; i < constrLen; ++i) {
-    n.constraints[i] = constr[i];
+    n.constraints[i] = constraints[i];
   }
   negations.push_back(std::move(n));
   return true;
@@ -547,9 +550,9 @@ bool RulePkt::addParameter(int index1, char* name1, int index2, char* name2,
   return true;
 }
 
-bool RulePkt::addAggregate(int eventType, Constraint* constr, int constrLen,
-                           int lowerId, const TimeMs& lowerTime, int upperId,
-                           char* name, AggregateFun fun) {
+bool RulePkt::addAggregate(int eventType, Constraint constraints[],
+                           int constrLen, int lowerId, const TimeMs& lowerTime,
+                           int upperId, char* name, AggregateFun fun) {
   int numPredicates = predicates.size();
   if (lowerId >= numPredicates) {
     return false;
@@ -568,7 +571,7 @@ bool RulePkt::addAggregate(int eventType, Constraint* constr, int constrLen,
   a.constraintsNum = constrLen;
   a.constraints = new Constraint[constrLen];
   for (int i = 0; i < constrLen; ++i) {
-    a.constraints[i] = constr[i];
+    a.constraints[i] = constraints[i];
   }
   strcpy(a.name, name);
   a.fun = fun;
@@ -576,7 +579,7 @@ bool RulePkt::addAggregate(int eventType, Constraint* constr, int constrLen,
   return true;
 }
 
-map<int, int> RulePkt::getReferenceCount() {
+map<int, int> RulePkt::getReferenceCount() const {
   map<int, int> referenceCount;
   int numPredicates = predicates.size();
   for (int i = 0; i < numPredicates; ++i) {
