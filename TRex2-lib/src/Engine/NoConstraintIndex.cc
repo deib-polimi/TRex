@@ -22,17 +22,19 @@
 
 using namespace std;
 
-NoConstraintIndex::NoConstraintIndex() { }
+NoConstraintIndex::NoConstraintIndex() {}
 
-NoConstraintIndex::~NoConstraintIndex() { }
+NoConstraintIndex::~NoConstraintIndex() {}
 
-void NoConstraintIndex::installPredicate(TablePred *predicate) {
-	predicates.insert(predicate);
+void NoConstraintIndex::installPredicate(TablePred* predicate) {
+  predicates.insert(predicate);
 }
 
-void NoConstraintIndex::processMessage(PubPkt *pkt, MatchingHandler &mh, map<TablePred *, int> &predCount) {
-	for (set<TablePred *>::iterator it=predicates.begin(); it!=predicates.end(); ++it) {
-		TablePred *pred = *it;
-		addToMatchingHandler(mh, pred);
-	}
+void NoConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
+                                       map<TablePred*, int>& predCount) {
+  for (set<TablePred*>::iterator it = predicates.begin();
+       it != predicates.end(); ++it) {
+    TablePred* pred = *it;
+    addToMatchingHandler(mh, pred);
+  }
 }

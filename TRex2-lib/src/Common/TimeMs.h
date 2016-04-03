@@ -33,58 +33,56 @@
  */
 class TimeMs {
 public:
+  /**
+   * Empty constructor: builds a new TimeMs with the current time value
+   */
+  TimeMs();
 
-	/**
-	 * Empty constructor: builds a new TimeMs with the current time value
-	 */
-	TimeMs();
+  /**
+   * Copy constructor
+   */
+  TimeMs(const TimeMs& x);
 
-	/**
-	 * Copy constructor
-	 */
-	TimeMs(const TimeMs &x);
+  /**
+   * Constructor with time value
+   */
+  TimeMs(uint64_t parTime);
 
-	/**
-	 * Constructor with time value
-	 */
-	TimeMs(uint64_t parTime);
+  /**
+   * Destructor
+   */
+  virtual ~TimeMs();
 
-	/**
-	 * Destructor
-	 */
-	virtual ~TimeMs();
+  /**
+   * Return true if and only if the time has elapsed
+   */
+  bool elapsed() const;
 
-	/**
-	 * Return true if and only if the time has elapsed
-	 */
-	bool elapsed() const;
+  /**
+   * Returns the stored value in milliseconds
+   */
+  uint64_t getTimeVal() const;
 
-	/**
-	 * Returns the stored value in milliseconds
-	 */
-	uint64_t getTimeVal() const;
-
-	/**
-	 * Overriding of operators
-	 */
-	TimeMs operator+(const TimeMs &x);
-	TimeMs operator-(const TimeMs &x);
-	TimeMs & operator=(const TimeMs &x);
-	TimeMs & operator+=(const TimeMs &x);
-	TimeMs & operator-=(const TimeMs &x);
-	bool operator==(const TimeMs &x) const;
-	bool operator!=(const TimeMs &x) const;
-	bool operator<(const TimeMs &x) const;
-	bool operator>(const TimeMs &x) const;
-	bool operator<=(const TimeMs &x) const;
-	bool operator>=(const TimeMs &x) const;
+  /**
+   * Overriding of operators
+   */
+  TimeMs operator+(const TimeMs& x);
+  TimeMs operator-(const TimeMs& x);
+  TimeMs& operator=(const TimeMs& x);
+  TimeMs& operator+=(const TimeMs& x);
+  TimeMs& operator-=(const TimeMs& x);
+  bool operator==(const TimeMs& x) const;
+  bool operator!=(const TimeMs& x) const;
+  bool operator<(const TimeMs& x) const;
+  bool operator>(const TimeMs& x) const;
+  bool operator<=(const TimeMs& x) const;
+  bool operator>=(const TimeMs& x) const;
 
 private:
-	// Time value
-	 uint64_t timeVal;
-
+  // Time value
+  uint64_t timeVal;
 };
 
-std::ostream& operator<<(std::ostream &out, const TimeMs &x);
+std::ostream& operator<<(std::ostream& out, const TimeMs& x);
 
 #endif

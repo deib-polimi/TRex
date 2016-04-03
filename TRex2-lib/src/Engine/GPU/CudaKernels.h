@@ -37,121 +37,146 @@ using namespace std;
 class CudaKernels {
 
 public:
-    /**
-     * Get a new intance of this class
-     */
-    static CudaKernels *getInstance(GPUProcessorIf* processor, MemoryManager *m, int mmT);
+  /**
+   * Get a new intance of this class
+   */
+  static CudaKernels* getInstance(GPUProcessorIf* processor, MemoryManager* m,
+                                  int mmT);
 
-    /**
-     * Destructor
-     */
-    ~CudaKernels();
+  /**
+   * Destructor
+   */
+  ~CudaKernels();
 
-    /**
-     * Sets the processor that is using the kernel
-     */
-    void setProcessor(GPUProcessorIf *processor);
+  /**
+   * Sets the processor that is using the kernel
+   */
+  void setProcessor(GPUProcessorIf* processor);
 
-    /**
-     * Decreases the reference count.
-     * If the reference count goes to zero, deletes the kernel.
-     */
-    static void decRefCount();
+  /**
+   * Decreases the reference count.
+   * If the reference count goes to zero, deletes the kernel.
+   */
+  static void decRefCount();
 
-    /**
-     * Sets the parameters
-     */
-    bool setParameters(map<int, set<GPUParameter *> > parameters);
+  /**
+   * Sets the parameters
+   */
+  bool setParameters(map<int, set<GPUParameter*>> parameters);
 
-    /**
-     * Sets the aggregates
-     */
-    void setAggregates(map<int, Aggregate *> aggregates);
+  /**
+   * Sets the aggregates
+   */
+  void setAggregates(map<int, Aggregate*> aggregates);
 
-    /**
-     * Sets the parameters for aggregates
-     */
-    bool setAggregatesParameters(map<int, set<GPUParameter *> > aggregatesParameters);
+  /**
+   * Sets the parameters for aggregates
+   */
+  bool setAggregatesParameters(
+      map<int, set<GPUParameter*>> aggregatesParameters);
 
-    /**
-     * Sets the parameters for negations
-     */
-    bool setNegationsParameters(map<int, set<GPUParameter *> > negationsParameters);
+  /**
+   * Sets the parameters for negations
+   */
+  bool setNegationsParameters(map<int, set<GPUParameter*>> negationsParameters);
 
-    /**
-     * Sets the stacks of EventInfo for events and negations
-     */
-    void setEventsStacks();
+  /**
+   * Sets the stacks of EventInfo for events and negations
+   */
+  void setEventsStacks();
 
-    /**
-     * Copies the last event to the device memory
-     */
-    void copyLastEventToDevice(PubPkt *event);
+  /**
+   * Copies the last event to the device memory
+   */
+  void copyLastEventToDevice(PubPkt* event);
 
-    /**
-     * Performs the computation on the device
-     */
-    void compute();
+  /**
+   * Performs the computation on the device
+   */
+  void compute();
 
-    /**
-     * Retrieves information from the device and fills the set of generated events
-     */
-    void getGeneratedEvents(set<PubPkt *> &generatedEventsSet);
-
+  /**
+   * Retrieves information from the device and fills the set of generated events
+   */
+  void getGeneratedEvents(set<PubPkt*>& generatedEventsSet);
 
 private:
   /**
-     * Sets the stacks of EventInfo for aggregates
-     */
-    void setAggregateStacks();
-    void initAliveChecker();
-    uint8_t aliveChecker;
-    EventInfoSet *eventsSet;
-    Parameter hostParameters[MAX_PARAMETERS_NUM];
-    GPUParameter hostComplexParameters[MAX_PARAMETERS_NUM];
-    int parametersNum;
+   * Sets the stacks of EventInfo for aggregates
+   */
+  void setAggregateStacks();
+  void initAliveChecker();
+  uint8_t aliveChecker;
+  EventInfoSet* eventsSet;
+  Parameter hostParameters[MAX_PARAMETERS_NUM];
+  GPUParameter hostComplexParameters[MAX_PARAMETERS_NUM];
+  int parametersNum;
 
-    void setAllNegations(int i, int n, negsPasser &negp, int &negSize, int &negMinId);
-    void setNegation(int n, passer &negp, parPasser &parp, int &negSize, int &negminId);
-    LoopKind prepareForNextLoop(int state, int &size, int &minId, passer &pages, parPasser &parameters, int negs[MAX_NEGATIONS_NUM], int &negsnum, bool &firstWithin);
-    float aggResult;
-    int mmToken;
-    MemoryManager *mm;
-    bool checkNegations(EventInfoSet eventsSet);
-    void deleteConsumed(EventInfoSet *eventsSet, int size);
-    int foots;
-    static CudaKernels *instance;														// The instance, used in the case of a singleton implementation
-    int refCount;																						// Reference counting variable
-    EventInfo *buffer;																			// Used to add a new event to the matrix of received
-    int *resultsSize;
-    int *aggResultsSize;
-    float *aggRes;																						// Pointer to the result of gpu reduction in host memory
-    EventInfoSet *lastEvent;																// Representation of the last event in host memory
-    int *aggregatesValPtr; // Pointers to partial values for aggregates in device memory
-    int parametersSize[MAX_RULE_FIELDS-1][MAX_PARAMETERS_NUM];									// Number of parameters defined for each state
-    int aggregatesParametersSize[MAX_RULE_FIELDS-1][MAX_PARAMETERS_NUM];				// Number of parameters defined for each aggregate
-    int negationsParametersSize[MAX_RULE_FIELDS-1][MAX_PARAMETERS_NUM];
-    GPUProcessorIf *processor;																			// Parameters handler
-    map<int, Aggregate *> aggregates;												// Set of aggregates defined for the rule
+  void setAllNegations(int i, int n, negsPasser& negp, int& negSize,
+                       int& negMinId);
+  void setNegation(int n, passer& negp, parPasser& parp, int& negSize,
+                   int& negminId);
+  LoopKind prepareForNextLoop(int state, int& size, int& minId, passer& pages,
+                              parPasser& parameters,
+                              int negs[MAX_NEGATIONS_NUM], int& negsnum,
+                              bool& firstWithin);
+  float aggResult;
+  int mmToken;
+  MemoryManager* mm;
+  bool checkNegations(EventInfoSet eventsSet);
+  void deleteConsumed(EventInfoSet* eventsSet, int size);
+  int foots;
+  // The instance, used in the case of a singleton implementation
+  static CudaKernels* instance;
+  // Reference counting variable
+  int refCount;
+  // Used to add a new event to the matrix of received
+  EventInfo* buffer;
+  int* resultsSize;
+  int* aggResultsSize;
+  // Pointer to the result of gpu reduction in host memory
+  float* aggRes;
+  // Representation of the last event in host memory
+  EventInfoSet* lastEvent;
+  // Pointers to partial values for aggregates in device memory
+  int* aggregatesValPtr;
+  // Number of parameters defined for each state
+  int parametersSize[MAX_RULE_FIELDS - 1][MAX_PARAMETERS_NUM];
+  // Number of parameters defined for each aggregate
+  int aggregatesParametersSize[MAX_RULE_FIELDS - 1][MAX_PARAMETERS_NUM];
+  int negationsParametersSize[MAX_RULE_FIELDS - 1][MAX_PARAMETERS_NUM];
+  // Parameters handler
+  GPUProcessorIf* processor;
+  // Set of aggregates defined for the rule
+  map<int, Aggregate*> aggregates;
 
-    /**
-     * Constructor. It is kept private since some implementations require this class to
-     * be implemented as a singleton
-     */
-    CudaKernels(GPUProcessorIf* processor, MemoryManager *m, int mmT);
+  /**
+   * Constructor. It is kept private since some implementations require this
+   * class to be implemented as a singleton
+   */
+  CudaKernels(GPUProcessorIf* processor, MemoryManager* m, int mmT);
 
-    /**
-     * Compute the value of aggregates.
-     * Used indexes contains the events used at each state.
-     * Stores the result of each aggregate in the results map.
-     */
-    float computeAggregates(EventInfoSet &usedEvents, map<int, Aggregate *> &aggregates, int i, OpTree *tree, Attribute *attributes);
-    int computeIntValue(EventInfoSet &events, map<int, Aggregate *> &aggregates, OpTree *opTree, Attribute *attributes);
-    bool computeBoolValue(EventInfoSet &events, map<int, Aggregate *> &aggregates, OpTree *opTree);
-    void computeStringValue(EventInfoSet &events, map<int, Aggregate *> &aggregates, OpTree *opTree, char *result);
-    float computeFloatValue(EventInfoSet &events, map<int, Aggregate *> &aggregates, OpTree *opTree, Attribute *attributes);
-    bool staticAttributesAdded;
-    void addStaticAttributes(CompositeEventTemplate *ceTemplate, Attribute *attributes);
+  /**
+   * Compute the value of aggregates.
+   * Used indexes contains the events used at each state.
+   * Stores the result of each aggregate in the results map.
+   */
+  float computeAggregates(EventInfoSet& usedEvents,
+                          map<int, Aggregate*>& aggregates, int i, OpTree* tree,
+                          Attribute* attributes);
+  int computeIntValue(EventInfoSet& events, map<int, Aggregate*>& aggregates,
+                      OpTree* opTree, Attribute* attributes);
+  bool computeBoolValue(EventInfoSet& events, map<int, Aggregate*>& aggregates,
+                        OpTree* opTree);
+  void computeStringValue(EventInfoSet& events,
+                          map<int, Aggregate*>& aggregates, OpTree* opTree,
+                          char* result);
+  float computeFloatValue(EventInfoSet& events,
+                          map<int, Aggregate*>& aggregates, OpTree* opTree,
+                          Attribute* attributes);
+  bool staticAttributesAdded;
+  void addStaticAttributes(CompositeEventTemplate* ceTemplate,
+                           Attribute* attributes);
 };
 
 #endif

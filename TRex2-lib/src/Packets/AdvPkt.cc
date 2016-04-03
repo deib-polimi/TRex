@@ -23,13 +23,9 @@
 using namespace std;
 
 AdvPkt::AdvPkt(set<int> parAdvertisements) {
-	advertisements = parAdvertisements;
+  advertisements = parAdvertisements;
 }
 
-AdvPkt::AdvPkt(const AdvPkt &pkt) {
-	advertisements = pkt.advertisements;
-}
+AdvPkt::AdvPkt(const AdvPkt& pkt) { advertisements = pkt.advertisements; }
 
-AdvPkt::~AdvPkt() {
-
-}
+AdvPkt::~AdvPkt() {}

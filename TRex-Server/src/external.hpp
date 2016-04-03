@@ -44,7 +44,11 @@
 #include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/utility/setup/common_attributes.hpp>
 #include <boost/log/support/date_time.hpp>
+#if BOOST_VERSION >= 105500
+#include <boost/utility/empty_deleter.hpp>
+#else
 #include <boost/log/utility/empty_deleter.hpp>
+#endif
 
 
 // C++ Standard Library

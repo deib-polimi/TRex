@@ -25,17 +25,16 @@
 
 /**
  * Represents a generic constraint index.
- * It includes all common functions used by constraint indexes specialized for a given type.
+ * It includes all common functions used by constraint indexes
+ * specialized for a given type.
  */
 class AbstractConstraintIndex {
 
 protected:
-
-	/**
-	 * Adds the information of tp in mh
-	 */
-	void addToMatchingHandler(MatchingHandler &mh, TablePred *tp);
-
+  /**
+   * Adds the information of tp in mh
+   */
+  void addToMatchingHandler(MatchingHandler& mh, TablePred* tp);
 };
 
 #endif

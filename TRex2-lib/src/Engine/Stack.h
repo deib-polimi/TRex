@@ -26,63 +26,53 @@
 
 class Stack {
 public:
+  /**
+   * Constructor
+   */
+  Stack(int refersTo, TimeMs window, CompKind kind);
 
-	/**
-	 * Constructor
-	 */
-	Stack(int refersTo, TimeMs window, CompKind kind);
+  /**
+   * Destructor
+   */
+  virtual ~Stack();
 
-	/**
-	 * Destructor
-	 */
-	virtual ~Stack();
+  CompKind getKind() const { return kind; }
 
-	CompKind getKind() const {
-		return kind;
-	}
+  TimeMs getWindow() const { return win; }
 
-	TimeMs getWindow() const {
-		return win;
-	}
+  int getRefersTo() const { return refersTo; }
 
-	int getRefersTo() const {
-		return refersTo;
-	}
+  /**
+   * Add a new referred Stack
+   */
+  void addLookBackTo(int reference) { lookBackTo->insert(reference); }
 
-	/**
-	 * Add a new referred Stack
-	 */
-	void addLookBackTo(int reference) {
-		lookBackTo->insert(reference);
-	}
+  /**
+   * Get referred Stacks
+   */
+  std::set<int>* getLookBackTo() { return lookBackTo; }
 
-	/**
-	 * Get referred Stacks
-	 */
-	std::set<int> * getLookBackTo() {
-		return lookBackTo;
-	}
+  /**
+   * Add a new referred Negation
+   */
+  void addLinkedNegation(int reference) { linkedNegations->insert(reference); }
 
-	/**
-	 * Add a new referred Negation
-	 */
-	void addLinkedNegation(int reference) {
-		linkedNegations->insert(reference);
-	}
-
-	/**
-	 * Get referred Negations
-	 */
-	std::set<int> *getLinkedNegations() {
-		return linkedNegations;
-	}
+  /**
+   * Get referred Negations
+   */
+  std::set<int>* getLinkedNegations() { return linkedNegations; }
 
 private:
-	int refersTo;												// The stack it refers to
-	TimeMs win; 												// The maximum time window to look back in the previous column
-	CompKind kind; 											// The kind of composition
-	std::set<int> *lookBackTo; 					// Referred stacks
-	std::set<int> *linkedNegations; 		// Referred negations
+  // The stack it refers to
+  int refersTo;
+  // The maximum time window to look back in the previous column
+  TimeMs win;
+  // The kind of composition
+  CompKind kind;
+  // Referred stacks
+  std::set<int>* lookBackTo;
+  // Referred negations
+  std::set<int>* linkedNegations;
 };
 
 #endif

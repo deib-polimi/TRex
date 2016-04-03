@@ -1,0 +1,9 @@
+---
+BasedOnStyle: Mozilla
+
+DerivePointerAlignment: false
+
+PointerAlignment: Left
+
+Standard: Cpp11
+...

@@ -22,38 +22,39 @@
 
 using namespace std;
 
-void AbstractConstraintIndex::addToMatchingHandler(MatchingHandler &mh, TablePred *tp) {
-	// Predicate refers to states
-	if (tp->stateType==STATE) {
-		map<int, set<int> >::iterator it=mh.matchingStates.find(tp->ruleId);
-		if (it==mh.matchingStates.end()) {
-			set<int> states;
-			states.insert(tp->stateId);
-			mh.matchingStates.insert(make_pair(tp->ruleId, states));
-		} else {
-			it->second.insert(tp->stateId);
-		}
-	}
-	// Predicate refers to aggregates
-	else if (tp->stateType==AGG) {
-		map<int, set<int> >::iterator it=mh.matchingAggregates.find(tp->ruleId);
-		if (it==mh.matchingAggregates.end()) {
-			set<int> aggs;
-			aggs.insert(tp->stateId);
-			mh.matchingAggregates.insert(make_pair(tp->ruleId, aggs));
-		} else {
-			it->second.insert(tp->stateId);
-		}
-	}
-	// Predicate refers to negations
-	else if (tp->stateType==NEG) {
-		map<int, set<int> >::iterator it=mh.matchingNegations.find(tp->ruleId);
-		if (it==mh.matchingNegations.end()) {
-			set<int> negs;
-			negs.insert(tp->stateId);
-			mh.matchingNegations.insert(make_pair(tp->ruleId, negs));
-		} else {
-			it->second.insert(tp->stateId);
-		}
-	}
+void AbstractConstraintIndex::addToMatchingHandler(MatchingHandler& mh,
+                                                   TablePred* tp) {
+  // Predicate refers to states
+  if (tp->stateType == STATE) {
+    map<int, set<int>>::iterator it = mh.matchingStates.find(tp->ruleId);
+    if (it == mh.matchingStates.end()) {
+      set<int> states;
+      states.insert(tp->stateId);
+      mh.matchingStates.insert(make_pair(tp->ruleId, states));
+    } else {
+      it->second.insert(tp->stateId);
+    }
+  }
+  // Predicate refers to aggregates
+  else if (tp->stateType == AGG) {
+    map<int, set<int>>::iterator it = mh.matchingAggregates.find(tp->ruleId);
+    if (it == mh.matchingAggregates.end()) {
+      set<int> aggs;
+      aggs.insert(tp->stateId);
+      mh.matchingAggregates.insert(make_pair(tp->ruleId, aggs));
+    } else {
+      it->second.insert(tp->stateId);
+    }
+  }
+  // Predicate refers to negations
+  else if (tp->stateType == NEG) {
+    map<int, set<int>>::iterator it = mh.matchingNegations.find(tp->ruleId);
+    if (it == mh.matchingNegations.end()) {
+      set<int> negs;
+      negs.insert(tp->stateId);
+      mh.matchingNegations.insert(make_pair(tp->ruleId, negs));
+    } else {
+      it->second.insert(tp->stateId);
+    }
+  }
 }

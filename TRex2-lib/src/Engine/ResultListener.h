@@ -25,26 +25,29 @@
 #include "../Packets/PubPkt.h"
 
 /**
- * A ResultListener can be connected to the processing engine to receive results.
- * It is an abstract class: extending subclasses must define the handleResult method
+ * A ResultListener can be connected to the processing engine to receive
+ * results.
+ * It is an abstract class: extending subclasses must define the handleResult
+ * method
  * to actually define the result processing behavior.
  */
 class ResultListener {
 
 public:
+  virtual ~ResultListener() {}
 
-	virtual ~ResultListener() { }
-
-	/**
-	 * Receives results from the processing engine.
-	 * The genPkts parameter is the set of generated packets.
-	 * The meanProcTime represents the mean time for processing a message, in microseconds.
-	 *
-	 * Important: at the end of this function messages will be automatically delete.
-	 * The developer MUST call the incRefCount function if it wants to store the packet locally.
-	 */
-	virtual void handleResult(std::set<PubPkt *> &genPkts, double procTime) = 0;
-
+  /**
+   * Receives results from the processing engine.
+   * The genPkts parameter is the set of generated packets.
+   * The meanProcTime represents the mean time for processing a message,
+   * in microseconds.
+   *
+   * Important: at the end of this function messages will be
+   * automatically delete.
+   * The developer MUST call the incRefCount function if it wants
+   * to store the packet locally.
+   */
+  virtual void handleResult(std::set<PubPkt*>& genPkts, double procTime) = 0;
 };
 
 #endif

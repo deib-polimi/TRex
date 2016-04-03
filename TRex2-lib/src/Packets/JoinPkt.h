@@ -28,26 +28,28 @@
  */
 class JoinPkt {
 public:
-	/**
-	 * Constructor: set address and port
-	 */
-	JoinPkt(int address, int port);
+  /**
+   * Constructor: set address and port
+   */
+  JoinPkt(int address, int port);
 
-	/**
-	 * Destructor
-	 */
-	virtual ~JoinPkt();
+  /**
+   * Destructor
+   */
+  virtual ~JoinPkt();
 
-	/**
-	 * Getters
-	 */
-	long getAddress();
+  /**
+   * Getters
+   */
+  long getAddress();
 
-	int getPort();
+  int getPort();
 
 private:
-	long address;			// Address
-	int port;					// Port
+  // Address
+  long address;
+  // Port
+  int port;
 };
 
 #endif /* JOINPKT_H_ */

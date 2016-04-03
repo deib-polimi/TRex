@@ -28,20 +28,24 @@
  * Represents a boolean constraint stored in the index table
  */
 typedef struct BoolTableConstraintStruct {
-	char name[NAME_LEN];												// Attribute name
-	Op op;																			// Operator
-	bool val;																		// Attribute value
-	std::set<TablePred *> connectedPredicates;	// Set of predicates using the constraint
+  char name[NAME_LEN]; // Attribute name
+  Op op;               // Operator
+  bool val;            // Attribute value
+  std::set<TablePred*>
+      connectedPredicates; // Set of predicates using the constraint
 } BoolTableConstraint;
 
 /**
  * Contains a Value -> Constraint index for each defined operator
  */
 typedef struct BoolOperatorsTable {
-	std::map<bool, BoolTableConstraint *> eq;	// Value -> equality constraint
-	std::map<bool, BoolTableConstraint *> df;	// Value -> different from constraint
-	// Overriding
-	bool operator<(const BoolOperatorsTable &table) const { return eq<table.eq; }
+  // Value -> equality constraint
+  std::map<bool, BoolTableConstraint*> eq;
+  // Value -> different from constraint Overriding
+  std::map<bool, BoolTableConstraint*> df;
+  bool operator<(const BoolOperatorsTable& table) const {
+    return eq < table.eq;
+  }
 } BoolOps;
 
 /**
@@ -49,54 +53,57 @@ typedef struct BoolOperatorsTable {
  */
 class BoolConstraintIndex : AbstractConstraintIndex {
 public:
+  BoolConstraintIndex();
 
-	BoolConstraintIndex();
+  /**
+   * Frees dynamic memory
+   */
+  virtual ~BoolConstraintIndex();
 
-	/**
-	 * Frees dynamic memory
-	 */
-	virtual ~BoolConstraintIndex();
+  /**
+   * Creates or gets the BoolTableConstraint C representing the constraint
+   * given as parameter. Then it installs the predicate in C.
+   */
+  void installConstraint(Constraint& constraints, TablePred* predicate);
 
-	/**
-	 * Creates or gets the BoolTableConstraint C representing the constraint
-	 * given as parameter. Then it installs the predicate in C.
-	 */
-	void installConstraint(Constraint &constraints, TablePred *predicate);
-
-	/**
-	 * Processes the given message, using the partial results stored in predCount.
-	 * It updates predCount and fills mh with the matching states.
-	 */
-	void processMessage(PubPkt *pkt, MatchingHandler &mh, std::map<TablePred *, int> &predCount);
+  /**
+   * Processes the given message, using the partial results stored in predCount.
+   * It updates predCount and fills mh with the matching states.
+   */
+  void processMessage(PubPkt* pkt, MatchingHandler& mh,
+                      std::map<TablePred*, int>& predCount);
 
 private:
+  // Name -> indexes for that name
+  std::map<std::string, BoolOps> indexes;
+  // Set of all constraints used in the table
+  std::set<BoolTableConstraint*> usedConstraints;
 
-	std::map<std::string, BoolOps> indexes;						// Name -> indexes for that name
-	std::set<BoolTableConstraint *> usedConstraints;	// Set of all constraints used in the table
+  /**
+   * Checks if there already exists an BoolTableConstraints which is
+   * compatible with the constraint c.
+   * If it finds a valid BoolTableConstraints, return a pointer to it,
+   * otherwise returns null.
+   */
+  BoolTableConstraint* getConstraint(Constraint& c);
 
-	/**
-	 * Checks if there already exists an BoolTableConstraints which is
-	 * compatible with the constraint c.
-	 * If it finds a valid BoolTableConstraints, return a pointer to it,
-	 * otherwise returns null.
-	 */
-	BoolTableConstraint * getConstraint(Constraint &c);
+  /**
+   * Creates a new BoolTableConstraint using the information stored in the
+   * parameter constraint
+   */
+  BoolTableConstraint* createConstraint(Constraint& c);
 
-	/**
-	 * Creates a new BoolTableConstraint using the information stored in the parameter constraint
-	 */
-	BoolTableConstraint * createConstraint(Constraint &c);
+  /**
+   * Installs the given constraint to the appropriate table
+   */
+  inline void installConstraint(BoolTableConstraint* c);
 
-	/**
-	 * Installs the given constraint to the appropriate table
-	 */
-	inline void installConstraint(BoolTableConstraint *c);
-
-	/**
-	 * Processes the given constraint by updating the predCount and, if needed, the mh structures
-	 */
-	inline void processConstraint(BoolTableConstraint *c, MatchingHandler &mh, std::map<TablePred *, int> &predCount);
-
+  /**
+   * Processes the given constraint by updating the predCount and, if needed,
+   * the mh structures
+   */
+  inline void processConstraint(BoolTableConstraint* c, MatchingHandler& mh,
+                                std::map<TablePred*, int>& predCount);
 };
 
 #endif

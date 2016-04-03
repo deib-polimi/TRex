@@ -29,13 +29,12 @@
 class Engine {
 
 public:
+  virtual ~Engine() {}
 
-	virtual ~Engine() { }
-
-	virtual void processPubPkt(PubPkt *event) = 0;
-	virtual void processRulePkt(RulePkt *rule) = 0;
-	virtual void addResultListener(ResultListener *resultListener) = 0;
-	virtual void removeResultListener(ResultListener *resultListener) = 0;
+  virtual void processPubPkt(PubPkt* event) = 0;
+  virtual void processRulePkt(RulePkt* rule) = 0;
+  virtual void addResultListener(ResultListener* resultListener) = 0;
+  virtual void removeResultListener(ResultListener* resultListener) = 0;
 };
 
 #endif

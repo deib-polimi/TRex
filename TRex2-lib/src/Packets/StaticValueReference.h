@@ -28,55 +28,55 @@
 
 /**
  * A StaticValueReference extends the OpValueReference class and defines
- * each reference to value by pointing to an attribute or aggregate in the RulePkt.
+ * each reference to value by pointing to an attribute or aggregate in the
+ * RulePkt.
  */
-class StaticValueReference: public OpValueReference {
+class StaticValueReference : public OpValueReference {
 
 public:
+  /**
+   * Constructor for a reference to a normal state attribute.
+   * Parameters: index in the packet, and name of the attribute.
+   */
+  StaticValueReference(float pValue);
 
-	/**
-	 * Constructor for a reference to a normal state attribute.
-	 * Parameters: index in the packet, and name of the attribute.
-	 */
-	StaticValueReference(float pValue);
+  /**
+   * Constructor for a reference to an aggregate state.
+   */
+  StaticValueReference(int pValue);
 
-	/**
-	 * Constructor for a reference to an aggregate state.
-	 */
-	StaticValueReference(int pValue);
-	
-	StaticValueReference(bool pValue);
-	
-	StaticValueReference(char *pValue);
+  StaticValueReference(bool pValue);
 
-	/**
-	 * Destructor
-	 */
-	virtual ~StaticValueReference();
+  StaticValueReference(char* pValue);
 
-	/**
-	 * Creates an exact copy of the data structure
-	 */
-	OpValueReference * dup();
+  /**
+   * Destructor
+   */
+  virtual ~StaticValueReference();
 
-	ValType getType();
-	
-	int getIntValue();
-	
-	float getFloatValue();
-	
-	bool getBoolValue();
-	
-	void getStringValue(char *pValue);
-	
+  /**
+   * Creates an exact copy of the data structure
+   */
+  OpValueReference* dup();
+
+  ValType getType();
+
+  int getIntValue();
+
+  float getFloatValue();
+
+  bool getBoolValue();
+
+  void getStringValue(char* pValue);
+
 private:
-	ValType type;
-	union {
-	int intVal;
-	float floatVal;
-	bool boolVal;
-	char stringVal[STRING_VAL_LEN+1];
-	} value;
+  ValType type;
+  union {
+    int intVal;
+    float floatVal;
+    bool boolVal;
+    char stringVal[STRING_VAL_LEN + 1];
+  } value;
 };
 
 #endif /* STATICVALUEREFERENCE_H_ */

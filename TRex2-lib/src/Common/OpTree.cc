@@ -20,60 +20,55 @@
 
 #include "OpTree.h"
 
-OpTree::OpTree(OpValueReference *parValue, ValType parValType) {
-	type = LEAF;
-	leftTree = NULL;
-	rightTree = NULL;
-	value = parValue;
-	valType = parValType;
+OpTree::OpTree(OpValueReference* parValue, ValType parValType) {
+  type = LEAF;
+  leftTree = NULL;
+  rightTree = NULL;
+  value = parValue;
+  valType = parValType;
 }
 
-OpTree::OpTree(OpTree *parLeftTree, OpTree *parRightTree, OpTreeOperation parOp, ValType parValType) {
-	type = INNER;
-	leftTree = parLeftTree;
-	rightTree = parRightTree;
-	value = NULL;
-	op = parOp;
-	valType = parValType;
+OpTree::OpTree(OpTree* parLeftTree, OpTree* parRightTree, OpTreeOperation parOp,
+               ValType parValType) {
+  type = INNER;
+  leftTree = parLeftTree;
+  rightTree = parRightTree;
+  value = NULL;
+  op = parOp;
+  valType = parValType;
 }
 
 OpTree::~OpTree() {
-	if (leftTree!=NULL) delete leftTree;
-	if (rightTree!=NULL) delete rightTree;
-	if (value!=NULL) delete value;
+  if (leftTree != NULL)
+    delete leftTree;
+  if (rightTree != NULL)
+    delete rightTree;
+  if (value != NULL)
+    delete value;
 }
 
-OpTreeType OpTree::getType() {
-	return type;
+OpTreeType OpTree::getType() { return type; }
+
+ValType OpTree::getValType() { return valType; }
+
+OpTree* OpTree::getLeftSubtree() { return leftTree; }
+
+OpTree* OpTree::getRightSubtree() { return rightTree; }
+
+OpTreeOperation OpTree::getOp() { return op; }
+
+OpValueReference* OpTree::getValueReference() { return value; }
+
+void OpTree::changeValueReference(OpValueReference* parValue) {
+  if (type == INNER)
+    return;
+  delete value;
+  value = parValue;
 }
 
-ValType OpTree::getValType() {
-	return valType;
-}
-
-OpTree * OpTree::getLeftSubtree() {
-	return leftTree;
-}
-
-OpTree * OpTree::getRightSubtree() {
-	return rightTree;
-}
-
-OpTreeOperation OpTree::getOp() {
-	return op;
-}
-
-OpValueReference * OpTree::getValueReference() {
-	return value;
-}
-
-void OpTree::changeValueReference(OpValueReference *parValue) {
-	if (type==INNER) return;
-	delete value;
-	value = parValue;
-}
-
-OpTree * OpTree::dup() {
-	if (type==LEAF) return new OpTree(value->dup(), valType);
-	else return new OpTree(leftTree->dup(), rightTree->dup(), op, valType);
+OpTree* OpTree::dup() {
+  if (type == LEAF)
+    return new OpTree(value->dup(), valType);
+  else
+    return new OpTree(leftTree->dup(), rightTree->dup(), op, valType);
 }

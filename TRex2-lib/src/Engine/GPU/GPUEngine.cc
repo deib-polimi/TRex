@@ -21,93 +21,94 @@
 #include "GPUEngine.h"
 #include <sys/time.h>
 
-
 void GPUEngine::processRulePkt(RulePkt* rule) {
-    setRecursionNeeded(rule);
-    if (processors->size()+1 > MAX_RULE_NUM) {
-        cout << "Max number of rules for GPU engine reached; exiting" << endl;
-        exit(-1);
-    }
-    GPUProcessor *processor = new GPUProcessor(rule, mm);
-    processor->init();
-    processors->push_back(processor);
+  setRecursionNeeded(rule);
+  if (processors->size() + 1 > MAX_RULE_NUM) {
+    cout << "Max number of rules for GPU engine reached; exiting" << endl;
+    exit(-1);
+  }
+  GPUProcessor* processor = new GPUProcessor(rule, mm);
+  processor->init();
+  processors->push_back(processor);
 }
 
-
 GPUEngine::GPUEngine() {
-    generatedEvents.clear();
-//     cout << "GPU engine init..." << endl;
-    processors = new vector<GPUProcessor *>();
-    mm = new MemoryManager();
-    recursionNeeded = false;
-//     cout << "... done" << endl;
+  generatedEvents.clear();
+  // cout << "GPU engine init..." << endl;
+  processors = new vector<GPUProcessor*>();
+  mm = new MemoryManager();
+  recursionNeeded = false;
+  // cout << "... done" << endl;
 }
 
 GPUEngine::~GPUEngine() {
-    for (vector<GPUProcessor *>::iterator it=processors->begin(); it!=processors->end(); ++it) {
-        GPUProcessor *processor = *it;
-        delete processor;
+  for (vector<GPUProcessor*>::iterator it = processors->begin();
+       it != processors->end(); ++it) {
+    GPUProcessor* processor = *it;
+    delete processor;
+  }
+  delete processors;
+  delete mm;
+}
+
+void GPUEngine::setRecursionNeeded(RulePkt* pkt) {
+  if (recursionNeeded == true)
+    return;
+
+  for (int i = 0; i < pkt->getPredicatesNum(); i++)
+    inputEvents.insert(pkt->getPredicate(i).eventType);
+  outputEvents.insert(pkt->getCompositeEventTemplate()->getEventType());
+
+  for (std::set<int>::iterator it = inputEvents.begin();
+       it != inputEvents.end(); ++it) {
+    if (outputEvents.find(*it) != outputEvents.end()) {
+      recursionNeeded = true;
+      return;
     }
-    delete processors;
-    delete mm;
+  }
 }
 
-void GPUEngine::setRecursionNeeded(RulePkt* pkt)
-{
-  if (recursionNeeded == true) return;
-  
-      for (int i=0; i<pkt->getPredicatesNum(); i++)
-	inputEvents.insert(pkt->getPredicate(i).eventType);
-      outputEvents.insert(pkt->getCompositeEventTemplate()->getEventType());
-      
-      for (std::set<int>::iterator it=inputEvents.begin(); it!=inputEvents.end(); ++it) {
-	if (outputEvents.find(*it) != outputEvents.end()) {
-	  recursionNeeded = true;
-	  return;
-	}
-      }
-      
-}
-
-void GPUEngine::processPubPkt(PubPkt* event, bool recursion)
-{
-  if (recursion==false) 
+void GPUEngine::processPubPkt(PubPkt* event, bool recursion) {
+  if (recursion == false)
     recursionDepth = 0;
-  else 
+  else
     recursionDepth++;
-  
-    set<PubPkt *> result;
-    timeval tValStart, tValEnd;
-    gettimeofday(&tValStart, NULL);
 
-    for (vector<GPUProcessor *>::iterator it=processors->begin(); it!=processors->end(); ++it) {
-        GPUProcessor *processor = *it;
+  set<PubPkt*> result;
+  timeval tValStart, tValEnd;
+  gettimeofday(&tValStart, NULL);
+
+  for (vector<GPUProcessor*>::iterator it = processors->begin();
+       it != processors->end(); ++it) {
+    GPUProcessor* processor = *it;
 #if MP_MODE == MP_COPY
-        processor->processEvent(event->copy(), result);
+    processor->processEvent(event->copy(), result);
 #elif MP_MODE == MP_LOCK
-        processor->processEvent(event, result);
+    processor->processEvent(event, result);
 #endif
-    }
-    gettimeofday(&tValEnd, NULL);
-    double duration = (tValEnd.tv_sec-tValStart.tv_sec)*1000000 + tValEnd.tv_usec - tValStart.tv_usec;
-    // Notifies results to listeners
-    for (set<ResultListener *>::iterator it=resultListeners.begin(); it!=resultListeners.end(); ++it) {
-        ResultListener *listener = *it;
-        listener->handleResult(result, duration);
-    }
+  }
+  gettimeofday(&tValEnd, NULL);
+  double duration = (tValEnd.tv_sec - tValStart.tv_sec) * 1000000 +
+                    tValEnd.tv_usec - tValStart.tv_usec;
+  // Notifies results to listeners
+  for (set<ResultListener*>::iterator it = resultListeners.begin();
+       it != resultListeners.end(); ++it) {
+    ResultListener* listener = *it;
+    listener->handleResult(result, duration);
+  }
 
-    for (set<PubPkt *>::iterator it=result.begin(); it!=result.end(); ++it) {
-        PubPkt *pkt = *it;
-	if (recursionNeeded && recursionDepth < MAX_RECURSION_DEPTH) processPubPkt(pkt->copy(), true);
-        if (pkt->decRefCount()) {
-            delete pkt;
-        }
+  for (set<PubPkt*>::iterator it = result.begin(); it != result.end(); ++it) {
+    PubPkt* pkt = *it;
+    if (recursionNeeded && recursionDepth < MAX_RECURSION_DEPTH)
+      processPubPkt(pkt->copy(), true);
+    if (pkt->decRefCount()) {
+      delete pkt;
     }
-    if (event->decRefCount()) delete event;
-
+  }
+  if (event->decRefCount())
+    delete event;
 }
 
-
-void GPUEngine::processPubPkt(PubPkt *event) {
-  	return processPubPkt(event, false);
+void GPUEngine::processPubPkt(PubPkt* event) {
+  return processPubPkt(event, false);
 }

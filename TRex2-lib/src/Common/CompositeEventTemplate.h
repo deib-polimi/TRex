@@ -31,36 +31,30 @@
  */
 class CompositeEventTemplateAttr {
 public:
-	CompositeEventTemplateAttr(char *parName, OpTree *parValue) {
-		name = new char[strlen(parName)+1];
-		strcpy(name, parName);
-		value = parValue;
-	}
+  CompositeEventTemplateAttr(char* parName, OpTree* parValue) {
+    name = new char[strlen(parName) + 1];
+    strcpy(name, parName);
+    value = parValue;
+  }
 
-	virtual ~CompositeEventTemplateAttr() {
-		delete name;
-		delete value;
-	}
+  virtual ~CompositeEventTemplateAttr() {
+    delete name;
+    delete value;
+  }
 
-	void getName(char *parName) {
-		strcpy(parName, name);
-	}
+  void getName(char* parName) { strcpy(parName, name); }
 
-	char *getName() {
-		return name;
-	}
+  char* getName() { return name; }
 
-	OpTree * getValue() {
-		return value;
-	}
+  OpTree* getValue() { return value; }
 
-	CompositeEventTemplateAttr * dup() {
-		return new CompositeEventTemplateAttr(name, value->dup());
-	}
+  CompositeEventTemplateAttr* dup() {
+    return new CompositeEventTemplateAttr(name, value->dup());
+  }
 
 private:
-	char *name;
-	OpTree *value;
+  char* name;
+  OpTree* value;
 };
 
 /**
@@ -68,34 +62,23 @@ private:
  */
 class CompositeEventTemplateStaticAttr {
 public:
-	CompositeEventTemplateStaticAttr(Attribute pattr) {
-		attr = pattr;
-	}
+  CompositeEventTemplateStaticAttr(Attribute pattr) { attr = pattr; }
 
-	virtual ~CompositeEventTemplateStaticAttr() {
-	}
+  virtual ~CompositeEventTemplateStaticAttr() {}
 
-	void getName(char *parName) {
-		strcpy(parName, attr.name);
-	}
+  void getName(char* parName) { strcpy(parName, attr.name); }
 
-	char *getName() {
-		return attr.name;
-	}
-	
-	Attribute getAttr() {
-	  return attr;
-	}
-	
-	CompositeEventTemplateStaticAttr * dup() {
-	  	return new CompositeEventTemplateStaticAttr(attr);
-	}
+  char* getName() { return attr.name; }
 
+  Attribute getAttr() { return attr; }
+
+  CompositeEventTemplateStaticAttr* dup() {
+    return new CompositeEventTemplateStaticAttr(attr);
+  }
 
 private:
-	Attribute attr;
+  Attribute attr;
 };
-
 
 /**
  * This class represents a template for a composite event.
@@ -105,87 +88,88 @@ private:
 class CompositeEventTemplate {
 
 public:
+  /**
+   * Constructor: takes the event type as its input
+   */
+  CompositeEventTemplate(int eventType);
 
-	/**
-	 * Constructor: takes the event type as its input
-	 */
-	CompositeEventTemplate(int eventType);
+  /**
+   * Destructor
+   */
+  virtual ~CompositeEventTemplate();
 
-	/**
-	 * Destructor
-	 */
-	virtual ~CompositeEventTemplate();
-	
-	/**
-	 * Adds a new static attribute to the composite event
-	 */
-	void addStaticAttribute(Attribute pattr);
+  /**
+   * Adds a new static attribute to the composite event
+   */
+  void addStaticAttribute(Attribute pattr);
 
-	/**
-	 * Adds a new attribute to the composite event
-	 */
-	void addAttribute(char *name, OpTree *value);
+  /**
+   * Adds a new attribute to the composite event
+   */
+  void addAttribute(char* name, OpTree* value);
 
-	/**
-	 * Returns the type of the composite event
-	 */
-	int getEventType();
+  /**
+   * Returns the type of the composite event
+   */
+  int getEventType();
 
-	/**
-	 * Returns the number of attributes defined in the template
-	 */
-	int getAttributesNum();
-	
-	/**
-	 * Returns the number of static attributes defined in the template
-	 */
-	int getStaticAttributesNum();
+  /**
+   * Returns the number of attributes defined in the template
+   */
+  int getAttributesNum();
 
-	/**
-	 * Copies the name of the attribute with the given index
-	 */
-	void getAttributeName(char *name, int index);
-	
-	/**
-	 * Copies the name of the static attribute with the given index
-	 */
-	void getStaticAttributeName(char *name, int index);
+  /**
+   * Returns the number of static attributes defined in the template
+   */
+  int getStaticAttributesNum();
 
-	/**
-	 * Copies the static attribute with the given index  in pAtt
-	 */
-	void getStaticAttribute(Attribute &pAtt, int index);
+  /**
+   * Copies the name of the attribute with the given index
+   */
+  void getAttributeName(char* name, int index);
 
-	/**
-	 * Returns the name of the attribute with the given index
-	 */
-	char *getAttributeName(int index);
+  /**
+   * Copies the name of the static attribute with the given index
+   */
+  void getStaticAttributeName(char* name, int index);
 
-	/**
-	 * Returns the operation tree for the attribute with the given index
-	 */
-	OpTree * getAttributeTree(int index);
+  /**
+   * Copies the static attribute with the given index  in pAtt
+   */
+  void getStaticAttribute(Attribute& pAtt, int index);
 
-	/**
-	 * Creates an exact copy (deep copy) of the data structure
-	 */
-	CompositeEventTemplate * dup();
+  /**
+   * Returns the name of the attribute with the given index
+   */
+  char* getAttributeName(int index);
+
+  /**
+   * Returns the operation tree for the attribute with the given index
+   */
+  OpTree* getAttributeTree(int index);
+
+  /**
+   * Creates an exact copy (deep copy) of the data structure
+   */
+  CompositeEventTemplate* dup();
 
 private:
-	int eventType;																					// Type of the composite event
-	std::map<int, CompositeEventTemplateAttr *> attributes;	// Attributes of the composite event
-	std::map<int, CompositeEventTemplateStaticAttr *> staticAttributes;	// Static attributes of the composite event
-	
-	/**
-	 * Adds a new attribute to the composite event
-	 */
-	void addAttribute(CompositeEventTemplateAttr *parAttr);
-	
-	/**
-	 * Adds a new static attribute to the composite event
-	 */
-	void addStaticAttribute(CompositeEventTemplateStaticAttr *parAttr);
+  // Type of the composite event
+  int eventType;
+  // Attributes of the composite event
+  std::map<int, CompositeEventTemplateAttr*> attributes;
+  // Static attributes of the composite event
+  std::map<int, CompositeEventTemplateStaticAttr*> staticAttributes;
 
+  /**
+   * Adds a new attribute to the composite event
+   */
+  void addAttribute(CompositeEventTemplateAttr* parAttr);
+
+  /**
+   * Adds a new static attribute to the composite event
+   */
+  void addStaticAttribute(CompositeEventTemplateStaticAttr* parAttr);
 };
 
 #endif /* COMPOSITEEVENTTEMPLATE_H_ */

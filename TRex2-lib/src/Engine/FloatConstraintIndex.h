@@ -28,25 +28,37 @@
  * Represents a float constraint stored in the index table
  */
 typedef struct FloatTableConstraintStruct {
-	char name[NAME_LEN];												// Attribute name
-	Op op;																			// Operator
-	float val;																	// Attribute value
-	std::set<TablePred *> connectedPredicates;	// Set of predicates using the constraint
+  // Attribute name
+  char name[NAME_LEN];
+  // Operator
+  Op op;
+  // Attribute value
+  float val;
+  // Set of predicates using the constraint
+  std::set<TablePred*> connectedPredicates;
 } FloatTableConstraint;
 
 /**
  * Contains a Value -> Constraint index for each defined operator
  */
 typedef struct FloatOperatorsTable {
-	std::map<float, FloatTableConstraint *> eq;	// Value -> equality constraint
-	std::map<float, FloatTableConstraint *> lt;	// Value -> less than constraint
-	std::map<float, FloatTableConstraint *> gt;	// Value -> greater then constraint
-	std::map<float, FloatTableConstraint *> ne;	// Value -> different from constraint
-	std::map<float, FloatTableConstraint *> le;	// Value -> less than or equal to constraint
-	std::map<float, FloatTableConstraint *> ge;	// Value -> greater than or equal to constraint
+  // Value -> equality constraint
+  std::map<float, FloatTableConstraint*> eq;
+  // Value -> less than constraint
+  std::map<float, FloatTableConstraint*> lt;
+  // Value -> greater then constraint
+  std::map<float, FloatTableConstraint*> gt;
+  // Value -> different from constraint
+  std::map<float, FloatTableConstraint*> ne;
+  // Value -> less than or equal to constraint
+  std::map<float, FloatTableConstraint*> le;
+  // Value -> greater than or equal to constraint
+  std::map<float, FloatTableConstraint*> ge;
 
-	// Overriding
-	bool operator<(const FloatOperatorsTable &table) const { return eq<table.eq; }
+  // Overriding
+  bool operator<(const FloatOperatorsTable& table) const {
+    return eq < table.eq;
+  }
 } FloatOps;
 
 /**
@@ -54,54 +66,57 @@ typedef struct FloatOperatorsTable {
  */
 class FloatConstraintIndex : AbstractConstraintIndex {
 public:
+  FloatConstraintIndex();
 
-	FloatConstraintIndex();
+  /**
+   * Frees dynamic memory
+   */
+  virtual ~FloatConstraintIndex();
 
-	/**
-	 * Frees dynamic memory
-	 */
-	virtual ~FloatConstraintIndex();
+  /**
+   * Creates or gets the FloatTableConstraint C representing the constraint
+   * given as parameter. Then it installs the predicate in C.
+   */
+  void installConstraint(Constraint& constraints, TablePred* predicate);
 
-	/**
-	 * Creates or gets the FloatTableConstraint C representing the constraint
-	 * given as parameter. Then it installs the predicate in C.
-	 */
-	void installConstraint(Constraint &constraints, TablePred *predicate);
-
-	/**
-	 * Processes the given message, using the partial results stored in predCount.
-	 * It updates predCount and fills mh with the matching states.
-	 */
-	void processMessage(PubPkt *pkt, MatchingHandler &mh, std::map<TablePred *, int> &predCount);
+  /**
+   * Processes the given message, using the partial results stored in predCount.
+   * It updates predCount and fills mh with the matching states.
+   */
+  void processMessage(PubPkt* pkt, MatchingHandler& mh,
+                      std::map<TablePred*, int>& predCount);
 
 private:
+  // Name -> indexes for that name
+  std::map<std::string, FloatOps> indexes;
+  // Set of all constraints used in the table
+  std::set<FloatTableConstraint*> usedConstraints;
 
-	std::map<std::string, FloatOps> indexes;					// Name -> indexes for that name
-	std::set<FloatTableConstraint *> usedConstraints;	// Set of all constraints used in the table
+  /**
+   * Checks if there already exists an FloatTableConstraints which is
+   * compatible with the constraint c.
+   * If it finds a valid FloatTableConstraints, return a pointer to it,
+   * otherwise returns null.
+   */
+  FloatTableConstraint* getConstraint(Constraint& c);
 
-	/**
-	 * Checks if there already exists an FloatTableConstraints which is
-	 * compatible with the constraint c.
-	 * If it finds a valid FloatTableConstraints, return a pointer to it,
-	 * otherwise returns null.
-	 */
-	FloatTableConstraint * getConstraint(Constraint &c);
+  /**
+   * Creates a new FloatTableConstraint using the information stored in the
+   * parameter constraint
+   */
+  FloatTableConstraint* createConstraint(Constraint& c);
 
-	/**
-	 * Creates a new FloatTableConstraint using the information stored in the parameter constraint
-	 */
-	FloatTableConstraint * createConstraint(Constraint &c);
+  /**
+   * Installs the given constraint to the appropriate table
+   */
+  inline void installConstraint(FloatTableConstraint* c);
 
-	/**
-	 * Installs the given constraint to the appropriate table
-	 */
-	inline void installConstraint(FloatTableConstraint *c);
-
-	/**
-	 * Processes the given constraint by updating the predCount and, if needed, the mh structures
-	 */
-	inline void processConstraint(FloatTableConstraint *c, MatchingHandler &mh, std::map<TablePred *, int> &predCount);
-
+  /**
+   * Processes the given constraint by updating the predCount
+   * and, if needed, the mh structures
+   */
+  inline void processConstraint(FloatTableConstraint* c, MatchingHandler& mh,
+                                std::map<TablePred*, int>& predCount);
 };
 
 #endif

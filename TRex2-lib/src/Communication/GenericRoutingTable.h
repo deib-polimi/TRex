@@ -34,30 +34,28 @@
 class GenericRoutingTable {
 
 public:
+  virtual ~GenericRoutingTable() {}
 
-	virtual ~GenericRoutingTable() { }
+  /**
+   * Installs a new subscription for the given client.
+   */
+  virtual void installSubscription(int clientId, SubPkt* subscription) = 0;
 
-	/**
-	 * Installs a new subscription for the given client.
-	 */
-	virtual void installSubscription(int clientId, SubPkt *subscription) = 0;
+  /**
+   * Deletes the subscription for the given client.
+   */
+  virtual void deleteSubscription(int clientId, SubPkt* subscription) = 0;
 
-	/**
-	 * Deletes the subscription for the given client.
-	 */
-	virtual void deleteSubscription(int clientId, SubPkt *subscription) = 0;
+  /**
+   * Deletes alla subscriptions stored for the given client.
+   */
+  virtual void removeClient(int clientId) = 0;
 
-	/**
-	 * Deletes alla subscriptions stored for the given client.
-	 */
-	virtual void removeClient(int clientId) = 0;
-
-	/**
-	 * Returns the set of clients matching the given publication.
-	 * Results are stored in the clients parameter.
-	 */
-	virtual void getMatchingClients(PubPkt *pubPkt, std::set<int> &clients) = 0;
-
+  /**
+   * Returns the set of clients matching the given publication.
+   * Results are stored in the clients parameter.
+   */
+  virtual void getMatchingClients(PubPkt* pubPkt, std::set<int>& clients) = 0;
 };
 
 #endif /* GENERICROUTINGTABLE_H_ */

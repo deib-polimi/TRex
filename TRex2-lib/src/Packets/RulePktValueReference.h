@@ -28,57 +28,61 @@
 
 /**
  * A RulePktValueReference extends the OpValueReference class and defines
- * each reference to value by pointing to an attribute or aggregate in the RulePkt.
+ * each reference to value by pointing to an attribute or aggregate in the
+ * RulePkt.
  */
-class RulePktValueReference: public OpValueReference {
+class RulePktValueReference : public OpValueReference {
 
 public:
+  /**
+   * Constructor for a reference to a normal state attribute.
+   * Parameters: index in the packet, and name of the attribute.
+   */
+  RulePktValueReference(int stateIndex, char* parAttrName, StateType sType);
 
-	/**
-	 * Constructor for a reference to a normal state attribute.
-	 * Parameters: index in the packet, and name of the attribute.
-	 */
-	RulePktValueReference(int stateIndex, char *parAttrName, StateType sType);
+  /**
+   * Constructor for a reference to an aggregate state.
+   */
+  RulePktValueReference(int aggregateIndex);
 
-	/**
-	 * Constructor for a reference to an aggregate state.
-	 */
-	RulePktValueReference(int aggregateIndex);
+  /**
+   * Destructor
+   */
+  virtual ~RulePktValueReference();
 
-	/**
-	 * Destructor
-	 */
-	virtual ~RulePktValueReference();
+  /**
+   * Creates an exact copy of the data structure
+   */
+  OpValueReference* dup();
 
-	/**
-	 * Creates an exact copy of the data structure
-	 */
-	OpValueReference * dup();
+  /**
+   * Returns the index of the state in the RulePkt
+   */
+  int getIndex();
 
-	/**
-	 * Returns the index of the state in the RulePkt
-	 */
-	int getIndex();
+  /**
+   * Returns the type of reference (to aggregate, or to normal state)
+   */
+  bool refersToAgg();
 
-	/**
-	 * Returns the type of reference (to aggregate, or to normal state)
-	 */
-	bool refersToAgg();
-	
-	bool refersToNeg();
+  bool refersToNeg();
 
-	/**
-	 * Returns the name of the attribute if the object refers to a normal state index.
-	 * Returns NULL if the the object refers to an aggregate index.
-	 */
-	char * getName();
-	
-	StateType getSType();
+  /**
+   * Returns the name of the attribute if the object refers
+   * to a normal state index.
+   * Returns NULL if the the object refers to an aggregate index.
+   */
+  char* getName();
+
+  StateType getSType();
 
 private:
-	int index;				// Index in the RulePkt
-	StateType type;		// Type of the index: pointing to a normal state, or to an aggregate?
-	char *attrName;		// Name of the attribute
+  // Index in the RulePkt
+  int index;
+  // Type of the index: pointing to a normal state, or to an aggregate?
+  StateType type;
+  // Name of the attribute
+  char* attrName;
 };
 
 #endif /* RULEPKTVALUEREFERENCE_H_ */
