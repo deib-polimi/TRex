@@ -28,7 +28,7 @@
 #include "../Packets/RulePktValueReference.h"
 #include "../Packets/StaticValueReference.h"
 #include <set>
-#include <map>
+#include <vector>
 
 /**
  * A basic event predicate
@@ -37,7 +37,7 @@ typedef struct EventPredicate {
   // Type of the event required by this predicate
   int eventType;
   // Predicate constraints
-  Constraint* constraints;
+  Constraint constraints[];
   // Number of constraints in the predicate
   int constraintsNum;
   // Index of the reference predicate (-1 if root)
@@ -72,14 +72,14 @@ public:
    * Adds the root predicate.
    * Returns false if an error occurs
    */
-  bool addRootPredicate(int eventId, Constraint* constr, int constrLen);
+  bool addRootPredicate(int eventId, Constraint constraints[], int constrLen);
 
   /**
    * Adds a predicate; root predicate must be already defined.
    * Returns false if an error occurs.
    */
-  bool addPredicate(int eventType, Constraint* constr, int constrLen,
-                    int refersTo, TimeMs& win, CompKind kind);
+  bool addPredicate(int eventType, Constraint constraints[], int constrLen,
+                    int refersTo, const TimeMs& win, CompKind kind);
 
   /**
    * Adds a new time based negation.
@@ -87,8 +87,8 @@ public:
    * within win from the state with id referenceId.
    * Returns false if an error occurs.
    */
-  bool addTimeBasedNegation(int eventType, Constraint* constraints,
-                            int constrLen, int referenceId, TimeMs& win);
+  bool addTimeBasedNegation(int eventType, Constraint constraints[],
+                            int constrLen, int referenceId, const TimeMs& win);
 
   /**
    * Adds a negation between two states.
@@ -96,7 +96,7 @@ public:
    * between the states with ids id1 and id2.
    * Returns false if an error occurs.
    */
-  bool addNegationBetweenStates(int eventType, Constraint* constraints,
+  bool addNegationBetweenStates(int eventType, Constraint constraints[],
                                 int constrLen, int id1, int id2);
 
   /**
@@ -162,8 +162,8 @@ public:
    * coming from events having the given eventType and satisfying all
    * constraints, occurring within win from the event used for the referenceId.
    */
-  bool addTimeBasedAggregate(int eventType, Constraint* constraints,
-                             int constrLen, int referenceId, TimeMs& win,
+  bool addTimeBasedAggregate(int eventType, Constraint constraints[],
+                             int constrLen, int referenceId, const TimeMs& win,
                              char* name, AggregateFun fun);
 
   /**
@@ -173,7 +173,7 @@ public:
    * coming from events having the given eventType and satisfying all
    * constraints, occurring within the events used for the ids id1 and id2.
    */
-  bool addAggregateBetweenStates(int eventType, Constraint* constraints,
+  bool addAggregateBetweenStates(int eventType, Constraint constraints[],
                                  int constrLen, int id1, int id2, char* name,
                                  AggregateFun fun);
 
@@ -193,96 +193,98 @@ public:
   /**
    * Fills leaves with the set of indexes that are leaves in the ordering graph
    */
-  void getLeaves(std::set<int>& leaves);
+  std::set<int> getLeaves() const;
 
   /**
    * Fills joinPoints with the set of indexes that are shared
    * among more than one sequence
    */
-  void getJoinPoints(std::set<int>& joinPoints);
+  std::set<int> getJoinPoints() const;
 
   /**
    * Returns the number of predicates in the rule
    */
-  int getPredicatesNum() { return predicates.size(); }
+  int getPredicatesNum() const { return predicates.size(); }
 
   /**
    * Returns the number of parameters in the rule
    */
-  int getParametersNum() { return parameters.size(); }
+  int getParametersNum() const { return parameters.size(); }
 
   // Is always the same as GPUComplexParameters, no need for another method
-  int getComplexParametersNum() { return complexParameters.size(); }
+  int getComplexParametersNum() const { return complexParameters.size(); }
 
   /**
    * Returns the number of negations in the rule
    */
-  int getNegationsNum() { return negations.size(); }
+  int getNegationsNum() const { return negations.size(); }
 
   /**
    * Returns the number of aggregates in the rule
    */
-  int getAggregatesNum() { return aggregates.size(); }
+  int getAggregatesNum() const { return aggregates.size(); }
 
   /**
    * Returns the predicate with the given index
    */
-  Predicate& getPredicate(int index) { return predicates[index]; }
+  Predicate& getPredicate(int index) const { return predicates[index]; }
 
   /**
    * Returns the parameter with the given index
    */
-  Parameter& getParameter(int index) { return parameters[index]; }
+  Parameter& getParameter(int index) const { return parameters[index]; }
 
   /**
    * Returns the complex parameter for the CPU with the given index
    */
-  CPUParameter& getComplexParameter(int index) {
+  CPUParameter& getComplexParameter(int index) const {
     return complexParameters[index];
   }
 
   /**
    * Returns the complex parameter for the GPU with the given index
    */
-  GPUParameter& getComplexGPUParameter(int index) {
+  GPUParameter& getComplexGPUParameter(int index) const {
     return complexGPUParameters[index];
   }
 
   /**
    * Returns the negation with the given index
    */
-  Negation& getNegation(int index) { return negations[index]; }
+  Negation& getNegation(int index) const { return negations[index]; }
 
   /**
    * Returns the aggregate with the given index
    */
-  Aggregate& getAggregate(int index) { return aggregates[index]; }
+  Aggregate& getAggregate(int index) const { return aggregates[index]; }
 
   /**
    * Returns the set of consuming indexes
    */
-  std::set<int> getConsuming() { return consuming; }
+  std::set<int> getConsuming() const { return consuming; }
 
   /**
    * Returns the composite event template
    */
-  CompositeEventTemplate* getCompositeEventTemplate() { return ceTemplate; }
+  CompositeEventTemplate* getCompositeEventTemplate() const {
+    return ceTemplate;
+  }
 
   /**
    * Returns the rule id
    */
-  int getRuleId() { return ruleId; }
+  int getRuleId() const { return ruleId; }
 
   /**
    * Returns true if the subscription contains at least
    * a predicate with the given eventType
    */
-  bool containsEventType(int eventType, bool includeNegations);
+  bool containsEventType(int eventType, bool includeNegations) const;
 
   /**
    * Returns the set of all contained event types
    */
-  void getContainedEventTypes(std::set<int>& eventTypes);
+  std::set<int> getContainedEventTypes() const;
 
   /**
    * Get the maximum time window between the two events
@@ -290,22 +292,22 @@ public:
    * && lowerId < getConstraintNum()
    * && upperId < getConstraintNum()
    */
-  TimeMs getWinBetween(int lowerId, int upperId);
+  TimeMs getWinBetween(int lowerId, int upperId) const;
 
   /**
    * Returns the maximum length of a sequence defined in the subscription
    */
-  TimeMs getMaxWin();
+  TimeMs getMaxWin() const;
 
   /**
    * Returns true if id1 is directly defined through id2, or viceversa
    */
-  bool isDirectlyConnected(int id1, int id2);
+  bool isDirectlyConnected(int id1, int id2) const;
 
   /**
    * Returns true if id1 is defined through id2, or viceversa
    */
-  bool isInTheSameSequence(int id1, int id2);
+  bool isInTheSameSequence(int id1, int id2) const;
 
   /**
    * Overloading
@@ -320,17 +322,17 @@ private:
   // Identifier of the rule
   int ruleId;
   // Array of event predicates
-  std::map<int, Predicate> predicates;
+  std::vector<Predicate> predicates;
   // Parameters between different predicates (map identifier -> data structure)
-  std::map<int, Parameter> parameters;
+  std::vector<Parameter> parameters;
   // Negations defined for the rule (map identifier -> data structure)
-  std::map<int, Negation> negations;
+  std::vector<Negation> negations;
   // Aggregates defined for the rule (map identifier -> data structure)
-  std::map<int, Aggregate> aggregates;
+  std::vector<Aggregate> aggregates;
   // Set of indexes of events that are consumed after detection
   std::set<int> consuming;
-  std::map<int, CPUParameter> complexParameters;
-  std::map<int, GPUParameter> complexGPUParameters;
+  std::vector<CPUParameter> complexParameters;
+  std::vector<GPUParameter> complexGPUParameters;
   // Template of the composite event
   CompositeEventTemplate* ceTemplate;
 
@@ -340,8 +342,8 @@ private:
    * If lowerId < 0, then the lowerTime bound is used.
    * Returns false if an error occurs
    */
-  bool addNegation(int eventType, Constraint* constr, int constrLen,
-                   int lowerId, TimeMs& lowerTime, int upperId);
+  bool addNegation(int eventType, Constraint constraints[], int constrLen,
+                   int lowerId, const TimeMs& lowerTime, int upperId);
 
   /**
    * Adds the parameter with the given attributes
@@ -357,47 +359,47 @@ private:
    * If lowerId < 0, then the lowerTime bound is used.
    * Returns false if an error occurs
    */
-  bool addAggregate(int eventType, Constraint* constr, int constrLen,
-                    int lowerId, TimeMs& lowerTime, int upperId, char* name,
-                    AggregateFun fun);
+  bool addAggregate(int eventType, Constraint constraints[], int constrLen,
+                    int lowerId, const TimeMs& lowerTime, int upperId,
+                    char* name, AggregateFun fun);
 
   /**
    * Fills referenceCount with the number of times each index is referenced
    */
-  void getReferenceCount(std::map<int, int>& referenceCount);
+  std::map<int, int> getReferenceCount() const;
 
   /**
    * Returns the index of the last state in a given tree
    */
-  int findLastState(OpTree* tree);
+  int findLastState(OpTree* tree) const;
 
   /**
    * Returns the index of the unique negation in the given tree
    */
-  int findNegation(OpTree* tree);
+  int findNegation(OpTree* tree) const;
 
   /**
    * Returns the index of the unique aggregate in the given tree
    */
-  int findAggregate(OpTree* tree);
+  int findAggregate(OpTree* tree) const;
 
   /**
    * Returns the depth of the given tree
    */
-  int findDepth(OpTree* tree, int depth);
+  int findDepth(OpTree* tree, int depth) const;
 
   /**
    * Serializes the trees passed as parameters and writes the results in the
    * given GPUComplexParameter structure
    */
   void serializeTrees(OpTree* ltree, OpTree* rtree, int depth,
-                      GPUParameter& gp);
+                      GPUParameter& gp) const;
 
   /**
    * Does the actual job for the serializeTrees function;
    * operates on one tree at a time
    */
-  void serializeNode(OpTree* tree, int& idx, Node serialized[]);
+  void serializeNode(OpTree* tree, int& idx, Node serialized[]) const;
 };
 
 #endif
