@@ -252,7 +252,7 @@ bool RulePkt::addComplexParameterForNegation(Op pOperation, ValType type,
   return true;
 }
 
-int RulePkt::findDepth(OpTree* tree, int depth) {
+int RulePkt::findDepth(OpTree* tree, int depth) const {
   if (tree->getType() == LEAF) {
     return depth;
   } else {
@@ -301,6 +301,7 @@ void RulePkt::serializeNode(OpTree* tree, int& idx, Node serialized[]) const {
           case FLOAT:
             serialized[idx].floatVal = sReference->getFloatValue();
             break;
+            // FIXME missing cases?
         }
       }
     } else {
@@ -421,9 +422,9 @@ set<int> RulePkt::getJoinPoints() const {
 
 bool RulePkt::containsEventType(int eventType, bool includeNegations) const {
   auto checkPredicate =
-      [this](const Predicate& it) { return it.eventType == eventType; };
+      [eventType](const Predicate& it) { return it.eventType == eventType; };
   auto checkNegation =
-      [this](const Negation& it) { return it.eventType == eventType; };
+      [eventType](const Negation& it) { return it.eventType == eventType; };
 
   return std::any_of(predicates.begin(), predicates.end(), checkPredicate) ||
          (includeNegations &&

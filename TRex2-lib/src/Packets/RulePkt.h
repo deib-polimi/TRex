@@ -37,7 +37,7 @@ typedef struct EventPredicate {
   // Type of the event required by this predicate
   int eventType;
   // Predicate constraints
-  Constraint constraints[];
+  Constraint* constraints;
   // Number of constraints in the predicate
   int constraintsNum;
   // Index of the reference predicate (-1 if root)
@@ -194,12 +194,22 @@ public:
    * Fills leaves with the set of indexes that are leaves in the ordering graph
    */
   std::set<int> getLeaves() const;
+  /**
+   * @deprecated Use `std::set<int> getLeaves() const;` instead
+   */
+  void getLeaves(std::set<int>& leaves) const { leaves = getLeaves(); }
 
   /**
    * Fills joinPoints with the set of indexes that are shared
    * among more than one sequence
    */
   std::set<int> getJoinPoints() const;
+  /**
+   * @deprecated Use `std::set<int> getJoinPoints() const;` instead
+   */
+  void getJoinPoints(std::set<int>& joinPoints) const {
+    joinPoints = getJoinPoints();
+  }
 
   /**
    * Returns the number of predicates in the rule
@@ -227,36 +237,36 @@ public:
   /**
    * Returns the predicate with the given index
    */
-  Predicate& getPredicate(int index) const { return predicates[index]; }
+  Predicate& getPredicate(int index) { return predicates[index]; }
 
   /**
    * Returns the parameter with the given index
    */
-  Parameter& getParameter(int index) const { return parameters[index]; }
+  Parameter& getParameter(int index) { return parameters[index]; }
 
   /**
    * Returns the complex parameter for the CPU with the given index
    */
-  CPUParameter& getComplexParameter(int index) const {
+  CPUParameter& getComplexParameter(int index) {
     return complexParameters[index];
   }
 
   /**
    * Returns the complex parameter for the GPU with the given index
    */
-  GPUParameter& getComplexGPUParameter(int index) const {
+  GPUParameter& getComplexGPUParameter(int index) {
     return complexGPUParameters[index];
   }
 
   /**
    * Returns the negation with the given index
    */
-  Negation& getNegation(int index) const { return negations[index]; }
+  Negation& getNegation(int index) { return negations[index]; }
 
   /**
    * Returns the aggregate with the given index
    */
-  Aggregate& getAggregate(int index) const { return aggregates[index]; }
+  Aggregate& getAggregate(int index) { return aggregates[index]; }
 
   /**
    * Returns the set of consuming indexes
