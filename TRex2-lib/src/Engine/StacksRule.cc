@@ -19,68 +19,72 @@
 //
 
 #include "StacksRule.h"
+#include <algorithm>
 
-using namespace std;
-
-StacksRule::StacksRule(RulePkt* pkt) {
+StacksRule::StacksRule(RulePkt* pkt)
+    : eventGenerator(pkt->getCompositeEventTemplate()) {
   // Initializes the rule identifier
   ruleId = pkt->getRuleId();
   rulePkt = pkt;
-  eventGenerator =
-      new CompositeEventGenerator(pkt->getCompositeEventTemplate());
-  if (pkt->getCompositeEventTemplate()->getAttributesNum() +
-          pkt->getCompositeEventTemplate()->getStaticAttributesNum() ==
-      0) {
-    compositeEventId = pkt->getCompositeEventTemplate()->getEventType();
+  CompositeEventTemplate* templ = pkt->getCompositeEventTemplate();
+  if (templ->getAttributesNum() + templ->getStaticAttributesNum() == 0) {
+    compositeEventId = templ->getEventType();
   } else {
     compositeEventId = -1;
   }
   stacksNum = 0;
   aggrsNum = 0;
   negsNum = 0;
-  stacksSize.resize(pkt->getPredicatesNum(), 0);
-  receivedPkts.resize(pkt->getPredicatesNum());
-  referenceState.resize(pkt->getPredicatesNum(), 0);
   // Initialize stacks map with predicate and fills it with references
-  for (int i = 0; i < pkt->getPredicatesNum(); i++) {
+  int predicatesNum = pkt->getPredicatesNum();
+  stacksSize.resize(predicatesNum, 0);
+  receivedPkts.resize(predicatesNum);
+  referenceState.resize(predicatesNum, 0);
+  for (int i = 0; i < predicatesNum; ++i) {
     Predicate& predicate = pkt->getPredicate(i);
     stacks.emplace_back(predicate.refersTo, predicate.win, predicate.kind);
     if (predicate.refersTo != -1) {
       stacks[predicate.refersTo].addLookBackTo(stacksNum);
       referenceState[i] = predicate.refersTo;
     }
-    stacksNum++;
-  }
-  // Initialize negations and fills stacks with references
-  negsSize.resize(pkt->getNegationsNum(), 0);
-  for (int i = 0; i < pkt->getNegationsNum(); i++) {
-    addNegation(pkt->getNegation(i).eventType, pkt->getNegation(i).constraints,
-                pkt->getNegation(i).constraintsNum, pkt->getNegation(i).lowerId,
-                pkt->getNegation(i).lowerTime, pkt->getNegation(i).upperId);
-  }
-  // Initialize aggregates belonging to the rule
-  aggsSize.resize(pkt->getAggregatesNum(), 0);
-  for (int i = 0; i < pkt->getAggregatesNum(); i++) {
-    addAggregate(
-        pkt->getAggregate(i).eventType, pkt->getAggregate(i).constraints,
-        pkt->getAggregate(i).constraintsNum, pkt->getAggregate(i).lowerId,
-        pkt->getAggregate(i).lowerTime, pkt->getAggregate(i).upperId,
-        pkt->getAggregate(i).name, pkt->getAggregate(i).fun);
-  }
-  // Initialize parameters belonging to the rule
-  for (int i = 0; i < pkt->getParametersNum(); i++) {
-    addParameter(pkt->getParameter(i).evIndex2, pkt->getParameter(i).name2,
-                 pkt->getParameter(i).evIndex1, pkt->getParameter(i).name1,
-                 pkt->getParameter(i).type, pkt);
+    ++stacksNum;
   }
 
-  for (int i = 0; i < pkt->getComplexParametersNum(); i++) {
-    addComplexParameter(pkt->getComplexParameter(i).operation,
-                        pkt->getComplexParameter(i).leftTree,
-                        pkt->getComplexParameter(i).rightTree,
-                        pkt->getComplexParameter(i).lastIndex,
-                        pkt->getComplexParameter(i).type,
-                        pkt->getComplexParameter(i).vtype);
+  // Initialize negations and fills stacks with references
+  int negationsNum = pkt->getNegationsNum();
+  negsSize.resize(negationsNum, 0);
+  receivedNegs.resize(negationsNum);
+  for (int i = 0; i < negationsNum; ++i) {
+    Negation& negation = pkt->getNegation(i);
+    addNegation(negation.eventType, negation.constraints,
+                negation.constraintsNum, negation.lowerId, negation.lowerTime,
+                negation.upperId);
+  }
+
+  // Initialize aggregates belonging to the rule
+  int aggregatesNum = pkt->getAggregatesNum();
+  aggsSize.resize(aggregatesNum, 0);
+  receivedAggs.resize(aggregatesNum);
+  for (int i = 0; i < aggregatesNum; ++i) {
+    Aggregate& aggregate = pkt->getAggregate(i);
+    addAggregate(aggregate.eventType, aggregate.constraints,
+                 aggregate.constraintsNum, aggregate.lowerId,
+                 aggregate.lowerTime, aggregate.upperId, aggregate.name,
+                 aggregate.fun);
+  }
+
+  // Initialize parameters belonging to the rule
+  for (int i = 0; i < pkt->getParametersNum(); ++i) {
+    Parameter& parameter = pkt->getParameter(i);
+    addParameter(parameter.evIndex2, parameter.name2, parameter.evIndex1,
+                 parameter.name1, parameter.type, pkt);
+  }
+
+  for (int i = 0; i < pkt->getComplexParametersNum(); ++i) {
+    CPUParameter& parameter = pkt->getComplexParameter(i);
+    addComplexParameter(parameter.operation, parameter.leftTree,
+                        parameter.rightTree, parameter.lastIndex,
+                        parameter.type, parameter.vtype);
   }
   // Initialize the set of consuming indexes
   consumingIndexes = pkt->getConsuming();
@@ -109,9 +113,6 @@ StacksRule::~StacksRule() {
       }
     }
   }
-
-  // frees heap memory
-  delete eventGenerator;
 }
 
 void StacksRule::addToStack(PubPkt* pkt, int index) {
@@ -126,7 +127,7 @@ void StacksRule::addToNegationStack(PubPkt* pkt, int index) {
   parametricAddToStack(pkt, negsSize[index], receivedNegs[index]);
 }
 
-void StacksRule::startComputation(PubPkt* pkt, set<PubPkt*>& results) {
+void StacksRule::startComputation(PubPkt* pkt, std::set<PubPkt*>& results) {
   // Adds the terminator to the last stack
   pkt->incRefCount();
   receivedPkts[0].push_back(pkt);
@@ -134,15 +135,13 @@ void StacksRule::startComputation(PubPkt* pkt, set<PubPkt*>& results) {
   // Removes expired events from stacks
   clearStacks();
   // Gets partial results (patterns)
-  list<PartialEvent*>* partialResults = getPartialResults(pkt);
+  std::list<PartialEvent> partialResults = getPartialResults(pkt);
   // Checks parameters and removes invalid results from collected ones
   removePartialEventsNotMatchingParameters(partialResults, endStackParameters);
   // Creates complex events and adds them to the results
   createComplexEvents(partialResults, results);
   // Deletes consumed events
   removeConsumedEvent(partialResults);
-  // Deletes partial results
-  deletePartialEvents(partialResults);
   // Removes the terminator from the last stack
   receivedPkts[0].clear();
   if (pkt->decRefCount()) {
@@ -152,20 +151,23 @@ void StacksRule::startComputation(PubPkt* pkt, set<PubPkt*>& results) {
 }
 
 void StacksRule::processPkt(PubPkt* pkt, MatchingHandler* mh,
-                            set<PubPkt*>& results, int index) {
-  map<int, set<int>>::iterator aggIt = mh->matchingAggregates.find(index);
+                            std::set<PubPkt*>& results, int index) {
+  std::map<int, std::set<int>>::iterator aggIt =
+      mh->matchingAggregates.find(index);
   if (aggIt != mh->matchingAggregates.end()) {
     for (const auto& aggIndex : aggIt->second) {
       addToAggregateStack(pkt, aggIndex);
     }
   }
-  map<int, set<int>>::iterator negIt = mh->matchingNegations.find(index);
+  std::map<int, std::set<int>>::iterator negIt =
+      mh->matchingNegations.find(index);
   if (negIt != mh->matchingNegations.end()) {
     for (const auto& negIndex : negIt->second) {
       addToNegationStack(pkt, negIndex);
     }
   }
-  map<int, set<int>>::iterator stateIt = mh->matchingStates.find(index);
+  std::map<int, std::set<int>>::iterator stateIt =
+      mh->matchingStates.find(index);
   if (stateIt != mh->matchingStates.end()) {
     bool lastStack = false;
     for (const auto& stateIndex : stateIt->second) {
@@ -182,16 +184,16 @@ void StacksRule::processPkt(PubPkt* pkt, MatchingHandler* mh,
 }
 
 void StacksRule::parametricAddToStack(PubPkt* pkt, int& parStacksSize,
-                                      vector<PubPkt*>& parReceived) {
+                                      std::vector<PubPkt*>& parReceived) {
   TimeMs timeStamp = pkt->getTimeStamp();
   int i = getFirstValidElement(parReceived, parStacksSize, timeStamp);
   if (i == -1) {
-    parStacksSize++;
+    ++parStacksSize;
     parReceived.push_back(pkt);
     pkt->incRefCount();
   } else {
-    parStacksSize++;
-    vector<PubPkt*>::iterator vecIt = parReceived.begin();
+    ++parStacksSize;
+    std::vector<PubPkt*>::iterator vecIt = parReceived.begin();
     parReceived.insert(vecIt + i, pkt);
     pkt->incRefCount();
   }
@@ -207,6 +209,7 @@ void StacksRule::addParameter(int index1, char* name1, int index2, char* name2,
   strcpy(tmp.name2, name2);
   if (type == STATE) {
     if (pkt->isInTheSameSequence(index1, index2) /*&& index2>0*/) {
+      // FIXME what should go in here?
     } else {
       endStackParameters.push_back(std::move(tmp));
     }
@@ -247,16 +250,15 @@ void StacksRule::addNegation(int eventType, Constraint constraints[],
   neg.lowerTime = lowTime;
   neg.upperId = highIndex;
   negations.push_back(std::move(neg));
-  receivedNegs.emplace_back();
   if (lowIndex < 0) {
     stacks[highIndex].addLinkedNegation(negsNum);
   } else {
     stacks[lowIndex].addLinkedNegation(negsNum);
   }
-  negsNum++;
+  ++negsNum;
 }
 
-void StacksRule::addAggregate(int eventType, Constraint* constraints,
+void StacksRule::addAggregate(int eventType, Constraint constraints[],
                               int constrLen, int lowIndex, TimeMs& lowTime,
                               int highIndex, char* parName, AggregateFun& fun) {
   Aggregate aggr;
@@ -269,13 +271,12 @@ void StacksRule::addAggregate(int eventType, Constraint* constraints,
   aggr.fun = fun;
   strcpy(aggr.name, parName);
   aggregates.push_back(std::move(aggr));
-  receivedAggs.emplace_back();
-  aggrsNum++;
+  ++aggrsNum;
 }
 
-void StacksRule::getWinEvents(list<PartialEvent*>* results, int index,
+void StacksRule::getWinEvents(std::list<PartialEvent>& results, int index,
                               TimeMs tsUp, CompKind mode,
-                              PartialEvent* partialEvent) {
+                              PartialEvent& partialEvent) {
   bool useComplexParameters = false;
   if (stacksSize[index] == 0) {
     return;
@@ -296,7 +297,7 @@ void StacksRule::getWinEvents(list<PartialEvent*>* results, int index,
   if (index2 < 0) {
     index2 = index1;
   }
-  map<int, vector<CPUParameter>>::iterator itComplex =
+  std::map<int, std::vector<CPUParameter>>::iterator itComplex =
       branchStackComplexParameters.find(index);
   if (itComplex != branchStackComplexParameters.end()) {
     useComplexParameters = true;
@@ -319,13 +320,13 @@ void StacksRule::getWinEvents(list<PartialEvent*>* results, int index,
                                STATE);
     }
     if (usable) {
-      PartialEvent* newPartialEvent = new PartialEvent;
-      memcpy(newPartialEvent->indexes, partialEvent->indexes,
+      PartialEvent newPartialEvent;
+      memcpy(newPartialEvent.indexes, partialEvent.indexes,
              sizeof(PubPkt*) * stacksNum);
-      newPartialEvent->indexes[index] = tmpPkt;
+      newPartialEvent.indexes[index] = tmpPkt;
       // Check negations
       bool invalidatedByNegations = false;
-      for (const auto& neg : *(stacks[index].getLinkedNegations())) {
+      for (auto& neg : stacks[index].getLinkedNegations()) {
         if (checkNegation(neg, newPartialEvent)) {
           invalidatedByNegations = true;
           break;
@@ -334,23 +335,21 @@ void StacksRule::getWinEvents(list<PartialEvent*>* results, int index,
       // If it is not invalidated by events, add the new partial event to
       // results, otherwise delete it
       if (!invalidatedByNegations) {
-        results->push_back(newPartialEvent);
+        results.push_back(std::move(newPartialEvent));
         if (mode == LAST_WITHIN || mode == FIRST_WITHIN) {
           break;
         }
-      } else {
-        delete newPartialEvent;
       }
     }
     // Updates index (increasing or decreasing, depending from the semantics)
     // and check termination condition
     if (mode == LAST_WITHIN) {
-      count--;
+      --count;
       if (count < endCount) {
         return;
       }
     } else {
-      count++;
+      ++count;
       if (count > endCount) {
         return;
       }
@@ -358,48 +357,48 @@ void StacksRule::getWinEvents(list<PartialEvent*>* results, int index,
   }
 }
 
-bool StacksRule::checkNegation(int negIndex, PartialEvent* partialResult) {
+bool StacksRule::checkNegation(int negIndex, PartialEvent& partialResult) {
   Negation& neg = negations[negIndex];
+  int negSize = negsSize[negIndex];
+  std::vector<PubPkt*>& recNeg = receivedNegs[negIndex];
   // No negations: return false
-  if (negsSize[negIndex] == 0) {
+  if (negSize == 0) {
     return false;
   }
   // Extracts timestamps and indexes
-  TimeMs maxTS = partialResult->indexes[neg.upperId]->getTimeStamp();
-  TimeMs minTS;
-  if (neg.lowerId < 0) {
-    minTS = maxTS - neg.lowerTime;
-  } else {
-    minTS = partialResult->indexes[neg.lowerId]->getTimeStamp();
-  }
-  int index1 =
-      getFirstValidElement(receivedNegs[negIndex], negsSize[negIndex], minTS);
+  TimeMs maxTS = partialResult.indexes[neg.upperId]->getTimeStamp();
+  TimeMs minTS = (neg.lowerId < 0)
+                     ? maxTS - neg.lowerTime
+                     : partialResult.indexes[neg.lowerId]->getTimeStamp();
+
+  int index1 = getFirstValidElement(recNeg, negSize, minTS);
   // TODO: Aggiungere la seguente riga per avere uguaglianza semantica
   // con TRex nel test Rain.
-  // if (receivedNegs[negIndex][0]->getTimeStamp()<=maxTS &&
-  // receivedNegs[negIndex][0]->getTimeStamp()>=minTS) return true;
+  // if (recNeg[0]->getTimeStamp() <= maxTS &&
+  //     recNeg[0]->getTimeStamp() >= minTS) {
+  //   return true;
+  // }
   if (index1 < 0) {
     return false;
   }
   // maxTS and minTS negation events are not valid; Jan 2015
-  if (receivedNegs[negIndex][index1]->getTimeStamp() >= maxTS) {
+  if (recNeg[index1]->getTimeStamp() >= maxTS) {
     return false;
   }
-  int index2 = getLastValidElement(receivedNegs[negIndex], negsSize[negIndex],
-                                   maxTS, index1);
-  if (index2 < 0)
+  int index2 = getLastValidElement(recNeg, negSize, maxTS, index1);
+  if (index2 < 0) {
     index2 = index1;
+  }
 
-  map<int, vector<CPUParameter>>::iterator itComplex =
+  std::map<int, std::vector<CPUParameter>>::iterator itComplex =
       negationComplexParameters.find(negIndex);
   if (itComplex == negationComplexParameters.end()) {
     return true;
   }
-  // Iterates over all negations and over all parameters.
   // If a negation can be found that satisfies all parameters,
   // then return true, otherwise return false
-  for (int count = 0; count <= index2 - index1; count++) {
-    PubPkt* tmpPkt = receivedNegs[negIndex].at(index1 + count);
+  for (int count = 0; count <= index2 - index1; ++count) {
+    PubPkt* tmpPkt = recNeg[index1 + count];
     if (checkParameters(tmpPkt, partialResult, itComplex->second, negIndex,
                         NEG)) {
       return true;
@@ -408,59 +407,48 @@ bool StacksRule::checkNegation(int negIndex, PartialEvent* partialResult) {
   return false;
 }
 
-list<PartialEvent*>* StacksRule::getPartialResults(PubPkt* pkt) {
-  list<PartialEvent*>* prevEvents = new list<PartialEvent*>;
-  list<PartialEvent*>* currentEvents = new list<PartialEvent*>;
-  PartialEvent* last = new PartialEvent;
-  last->indexes[0] = pkt;
-  prevEvents->push_back(last);
+std::list<PartialEvent> StacksRule::getPartialResults(PubPkt* pkt) {
+  std::list<PartialEvent> prevEvents;
+  std::list<PartialEvent> currentEvents;
+
+  prevEvents.emplace_back();
+  PartialEvent& last = prevEvents.back();
+  last.indexes[0] = pkt;
+
   // Checks negations on the first state
-  for (const auto& neg : *(stacks[0].getLinkedNegations())) {
+  for (const auto& neg : stacks[0].getLinkedNegations()) {
     if (checkNegation(neg, last)) {
-      delete last;
-      delete prevEvents;
       return currentEvents;
     }
   }
   // Iterates over all states
-  for (int state = 1; state < stacksNum; state++) {
+  for (int state = 1; state < stacksNum; ++state) {
+    currentEvents.clear();
     // Iterates over all previously generated events
-    for (const auto& event : *prevEvents) {
+    for (auto& event : prevEvents) {
       // Extract events for next iteration
       int refState = referenceState[state];
-      TimeMs maxTimeStamp = event->indexes[refState]->getTimeStamp();
+      TimeMs maxTimeStamp = event.indexes[refState]->getTimeStamp();
       CompKind kind = stacks[state].getKind();
       getWinEvents(currentEvents, state, maxTimeStamp, kind, event);
     }
-    // Swaps current and previous results and deletes previous ones
-    for (const auto& pe : *prevEvents) {
-      delete pe;
-    }
-    prevEvents->clear();
-    list<PartialEvent*>* temp = prevEvents;
-    prevEvents = currentEvents;
-    currentEvents = temp;
-    if (prevEvents->empty()) {
+    // Swaps current and previous results
+    std::swap(prevEvents, currentEvents);
+    if (prevEvents.empty()) {
       break;
     }
   }
-  delete currentEvents;
   return prevEvents;
 }
 
-bool StacksRule::checkParameter(PubPkt* pkt, PartialEvent* partialEvent,
-                                Parameter* parameter) {
-  int indexOfReferenceEvent = parameter->evIndex1;
-  PubPkt* receivedPkt = partialEvent->indexes[indexOfReferenceEvent];
+bool StacksRule::checkParameter(PubPkt* pkt, PartialEvent& partialEvent,
+                                Parameter& parameter) {
+  PubPkt* receivedPkt = partialEvent.indexes[parameter.evIndex1];
   ValType type1, type2;
   int index1, index2;
-  if (!receivedPkt->getAttributeIndexAndType(parameter->name2, index2, type2)) {
-    return false;
-  }
-  if (!pkt->getAttributeIndexAndType(parameter->name1, index1, type1)) {
-    return false;
-  }
-  if (type1 != type2) {
+  if (!receivedPkt->getAttributeIndexAndType(parameter.name2, index2, type2) ||
+      !pkt->getAttributeIndexAndType(parameter.name1, index1, type1) ||
+      type1 != type2) {
     return false;
   }
   switch (type1) {
@@ -484,68 +472,54 @@ bool StacksRule::checkParameter(PubPkt* pkt, PartialEvent* partialEvent,
   }
 }
 
-bool StacksRule::checkParameters(PubPkt* pkt, PartialEvent* partialEvent,
-                                 vector<CPUParameter>& complexParameters,
-                                 int index, StateType sType) {
-  for (auto& par : complexParameters) {
-    if (!checkComplexParameter(pkt, partialEvent, &par, index, sType)) {
-      return false;
-    }
-  }
-  return true;
+bool StacksRule::checkParameters(PubPkt* pkt, PartialEvent& partialEvent,
+                                 std::vector<CPUParameter>& params, int index,
+                                 StateType sType) {
+  return std::all_of(params.begin(), params.end(), [&](CPUParameter& par) {
+    return checkComplexParameter(pkt, &partialEvent, &par, index, sType);
+  });
 }
 
 void StacksRule::removePartialEventsNotMatchingParameters(
-    list<PartialEvent*>* partialEvents, vector<Parameter>& parameters) {
-  for (auto it = partialEvents->begin(); it != partialEvents->end();) {
-    PartialEvent* partialEvent = *it;
-    bool valid = true;
-    for (auto& par : parameters) {
-      int indexOfReferenceEvent = par.evIndex2;
-      PubPkt* receivedPkt = partialEvent->indexes[indexOfReferenceEvent];
-      if (!checkParameter(receivedPkt, partialEvent, &par)) {
-        valid = false;
-        break;
-      }
-    }
-    if (!valid) {
-      it = partialEvents->erase(it);
-    } else {
-      ++it;
-    }
-  }
+    std::list<PartialEvent>& partialEvents,
+    std::vector<Parameter>& parameters) {
+  partialEvents.erase(
+      std::remove_if(
+          partialEvents.begin(), partialEvents.end(),
+          [&](PartialEvent& pe) {
+            return std::any_of(
+                parameters.begin(), parameters.end(), [&](Parameter& par) {
+                  return !checkParameter(pe.indexes[par.evIndex2], pe, par);
+                });
+          }),
+      partialEvents.end());
 }
 
-void StacksRule::createComplexEvents(list<PartialEvent*>* partialEvents,
-                                     set<PubPkt*>& results) {
-  for (PartialEvent* pe : *partialEvents) {
+void StacksRule::createComplexEvents(std::list<PartialEvent>& partialEvents,
+                                     std::set<PubPkt*>& results) {
+  for (auto& pe : partialEvents) {
     PubPkt* genPkt = NULL;
     if (compositeEventId >= 0) {
       genPkt = new PubPkt(compositeEventId, NULL, 0);
       genPkt->setTime(receivedPkts[0][0]->getTimeStamp());
     } else {
-      genPkt = eventGenerator->generateCompositeEvent(
-          *pe, aggregates, aggsSize, receivedPkts, receivedAggs,
+      genPkt = eventGenerator.generateCompositeEvent(
+          pe, aggregates, aggsSize, receivedPkts, receivedAggs,
           aggregateComplexParameters);
     }
     results.insert(genPkt);
   }
 }
 
-void StacksRule::removeConsumedEvent(list<PartialEvent*>* partialEvents) {
+void StacksRule::removeConsumedEvent(std::list<PartialEvent>& partialEvents) {
   if (consumingIndexes.empty()) {
     return;
   }
-  for (int i = 1; i < stacksNum; i++) {
-    if (consumingIndexes.find(i) == consumingIndexes.end()) {
-      continue;
-    }
-    set<PubPkt*> pktsToRemove;
-    for (const auto& pe : *partialEvents) {
-      PubPkt* pkt = pe->indexes[i];
-      if (pktsToRemove.find(pkt) == pktsToRemove.end()) {
-        pktsToRemove.insert(pkt);
-      }
+
+  for (int i : consumingIndexes) {
+    std::set<PubPkt*> pktsToRemove;
+    for (const auto& pe : partialEvents) {
+      pktsToRemove.insert(pe.indexes[i]);
     }
     std::vector<PubPkt*>& recPkts = receivedPkts[i];
     for (auto it = recPkts.begin(); it != recPkts.end();) {
@@ -555,7 +529,7 @@ void StacksRule::removeConsumedEvent(list<PartialEvent*>* partialEvents) {
         if (pkt->decRefCount()) {
           delete pkt;
         }
-        stacksSize[i]--;
+        --stacksSize[i];
       } else {
         ++it;
       }
@@ -563,15 +537,8 @@ void StacksRule::removeConsumedEvent(list<PartialEvent*>* partialEvents) {
   }
 }
 
-void StacksRule::deletePartialEvents(list<PartialEvent*>* partialEvents) {
-  for (const auto& pe : *partialEvents) {
-    delete pe;
-  }
-  delete partialEvents;
-}
-
 void StacksRule::clearStacks() {
-  for (int stack = 1; stack < stacksNum; stack++) {
+  for (int stack = 1; stack < stacksNum; ++stack) {
     int refersToStack = stacks[stack].getRefersTo();
     if (stacksSize[refersToStack] == 0) {
       continue;
@@ -580,34 +547,26 @@ void StacksRule::clearStacks() {
                    stacks[stack].getWindow();
     removeOldPacketsFromStack(minTS, stacksSize[stack], receivedPkts[stack]);
   }
-  for (int negIndex = 0; negIndex < negsNum; negIndex++) {
+  for (int negIndex = 0; negIndex < negsNum; ++negIndex) {
     Negation& neg = negations[negIndex];
     int refersToStack = neg.upperId;
     if (stacksSize[refersToStack] == 0) {
       continue;
     }
-    TimeMs win;
-    if (neg.lowerId < 0) {
-      win = neg.lowerTime;
-    } else {
-      int secondIndex = neg.lowerId;
-      win = stacks[secondIndex].getWindow();
-    }
+    TimeMs win =
+        neg.lowerId < 0 ? neg.lowerTime : stacks[neg.lowerId].getWindow();
     TimeMs minTS = receivedPkts[refersToStack][0]->getTimeStamp() - win;
     removeOldPacketsFromStack(minTS, negsSize[negIndex],
                               receivedNegs[negIndex]);
   }
-  for (int aggIndex = 0; aggIndex < aggrsNum; aggIndex++) {
+  for (int aggIndex = 0; aggIndex < aggrsNum; ++aggIndex) {
     Aggregate& agg = aggregates[aggIndex];
     int refersToStack = agg.upperId;
     if (stacksSize[refersToStack] == 0) {
       continue;
     }
-    TimeMs win = agg.lowerTime;
-    if (win < 0) {
-      int secondIndex = agg.lowerId;
-      win = stacks[secondIndex].getWindow();
-    }
+    TimeMs win =
+        agg.lowerId < 0 ? agg.lowerTime : stacks[agg.lowerId].getWindow();
     TimeMs minTS = receivedPkts[refersToStack][0]->getTimeStamp() - win;
     removeOldPacketsFromStack(minTS, aggsSize[aggIndex],
                               receivedAggs[aggIndex]);
@@ -615,7 +574,7 @@ void StacksRule::clearStacks() {
 }
 
 void StacksRule::removeOldPacketsFromStack(TimeMs& minTS, int& parStacksSize,
-                                           vector<PubPkt*>& parReceived) {
+                                           std::vector<PubPkt*>& parReceived) {
   if (parStacksSize == 0) {
     return;
   }
@@ -623,8 +582,8 @@ void StacksRule::removeOldPacketsFromStack(TimeMs& minTS, int& parStacksSize,
   if (newSize == parStacksSize) {
     return;
   }
-  vector<PubPkt*>::iterator it = parReceived.begin();
-  for (int count = 0; count < parStacksSize - newSize; count++) {
+  std::vector<PubPkt*>::iterator it = parReceived.begin();
+  for (int count = 0; count < parStacksSize - newSize; ++count) {
     PubPkt* pkt = *it;
     if (pkt->decRefCount()) {
       delete pkt;

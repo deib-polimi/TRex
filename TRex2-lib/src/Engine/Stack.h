@@ -31,16 +31,10 @@ public:
    */
   Stack(int refersTo, TimeMs window, CompKind kind);
 
-  Stack(const Stack& other);
-
-  Stack(Stack&& other);
-
-  Stack& operator=(Stack other);
-
   /**
    * Destructor
    */
-  virtual ~Stack();
+  virtual ~Stack(){};
 
   CompKind getKind() const { return kind; }
 
@@ -51,22 +45,22 @@ public:
   /**
    * Add a new referred Stack
    */
-  void addLookBackTo(int reference) { lookBackTo->insert(reference); }
+  void addLookBackTo(int reference) { lookBackTo.insert(reference); }
 
   /**
    * Get referred Stacks
    */
-  std::set<int>* getLookBackTo() { return lookBackTo; }
+  std::set<int>& getLookBackTo() { return lookBackTo; }
 
   /**
    * Add a new referred Negation
    */
-  void addLinkedNegation(int reference) { linkedNegations->insert(reference); }
+  void addLinkedNegation(int reference) { linkedNegations.insert(reference); }
 
   /**
    * Get referred Negations
    */
-  std::set<int>* getLinkedNegations() { return linkedNegations; }
+  std::set<int>& getLinkedNegations() { return linkedNegations; }
 
 private:
   // The stack it refers to
@@ -76,9 +70,9 @@ private:
   // The kind of composition
   CompKind kind;
   // Referred stacks
-  std::set<int>* lookBackTo;
+  std::set<int> lookBackTo;
   // Referred negations
-  std::set<int>* linkedNegations;
+  std::set<int> linkedNegations;
 };
 
 #endif

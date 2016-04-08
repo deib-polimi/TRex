@@ -31,8 +31,6 @@
 #include "Stack.h"
 #include <list>
 #include <map>
-#include <set>
-#include <bitset>
 #include <vector>
 
 /**
@@ -140,7 +138,7 @@ private:
   // Indexes of events in the consuming clause (set of stack ids)
   std::set<int> consumingIndexes;
   // Used to generate composite event attributes (if any)
-  CompositeEventGenerator* eventGenerator;
+  CompositeEventGenerator eventGenerator;
   // Used to generate a composite event id no attributes are defined
   int compositeEventId;
 
@@ -160,19 +158,20 @@ private:
   inline void addComplexParameter(Op pOperation, OpTree* lTree, OpTree* rTree,
                                   int lastIdx, StateType type, ValType vtype);
 
-  int computeIntValue(PubPkt* pkt, PartialEvent* partialEvent, OpTree* opTree,
+  int computeIntValue(PubPkt* pkt, PartialEvent& partialEvent, OpTree* opTree,
                       int index, bool isNeg);
 
   /**
    * Adds a new negation to negations map
    */
-  inline void addNegation(int eventType, Constraint* constraints, int constrLen,
-                          int lowIndex, TimeMs& lowTime, int highIndex);
+  inline void addNegation(int eventType, Constraint constraints[],
+                          int constrLen, int lowIndex, TimeMs& lowTime,
+                          int highIndex);
 
   /**
    * Adds a new aggregate to aggregates map
    */
-  inline void addAggregate(int eventType, Constraint* constraints,
+  inline void addAggregate(int eventType, Constraint constraints[],
                            int constrLen, int lowIndex, TimeMs& lowTime,
                            int highIndex, char* name, AggregateFun& fun);
 
@@ -180,41 +179,36 @@ private:
    * Returns the events that satisfy the stack window with the given from the
    * given time stamp
    */
-  inline void getWinEvents(std::list<PartialEvent*>* partialEvents, int index,
+  inline void getWinEvents(std::list<PartialEvent>& partialEvents, int index,
                            TimeMs tsUp, CompKind mode,
-                           PartialEvent* partialEvent);
+                           PartialEvent& partialEvent);
 
   /**
    * Return true for the presence of negation (according to parameters)
    */
-  inline bool checkNegation(int negIndex, PartialEvent* partialResult);
+  inline bool checkNegation(int negIndex, PartialEvent& partialResult);
 
   /**
    * Computes partial results and returns them as a list of PartialEvent.
    */
-  inline std::list<PartialEvent*>* getPartialResults(PubPkt* pkt);
+  inline std::list<PartialEvent> getPartialResults(PubPkt* pkt);
 
   /**
    * Computes complex events and adds them to the results set
    */
-  inline void createComplexEvents(std::list<PartialEvent*>* partialEvents,
+  inline void createComplexEvents(std::list<PartialEvent>& partialEvents,
                                   std::set<PubPkt*>& results);
 
   /**
    * Removes events that have been consumed
    */
-  inline void removeConsumedEvent(std::list<PartialEvent*>* partialEvents);
-
-  /**
-   * Deletes partial events
-   */
-  inline void deletePartialEvents(std::list<PartialEvent*>* partialEvents);
+  inline void removeConsumedEvent(std::list<PartialEvent>& partialEvents);
 
   /**
    * Returns true if the parameter is satisfied by the packet
    */
-  inline bool checkParameter(PubPkt* pkt, PartialEvent* partialEvent,
-                             Parameter* parameter);
+  inline bool checkParameter(PubPkt* pkt, PartialEvent& partialEvent,
+                             Parameter& parameter);
 
   // inline bool checkComplexParameter(PubPkt *pkt, PartialEvent
   // *partialEvent, CPUParameter *parameter, int index, bool isNeg);
@@ -222,7 +216,7 @@ private:
   /**
    * Returns true if all parameters are satisfied by the packet
    */
-  inline bool checkParameters(PubPkt* pkt, PartialEvent* partialEvent,
+  inline bool checkParameters(PubPkt* pkt, PartialEvent& partialEvent,
                               std::vector<CPUParameter>& complexParameters,
                               int index, StateType sType);
 
@@ -230,7 +224,7 @@ private:
    * Removes partial events that do not match parameters
    */
   inline void removePartialEventsNotMatchingParameters(
-      std::list<PartialEvent*>* partialEvents,
+      std::list<PartialEvent>& partialEvents,
       std::vector<Parameter>& parameters);
 
   /**

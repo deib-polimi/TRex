@@ -26,41 +26,5 @@ Stack::Stack(int refersTo, TimeMs win, CompKind kind)
     : refersTo(refersTo),
       win(win),
       kind(kind),
-      lookBackTo(new set<int>),
-      linkedNegations(new set<int>) {}
-
-Stack::Stack(const Stack& other)
-    : refersTo(other.refersTo),
-      win(other.win),
-      kind(other.kind),
-      lookBackTo(new set<int>(*other.lookBackTo)),
-      linkedNegations(new set<int>(*other.lookBackTo)) {}
-
-Stack::Stack(Stack&& other)
-    : refersTo(other.refersTo),
-      win(other.win),
-      kind(other.kind),
       lookBackTo(),
-      linkedNegations() {
-  std::swap(lookBackTo, other.lookBackTo);
-  std::swap(linkedNegations, other.linkedNegations);
-}
-
-Stack& Stack::operator=(Stack other) {
-  refersTo = other.refersTo;
-  win = other.win;
-  kind = other.kind;
-  std::swap(lookBackTo, other.lookBackTo);
-  std::swap(linkedNegations, other.linkedNegations);
-
-  return *this;
-}
-
-Stack::~Stack() {
-  if (lookBackTo != NULL) {
-    delete lookBackTo;
-  }
-  if (linkedNegations != NULL) {
-    delete linkedNegations;
-  }
-}
+      linkedNegations() {}
