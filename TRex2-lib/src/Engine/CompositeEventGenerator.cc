@@ -303,14 +303,16 @@ inline float CompositeEventGenerator::computeAggregate(
   } else {
     minTS = partialEvent.indexes[agg.lowerId]->getTimeStamp();
   }
-  int index1 =
-      getFirstValidElement(receivedAggs[index], aggsSize[index], minTS);
-  if (index1 < 0)
+
+  vector<PubPkt*>::iterator first = getBeginPacket(receivedAggs[index], minTS);
+  if (first == receivedAggs[index].end()) {
     return 0;
-  int index2 =
-      getLastValidElement(receivedAggs[index], aggsSize[index], maxTS, index1);
-  if (index2 < 0)
-    index2 = index1;
+  }
+
+  vector<PubPkt*>::iterator last = getEndPacket(receivedAggs[index], maxTS);
+  if (first >= last) {
+    return 0;
+  }
   AggregateFun fun = agg.fun;
   char* name = agg.name;
   float sum = 0;
@@ -325,8 +327,8 @@ inline float CompositeEventGenerator::computeAggregate(
       aggregateParameters.find(index);
   if (paramIt != aggregateParameters.end())
     checkParams = true;
-  for (int i = index1; i <= index2; i++) {
-    PubPkt* pkt = receivedAggs[index][i];
+  for (auto it = first; it != last; ++it) {
+    PubPkt* pkt = *it;
     if (checkParams) {
       if (!checkParameters(pkt, partialEvent, paramIt->second))
         continue;

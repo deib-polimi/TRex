@@ -19,6 +19,7 @@
 //
 
 #include "Funs.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -497,6 +498,26 @@ int getLastValidElement(vector<PubPkt*>& column, int columnSize,
   if (column[maxValue]->getTimeStamp() < maxTimeStamp)
     return maxValue;
   return minValue;
+}
+
+class CompareTS {
+public:
+  bool operator()(const TimeMs& a, PubPkt* b) { return a < b->getTimeStamp(); }
+  bool operator()(PubPkt* a, const TimeMs& b) { return a->getTimeStamp() < b; }
+  bool operator()(const TimeMs& a, const TimeMs& b) { return a < b; }
+  bool operator()(PubPkt* a, PubPkt* b) {
+    return a->getTimeStamp() < b->getTimeStamp();
+  }
+};
+
+vector<PubPkt*>::iterator getBeginPacket(vector<PubPkt*>& column,
+                                         TimeMs minTime) {
+  return std::upper_bound(column.begin(), column.end(), minTime, CompareTS());
+}
+
+vector<PubPkt*>::iterator getEndPacket(vector<PubPkt*>& column,
+                                       TimeMs maxTime) {
+  return std::lower_bound(column.begin(), column.end(), maxTime, CompareTS());
 }
 
 int deleteInvalidElements(vector<PubPkt*>& column, int columnSize,

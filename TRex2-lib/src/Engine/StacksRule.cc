@@ -185,18 +185,12 @@ void StacksRule::processPkt(PubPkt* pkt, MatchingHandler* mh,
 
 void StacksRule::parametricAddToStack(PubPkt* pkt, int& parStacksSize,
                                       std::vector<PubPkt*>& parReceived) {
-  TimeMs timeStamp = pkt->getTimeStamp();
-  int i = getFirstValidElement(parReceived, parStacksSize, timeStamp);
-  if (i == -1) {
-    ++parStacksSize;
-    parReceived.push_back(pkt);
-    pkt->incRefCount();
-  } else {
-    ++parStacksSize;
-    std::vector<PubPkt*>::iterator vecIt = parReceived.begin();
-    parReceived.insert(vecIt + i, pkt);
-    pkt->incRefCount();
-  }
+  std::vector<PubPkt*>::iterator it =
+      getBeginPacket(parReceived, pkt->getTimeStamp());
+
+  ++parStacksSize;
+  parReceived.insert(it, pkt);
+  pkt->incRefCount();
 }
 
 void StacksRule::addParameter(int index1, char* name1, int index2, char* name2,
@@ -278,55 +272,50 @@ void StacksRule::getWinEvents(std::list<PartialEvent>& results, int index,
                               TimeMs tsUp, CompKind mode,
                               PartialEvent& partialEvent) {
   bool useComplexParameters = false;
-  if (stacksSize[index] == 0) {
+
+  int stackSize = stacksSize[index];
+  std::vector<PubPkt*>& recPkts = receivedPkts[index];
+  Stack& stack = stacks[index];
+
+  if (stackSize == 0) {
     return;
   }
   // Extracts the minimum and maximum element to process.
   // Returns immediately if they cannot be found.
-  TimeMs minTimeStamp = tsUp - stacks[index].getWindow();
-  int index1 = getFirstValidElement(receivedPkts[index], stacksSize[index],
-                                    minTimeStamp);
-  if (index1 < 0) {
+  std::vector<PubPkt*>::iterator first =
+      getBeginPacket(recPkts, tsUp - stack.getWindow());
+  if (first == recPkts.end() || (*first)->getTimeStamp() >= tsUp) {
     return;
   }
-  if (receivedPkts[index][index1]->getTimeStamp() >= tsUp) {
+
+  std::vector<PubPkt*>::iterator last = getEndPacket(recPkts, tsUp);
+  if (first >= last) {
     return;
   }
-  int index2 =
-      getLastValidElement(receivedPkts[index], stacksSize[index], tsUp, index1);
-  if (index2 < 0) {
-    index2 = index1;
-  }
+  // Position the iterator to the last valid element
+  --last;
+
   std::map<int, std::vector<CPUParameter>>::iterator itComplex =
       branchStackComplexParameters.find(index);
   if (itComplex != branchStackComplexParameters.end()) {
     useComplexParameters = true;
   }
 
-  // Computes the indexes for processing
-  int count = 0;
-  int endCount = index2 - index1;
   // In the case of a LAST_WITHIN semantics, reverses processing order
   if (mode == LAST_WITHIN) {
-    count = index2 - index1;
-    endCount = 0;
+    std::swap(first, last);
   }
-  // Starts processing
+
   while (true) {
-    bool usable = true;
-    PubPkt* tmpPkt = receivedPkts[index][index1 + count];
-    if (useComplexParameters) {
-      usable = checkParameters(tmpPkt, partialEvent, itComplex->second, index,
-                               STATE);
-    }
-    if (usable) {
+    PubPkt* pkt = *first;
+    if (!useComplexParameters ||
+        checkParameters(pkt, partialEvent, itComplex->second, index, STATE)) {
       PartialEvent newPartialEvent;
-      memcpy(newPartialEvent.indexes, partialEvent.indexes,
-             sizeof(PubPkt*) * stacksNum);
-      newPartialEvent.indexes[index] = tmpPkt;
+      std::copy_n(partialEvent.indexes, stacksNum, newPartialEvent.indexes);
+      newPartialEvent.indexes[index] = pkt;
       // Check negations
       bool invalidatedByNegations = false;
-      for (auto& neg : stacks[index].getLinkedNegations()) {
+      for (auto& neg : stack.getLinkedNegations()) {
         if (checkNegation(neg, newPartialEvent)) {
           invalidatedByNegations = true;
           break;
@@ -344,14 +333,14 @@ void StacksRule::getWinEvents(std::list<PartialEvent>& results, int index,
     // Updates index (increasing or decreasing, depending from the semantics)
     // and check termination condition
     if (mode == LAST_WITHIN) {
-      --count;
-      if (count < endCount) {
-        return;
+      --first;
+      if (first < last) {
+        break;
       }
     } else {
-      ++count;
-      if (count > endCount) {
-        return;
+      ++first;
+      if (first > last) {
+        break;
       }
     }
   }
@@ -371,40 +360,35 @@ bool StacksRule::checkNegation(int negIndex, PartialEvent& partialResult) {
                      ? maxTS - neg.lowerTime
                      : partialResult.indexes[neg.lowerId]->getTimeStamp();
 
-  int index1 = getFirstValidElement(recNeg, negSize, minTS);
+  std::vector<PubPkt*>::iterator first = getBeginPacket(recNeg, minTS);
+
   // TODO: Aggiungere la seguente riga per avere uguaglianza semantica
   // con TRex nel test Rain.
   // if (recNeg[0]->getTimeStamp() <= maxTS &&
   //     recNeg[0]->getTimeStamp() >= minTS) {
   //   return true;
   // }
-  if (index1 < 0) {
-    return false;
-  }
+
   // maxTS and minTS negation events are not valid; Jan 2015
-  if (recNeg[index1]->getTimeStamp() >= maxTS) {
+  if (first == recNeg.end() || (*first)->getTimeStamp() >= maxTS) {
     return false;
-  }
-  int index2 = getLastValidElement(recNeg, negSize, maxTS, index1);
-  if (index2 < 0) {
-    index2 = index1;
   }
 
-  std::map<int, std::vector<CPUParameter>>::iterator itComplex =
+  std::vector<PubPkt*>::iterator last = getEndPacket(recNeg, maxTS);
+  if (first >= last) {
+    return false;
+  }
+
+  std::map<int, std::vector<CPUParameter>>::iterator itComp =
       negationComplexParameters.find(negIndex);
-  if (itComplex == negationComplexParameters.end()) {
+  if (itComp == negationComplexParameters.end()) {
     return true;
   }
   // If a negation can be found that satisfies all parameters,
   // then return true, otherwise return false
-  for (int count = 0; count <= index2 - index1; ++count) {
-    PubPkt* tmpPkt = recNeg[index1 + count];
-    if (checkParameters(tmpPkt, partialResult, itComplex->second, negIndex,
-                        NEG)) {
-      return true;
-    }
-  }
-  return false;
+  return std::any_of(first, last, [&](PubPkt* pkt) {
+    return checkParameters(pkt, partialResult, itComp->second, negIndex, NEG);
+  });
 }
 
 std::list<PartialEvent> StacksRule::getPartialResults(PubPkt* pkt) {
@@ -575,20 +559,15 @@ void StacksRule::clearStacks() {
 
 void StacksRule::removeOldPacketsFromStack(TimeMs& minTS, int& parStacksSize,
                                            std::vector<PubPkt*>& parReceived) {
-  if (parStacksSize == 0) {
-    return;
-  }
-  int newSize = deleteInvalidElements(parReceived, parStacksSize, minTS);
-  if (newSize == parStacksSize) {
-    return;
-  }
-  std::vector<PubPkt*>::iterator it = parReceived.begin();
-  for (int count = 0; count < parStacksSize - newSize; ++count) {
+  std::vector<PubPkt*>::iterator firstValid =
+      getBeginPacket(parReceived, minTS);
+  std::vector<PubPkt*>::iterator begin = parReceived.begin();
+  for (auto it = begin; it != firstValid; ++it) {
     PubPkt* pkt = *it;
     if (pkt->decRefCount()) {
       delete pkt;
     }
-    it = parReceived.erase(it);
   }
-  parStacksSize = newSize;
+  parReceived.erase(begin, firstValid);
+  parStacksSize = parReceived.size();
 }

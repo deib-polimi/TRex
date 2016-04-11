@@ -104,21 +104,49 @@ Parameter* dupParameter(Parameter* param);
  * value greater than minTimeStamp.
  * Returns -1 if such an element cannot be found.
  * The search is performed in logarithmic time, using a binary search.
+ *
+ * @deprecated use
+ *     `vector<PubPkt*>::iterator getBeginPacket(
+ *          vector<PubPkt*>& column, TimeMs minTime
+ *     )`
  */
 int getFirstValidElement(std::vector<PubPkt*>& column, int columnSize,
                          TimeMs minTimeStamp);
+
+/**
+ * Returns an iterator pointing to the first element in the given column having
+ * a timestamp greater than minTime, or to the end of the vector if such an
+ * element cannot be found.
+ * The search is performed in logarithmic time, using a binary search.
+ */
+vector<PubPkt*>::iterator getBeginPacket(vector<PubPkt*>& column,
+                                         TimeMs minTime);
 
 /**
  * Returns the id of the last element in the given column having a
  * value smaller than maxTimeStamp and an index greater than minIndex.
  * Returns -1 if such an element cannot be found.
  * The search is performed in logarithmic time, using a binary search.
+ *
+ * @deprecated use
+ *     `vector<PubPkt*>::iterator getEndPacket(
+ *          vector<PubPkt*>& column, TimeMs maxTime
+ *     )`
  */
 int getLastValidElement(std::vector<PubPkt*>& column, int columnSize,
                         TimeMs maxTimeStamp, int minIndex);
+/**
+ * Returns an iterator pointing to the element after the last one in the given
+ * column having a timestamp smaller than maxTime, or to the end of the vector
+ * if such an element cannot be found.
+ * The search is performed in logarithmic time, using a binary search.
+ */
+vector<PubPkt*>::iterator getEndPacket(vector<PubPkt*>& column, TimeMs maxTime);
 
 /**
  * Returns the new size of the column.
+ *
+ * @deprecated this function is quite useless and confusing
  */
 int deleteInvalidElements(std::vector<PubPkt*>& column, int columnSize,
                           TimeMs minTimeStamp);
