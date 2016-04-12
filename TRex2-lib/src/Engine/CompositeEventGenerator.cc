@@ -31,7 +31,7 @@ CompositeEventGenerator::~CompositeEventGenerator() { delete ceTemplate; }
 
 PubPkt* CompositeEventGenerator::generateCompositeEvent(
     PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
-    std::vector<int>& aggsSize, std::vector<std::vector<PubPkt*>>& receivedPkts,
+    std::vector<std::vector<PubPkt*>>& receivedPkts,
     std::vector<std::vector<PubPkt*>>& receivedAggs,
     std::map<int, std::vector<CPUParameter>>& aggregateParameters) {
   int eventType = ceTemplate->getEventType();
@@ -43,21 +43,20 @@ PubPkt* CompositeEventGenerator::generateCompositeEvent(
     ValType valType = ceTemplate->getAttributeTree(i)->getValType();
     attributes[i].type = valType;
     if (valType == INT)
-      attributes[i].intVal = computeIntValue(
-          partialEvent, aggregates, aggsSize, receivedPkts, receivedAggs,
-          aggregateParameters, ceTemplate->getAttributeTree(i));
+      attributes[i].intVal =
+          computeIntValue(partialEvent, aggregates, receivedPkts, receivedAggs,
+                          aggregateParameters, ceTemplate->getAttributeTree(i));
     else if (valType == FLOAT)
       attributes[i].floatVal = computeFloatValue(
-          partialEvent, aggregates, aggsSize, receivedPkts, receivedAggs,
+          partialEvent, aggregates, receivedPkts, receivedAggs,
           aggregateParameters, ceTemplate->getAttributeTree(i));
     else if (valType == BOOL)
       attributes[i].boolVal = computeBoolValue(
-          partialEvent, aggregates, aggsSize, receivedPkts, receivedAggs,
+          partialEvent, aggregates, receivedPkts, receivedAggs,
           aggregateParameters, ceTemplate->getAttributeTree(i));
     else if (valType == STRING)
-      computeStringValue(partialEvent, aggregates, aggsSize, receivedPkts,
-                         receivedAggs, aggregateParameters,
-                         ceTemplate->getAttributeTree(i),
+      computeStringValue(partialEvent, aggregates, receivedPkts, receivedAggs,
+                         aggregateParameters, ceTemplate->getAttributeTree(i),
                          attributes[i].stringVal);
   }
   for (int i = 0; i < staticAttributesNum; i++) {
@@ -71,7 +70,7 @@ PubPkt* CompositeEventGenerator::generateCompositeEvent(
 
 inline int CompositeEventGenerator::computeIntValue(
     PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
-    std::vector<int>& aggsSize, std::vector<std::vector<PubPkt*>>& receivedPkts,
+    std::vector<std::vector<PubPkt*>>& receivedPkts,
     std::vector<std::vector<PubPkt*>>& receivedAggs,
     std::map<int, std::vector<CPUParameter>>& aggregateParameters,
     OpTree* opTree) {
@@ -104,18 +103,18 @@ inline int CompositeEventGenerator::computeIntValue(
       else if (type == FLOAT)
         return pkt->getFloatAttributeVal(attrIndex);
     } else {
-      return computeAggregate(index, partialEvent, aggregates, aggsSize,
-                              receivedPkts, receivedAggs, aggregateParameters);
+      return computeAggregate(index, partialEvent, aggregates, receivedPkts,
+                              receivedAggs, aggregateParameters);
     }
   } else {
     // Integer can only be obtained from integer:
     // assume this is ensured at rule deployment time
-    int leftValue = computeIntValue(
-        partialEvent, aggregates, aggsSize, receivedPkts, receivedAggs,
-        aggregateParameters, opTree->getLeftSubtree());
-    int rightValue = computeIntValue(
-        partialEvent, aggregates, aggsSize, receivedPkts, receivedAggs,
-        aggregateParameters, opTree->getRightSubtree());
+    int leftValue =
+        computeIntValue(partialEvent, aggregates, receivedPkts, receivedAggs,
+                        aggregateParameters, opTree->getLeftSubtree());
+    int rightValue =
+        computeIntValue(partialEvent, aggregates, receivedPkts, receivedAggs,
+                        aggregateParameters, opTree->getRightSubtree());
     OpTreeOperation op = opTree->getOp();
     cout << "CPU not leaf " << leftValue << "; " << rightValue << ". OP " << op
          << endl;
@@ -133,7 +132,7 @@ inline int CompositeEventGenerator::computeIntValue(
 
 inline float CompositeEventGenerator::computeFloatValue(
     PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
-    std::vector<int>& aggsSize, std::vector<std::vector<PubPkt*>>& receivedPkts,
+    std::vector<std::vector<PubPkt*>>& receivedPkts,
     std::vector<std::vector<PubPkt*>>& receivedAggs,
     std::map<int, std::vector<CPUParameter>>& aggregateParameters,
     OpTree* opTree) {
@@ -167,30 +166,30 @@ inline float CompositeEventGenerator::computeFloatValue(
       else if (type == FLOAT)
         return pkt->getFloatAttributeVal(attrIndex);
     } else {
-      return computeAggregate(index, partialEvent, aggregates, aggsSize,
-                              receivedPkts, receivedAggs, aggregateParameters);
+      return computeAggregate(index, partialEvent, aggregates, receivedPkts,
+                              receivedAggs, aggregateParameters);
     }
   } else {
     // Floats can only be obtained from integer and float:
     // assume this is ensured at rule deployment time
     float leftValue;
     if (opTree->getLeftSubtree()->getValType() == INT)
-      leftValue = computeIntValue(
-          partialEvent, aggregates, aggsSize, receivedPkts, receivedAggs,
-          aggregateParameters, opTree->getLeftSubtree());
+      leftValue =
+          computeIntValue(partialEvent, aggregates, receivedPkts, receivedAggs,
+                          aggregateParameters, opTree->getLeftSubtree());
     else
-      leftValue = computeFloatValue(
-          partialEvent, aggregates, aggsSize, receivedPkts, receivedAggs,
-          aggregateParameters, opTree->getLeftSubtree());
+      leftValue = computeFloatValue(partialEvent, aggregates, receivedPkts,
+                                    receivedAggs, aggregateParameters,
+                                    opTree->getLeftSubtree());
     float rightValue;
     if (opTree->getRightSubtree()->getValType() == INT)
-      rightValue = computeIntValue(
-          partialEvent, aggregates, aggsSize, receivedPkts, receivedAggs,
-          aggregateParameters, opTree->getRightSubtree());
+      rightValue =
+          computeIntValue(partialEvent, aggregates, receivedPkts, receivedAggs,
+                          aggregateParameters, opTree->getRightSubtree());
     else
-      rightValue = computeFloatValue(
-          partialEvent, aggregates, aggsSize, receivedPkts, receivedAggs,
-          aggregateParameters, opTree->getRightSubtree());
+      rightValue = computeFloatValue(partialEvent, aggregates, receivedPkts,
+                                     receivedAggs, aggregateParameters,
+                                     opTree->getRightSubtree());
     OpTreeOperation op = opTree->getOp();
     if (op == ADD)
       return leftValue + rightValue;
@@ -206,7 +205,7 @@ inline float CompositeEventGenerator::computeFloatValue(
 
 inline bool CompositeEventGenerator::computeBoolValue(
     PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
-    std::vector<int>& aggsSize, std::vector<std::vector<PubPkt*>>& receivedPkts,
+    std::vector<std::vector<PubPkt*>>& receivedPkts,
     std::vector<std::vector<PubPkt*>>& receivedAggs,
     std::map<int, std::vector<CPUParameter>>& aggregateParameters,
     OpTree* opTree) {
@@ -243,12 +242,12 @@ inline bool CompositeEventGenerator::computeBoolValue(
   } else {
     // Booleans can only be obtained from booleans:
     // assume this is ensured at rule deployment time
-    bool leftValue = computeBoolValue(
-        partialEvent, aggregates, aggsSize, receivedPkts, receivedAggs,
-        aggregateParameters, opTree->getLeftSubtree());
-    bool rightValue = computeBoolValue(
-        partialEvent, aggregates, aggsSize, receivedPkts, receivedAggs,
-        aggregateParameters, opTree->getRightSubtree());
+    bool leftValue =
+        computeBoolValue(partialEvent, aggregates, receivedPkts, receivedAggs,
+                         aggregateParameters, opTree->getLeftSubtree());
+    bool rightValue =
+        computeBoolValue(partialEvent, aggregates, receivedPkts, receivedAggs,
+                         aggregateParameters, opTree->getRightSubtree());
     OpTreeOperation op = opTree->getOp();
     if (op == AND)
       return leftValue && rightValue;
@@ -260,7 +259,7 @@ inline bool CompositeEventGenerator::computeBoolValue(
 
 inline void CompositeEventGenerator::computeStringValue(
     PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
-    std::vector<int>& aggsSize, std::vector<std::vector<PubPkt*>>& receivedPkts,
+    std::vector<std::vector<PubPkt*>>& receivedPkts,
     std::vector<std::vector<PubPkt*>>& receivedAggs,
     std::map<int, std::vector<CPUParameter>>& aggregateParameters,
     OpTree* opTree, char* result) {
@@ -292,7 +291,7 @@ inline void CompositeEventGenerator::computeStringValue(
 
 inline float CompositeEventGenerator::computeAggregate(
     int index, PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
-    std::vector<int>& aggsSize, std::vector<std::vector<PubPkt*>>& receivedPkts,
+    std::vector<std::vector<PubPkt*>>& receivedPkts,
     std::vector<std::vector<PubPkt*>>& receivedAggs,
     std::map<int, std::vector<CPUParameter>>& aggregateParameters) {
   Aggregate& agg = aggregates[index];

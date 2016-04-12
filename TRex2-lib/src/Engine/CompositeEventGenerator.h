@@ -51,10 +51,29 @@ public:
   /**
    * Creates a new composite event starting from the stored template and
    * from the set of events given as input parameter.
+   *
+   * @deprecated use
+   *     `PubPkt* generateCompositeEvent(
+   *          PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
+   *          std::vector<std::vector<PubPkt*>>& receivedPkts,
+   *          std::vector<std::vector<PubPkt*>>& receivedAggs,
+   *          std::map<int, std::vector<CPUParameter>>& aggregateParameters);`
    */
   PubPkt* generateCompositeEvent(
       PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
       std::vector<int>& aggsSize,
+      std::vector<std::vector<PubPkt*>>& receivedPkts,
+      std::vector<std::vector<PubPkt*>>& receivedAggs,
+      std::map<int, std::vector<CPUParameter>>& aggregateParameters) {
+    return generateCompositeEvent(partialEvent, aggregates, receivedPkts,
+                                  receivedAggs, aggregateParameters);
+  }
+  /**
+   * Creates a new composite event starting from the stored template and
+   * from the set of events given as input parameter.
+   */
+  PubPkt* generateCompositeEvent(
+      PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
       std::vector<std::vector<PubPkt*>>& receivedPkts,
       std::vector<std::vector<PubPkt*>>& receivedAggs,
       std::map<int, std::vector<CPUParameter>>& aggregateParameters);
@@ -75,7 +94,6 @@ private:
    */
   inline int computeIntValue(
       PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
-      std::vector<int>& aggsSize,
       std::vector<std::vector<PubPkt*>>& receivedPkts,
       std::vector<std::vector<PubPkt*>>& receivedAggs,
       std::map<int, std::vector<CPUParameter>>& aggregateParameters,
@@ -87,7 +105,6 @@ private:
    */
   inline float computeFloatValue(
       PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
-      std::vector<int>& aggsSize,
       std::vector<std::vector<PubPkt*>>& receivedPkts,
       std::vector<std::vector<PubPkt*>>& receivedAggs,
       std::map<int, std::vector<CPUParameter>>& aggregateParameters,
@@ -99,7 +116,6 @@ private:
    */
   inline bool computeBoolValue(
       PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
-      std::vector<int>& aggsSize,
       std::vector<std::vector<PubPkt*>>& receivedPkts,
       std::vector<std::vector<PubPkt*>>& receivedAggs,
       std::map<int, std::vector<CPUParameter>>& aggregateParameters,
@@ -111,7 +127,6 @@ private:
    */
   inline void computeStringValue(
       PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
-      std::vector<int>& aggsSize,
       std::vector<std::vector<PubPkt*>>& receivedPkts,
       std::vector<std::vector<PubPkt*>>& receivedAggs,
       std::map<int, std::vector<CPUParameter>>& aggregateParameters,
@@ -125,7 +140,6 @@ private:
    */
   inline float computeAggregate(
       int index, PartialEvent& partialEvent, std::vector<Aggregate>& aggregates,
-      std::vector<int>& aggsSize,
       std::vector<std::vector<PubPkt*>>& receivedPkts,
       std::vector<std::vector<PubPkt*>>& receivedAggs,
       std::map<int, std::vector<CPUParameter>>& aggregateParameters);

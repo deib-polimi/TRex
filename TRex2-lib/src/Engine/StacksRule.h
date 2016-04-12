@@ -111,22 +111,9 @@ private:
   std::vector<Aggregate> aggregates;
   // Negations in the rule (negation id -> data structure)
   std::vector<Negation> negations;
-  // Number of stacks in the rule
-  int stacksNum;
-  // Number of aggregates in the rule
-  int aggrsNum;
-  // Number of negations in the rule
-  int negsNum;
 
   // Stack id -> state it refers to in the rule
   std::vector<int> referenceState;
-
-  // Number of pkts stored for each stack in the rule
-  std::vector<int> stacksSize;
-  // Number of pkts stored for each negation in the rule
-  std::vector<int> negsSize;
-  // Number of pkts stored for each aggregate in the sequence
-  std::vector<int> aggsSize;
 
   // Aggregate index -> set of all matching PubPkt
   std::vector<std::vector<PubPkt*>> receivedAggs;
@@ -146,7 +133,7 @@ private:
    * Adds the packet to the given stack (can be a normal stack, or a stack for
    * negations or aggregates)
    */
-  inline void parametricAddToStack(PubPkt* pkt, int& parStacksSize,
+  inline void parametricAddToStack(PubPkt* pkt,
                                    std::vector<PubPkt*>& parReceived);
 
   /**
@@ -236,7 +223,7 @@ private:
    * Removes all packets that are older than minTS from the given stack.
    * The stack can be a normal stack, or a stack for negations or aggregates.
    */
-  inline void removeOldPacketsFromStack(TimeMs& minTS, int& parStacksSize,
+  inline void removeOldPacketsFromStack(TimeMs& minTS,
                                         std::vector<PubPkt*>& parReceived);
 };
 

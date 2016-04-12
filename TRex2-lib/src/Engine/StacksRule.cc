@@ -32,27 +32,22 @@ StacksRule::StacksRule(RulePkt* pkt)
   } else {
     compositeEventId = -1;
   }
-  stacksNum = 0;
-  aggrsNum = 0;
-  negsNum = 0;
+
   // Initialize stacks map with predicate and fills it with references
   int predicatesNum = pkt->getPredicatesNum();
-  stacksSize.resize(predicatesNum, 0);
   receivedPkts.resize(predicatesNum);
   referenceState.resize(predicatesNum, 0);
   for (int i = 0; i < predicatesNum; ++i) {
     Predicate& predicate = pkt->getPredicate(i);
     stacks.emplace_back(predicate.refersTo, predicate.win, predicate.kind);
     if (predicate.refersTo != -1) {
-      stacks[predicate.refersTo].addLookBackTo(stacksNum);
+      stacks[predicate.refersTo].addLookBackTo(i);
       referenceState[i] = predicate.refersTo;
     }
-    ++stacksNum;
   }
 
   // Initialize negations and fills stacks with references
   int negationsNum = pkt->getNegationsNum();
-  negsSize.resize(negationsNum, 0);
   receivedNegs.resize(negationsNum);
   for (int i = 0; i < negationsNum; ++i) {
     Negation& negation = pkt->getNegation(i);
@@ -63,7 +58,6 @@ StacksRule::StacksRule(RulePkt* pkt)
 
   // Initialize aggregates belonging to the rule
   int aggregatesNum = pkt->getAggregatesNum();
-  aggsSize.resize(aggregatesNum, 0);
   receivedAggs.resize(aggregatesNum);
   for (int i = 0; i < aggregatesNum; ++i) {
     Aggregate& aggregate = pkt->getAggregate(i);
@@ -116,22 +110,21 @@ StacksRule::~StacksRule() {
 }
 
 void StacksRule::addToStack(PubPkt* pkt, int index) {
-  parametricAddToStack(pkt, stacksSize[index], receivedPkts[index]);
+  parametricAddToStack(pkt, receivedPkts[index]);
 }
 
 void StacksRule::addToAggregateStack(PubPkt* pkt, int index) {
-  parametricAddToStack(pkt, aggsSize[index], receivedAggs[index]);
+  parametricAddToStack(pkt, receivedAggs[index]);
 }
 
 void StacksRule::addToNegationStack(PubPkt* pkt, int index) {
-  parametricAddToStack(pkt, negsSize[index], receivedNegs[index]);
+  parametricAddToStack(pkt, receivedNegs[index]);
 }
 
 void StacksRule::startComputation(PubPkt* pkt, std::set<PubPkt*>& results) {
   // Adds the terminator to the last stack
   pkt->incRefCount();
   receivedPkts[0].push_back(pkt);
-  stacksSize[0] = 1;
   // Removes expired events from stacks
   clearStacks();
   // Gets partial results (patterns)
@@ -147,7 +140,6 @@ void StacksRule::startComputation(PubPkt* pkt, std::set<PubPkt*>& results) {
   if (pkt->decRefCount()) {
     delete pkt;
   }
-  stacksSize[0] = 0;
 }
 
 void StacksRule::processPkt(PubPkt* pkt, MatchingHandler* mh,
@@ -183,12 +175,10 @@ void StacksRule::processPkt(PubPkt* pkt, MatchingHandler* mh,
   }
 }
 
-void StacksRule::parametricAddToStack(PubPkt* pkt, int& parStacksSize,
+void StacksRule::parametricAddToStack(PubPkt* pkt,
                                       std::vector<PubPkt*>& parReceived) {
   std::vector<PubPkt*>::iterator it =
       getBeginPacket(parReceived, pkt->getTimeStamp());
-
-  ++parStacksSize;
   parReceived.insert(it, pkt);
   pkt->incRefCount();
 }
@@ -245,11 +235,10 @@ void StacksRule::addNegation(int eventType, Constraint constraints[],
   neg.upperId = highIndex;
   negations.push_back(std::move(neg));
   if (lowIndex < 0) {
-    stacks[highIndex].addLinkedNegation(negsNum);
+    stacks[highIndex].addLinkedNegation(negations.size() - 1);
   } else {
-    stacks[lowIndex].addLinkedNegation(negsNum);
+    stacks[lowIndex].addLinkedNegation(negations.size() - 1);
   }
-  ++negsNum;
 }
 
 void StacksRule::addAggregate(int eventType, Constraint constraints[],
@@ -265,7 +254,6 @@ void StacksRule::addAggregate(int eventType, Constraint constraints[],
   aggr.fun = fun;
   strcpy(aggr.name, parName);
   aggregates.push_back(std::move(aggr));
-  ++aggrsNum;
 }
 
 void StacksRule::getWinEvents(std::list<PartialEvent>& results, int index,
@@ -273,8 +261,8 @@ void StacksRule::getWinEvents(std::list<PartialEvent>& results, int index,
                               PartialEvent& partialEvent) {
   bool useComplexParameters = false;
 
-  int stackSize = stacksSize[index];
   std::vector<PubPkt*>& recPkts = receivedPkts[index];
+  int stackSize = recPkts.size();
   Stack& stack = stacks[index];
 
   if (stackSize == 0) {
@@ -311,7 +299,7 @@ void StacksRule::getWinEvents(std::list<PartialEvent>& results, int index,
     if (!useComplexParameters ||
         checkParameters(pkt, partialEvent, itComplex->second, index, STATE)) {
       PartialEvent newPartialEvent;
-      std::copy_n(partialEvent.indexes, stacksNum, newPartialEvent.indexes);
+      std::copy_n(partialEvent.indexes, stacks.size(), newPartialEvent.indexes);
       newPartialEvent.indexes[index] = pkt;
       // Check negations
       bool invalidatedByNegations = false;
@@ -348,8 +336,8 @@ void StacksRule::getWinEvents(std::list<PartialEvent>& results, int index,
 
 bool StacksRule::checkNegation(int negIndex, PartialEvent& partialResult) {
   Negation& neg = negations[negIndex];
-  int negSize = negsSize[negIndex];
   std::vector<PubPkt*>& recNeg = receivedNegs[negIndex];
+  int negSize = recNeg.size();
   // No negations: return false
   if (negSize == 0) {
     return false;
@@ -406,7 +394,7 @@ std::list<PartialEvent> StacksRule::getPartialResults(PubPkt* pkt) {
     }
   }
   // Iterates over all states
-  for (int state = 1; state < stacksNum; ++state) {
+  for (int state = 1; state < stacks.size(); ++state) {
     currentEvents.clear();
     // Iterates over all previously generated events
     for (auto& event : prevEvents) {
@@ -488,7 +476,7 @@ void StacksRule::createComplexEvents(std::list<PartialEvent>& partialEvents,
       genPkt->setTime(receivedPkts[0][0]->getTimeStamp());
     } else {
       genPkt = eventGenerator.generateCompositeEvent(
-          pe, aggregates, aggsSize, receivedPkts, receivedAggs,
+          pe, aggregates, receivedPkts, receivedAggs,
           aggregateComplexParameters);
     }
     results.insert(genPkt);
@@ -513,7 +501,6 @@ void StacksRule::removeConsumedEvent(std::list<PartialEvent>& partialEvents) {
         if (pkt->decRefCount()) {
           delete pkt;
         }
-        --stacksSize[i];
       } else {
         ++it;
       }
@@ -522,42 +509,40 @@ void StacksRule::removeConsumedEvent(std::list<PartialEvent>& partialEvents) {
 }
 
 void StacksRule::clearStacks() {
-  for (int stack = 1; stack < stacksNum; ++stack) {
+  for (int stack = 1; stack < stacks.size(); ++stack) {
     int refersToStack = stacks[stack].getRefersTo();
-    if (stacksSize[refersToStack] == 0) {
+    if (receivedPkts[refersToStack].empty()) {
       continue;
     }
     TimeMs minTS = receivedPkts[refersToStack][0]->getTimeStamp() -
                    stacks[stack].getWindow();
-    removeOldPacketsFromStack(minTS, stacksSize[stack], receivedPkts[stack]);
+    removeOldPacketsFromStack(minTS, receivedPkts[stack]);
   }
-  for (int negIndex = 0; negIndex < negsNum; ++negIndex) {
+  for (int negIndex = 0; negIndex < negations.size(); ++negIndex) {
     Negation& neg = negations[negIndex];
     int refersToStack = neg.upperId;
-    if (stacksSize[refersToStack] == 0) {
+    if (receivedPkts[refersToStack].empty()) {
       continue;
     }
     TimeMs win =
         neg.lowerId < 0 ? neg.lowerTime : stacks[neg.lowerId].getWindow();
     TimeMs minTS = receivedPkts[refersToStack][0]->getTimeStamp() - win;
-    removeOldPacketsFromStack(minTS, negsSize[negIndex],
-                              receivedNegs[negIndex]);
+    removeOldPacketsFromStack(minTS, receivedNegs[negIndex]);
   }
-  for (int aggIndex = 0; aggIndex < aggrsNum; ++aggIndex) {
+  for (int aggIndex = 0; aggIndex < aggregates.size(); ++aggIndex) {
     Aggregate& agg = aggregates[aggIndex];
     int refersToStack = agg.upperId;
-    if (stacksSize[refersToStack] == 0) {
+    if (receivedPkts[refersToStack].empty()) {
       continue;
     }
     TimeMs win =
         agg.lowerId < 0 ? agg.lowerTime : stacks[agg.lowerId].getWindow();
     TimeMs minTS = receivedPkts[refersToStack][0]->getTimeStamp() - win;
-    removeOldPacketsFromStack(minTS, aggsSize[aggIndex],
-                              receivedAggs[aggIndex]);
+    removeOldPacketsFromStack(minTS, receivedAggs[aggIndex]);
   }
 }
 
-void StacksRule::removeOldPacketsFromStack(TimeMs& minTS, int& parStacksSize,
+void StacksRule::removeOldPacketsFromStack(TimeMs& minTS,
                                            std::vector<PubPkt*>& parReceived) {
   std::vector<PubPkt*>::iterator firstValid =
       getBeginPacket(parReceived, minTS);
@@ -569,5 +554,4 @@ void StacksRule::removeOldPacketsFromStack(TimeMs& minTS, int& parStacksSize,
     }
   }
   parReceived.erase(begin, firstValid);
-  parStacksSize = parReceived.size();
 }
