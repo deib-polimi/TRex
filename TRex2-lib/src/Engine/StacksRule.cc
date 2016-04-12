@@ -121,7 +121,7 @@ void StacksRule::addToNegationStack(PubPkt* pkt, int index) {
   parametricAddToStack(pkt, receivedNegs[index]);
 }
 
-void StacksRule::startComputation(PubPkt* pkt, std::set<PubPkt*>& results) {
+std::set<PubPkt*> StacksRule::startComputation(PubPkt* pkt) {
   // Adds the terminator to the last stack
   pkt->incRefCount();
   receivedPkts[0].push_back(pkt);
@@ -132,7 +132,7 @@ void StacksRule::startComputation(PubPkt* pkt, std::set<PubPkt*>& results) {
   // Checks parameters and removes invalid results from collected ones
   removePartialEventsNotMatchingParameters(partialResults, endStackParameters);
   // Creates complex events and adds them to the results
-  createComplexEvents(partialResults, results);
+  std::set<PubPkt*> results = createComplexEvents(partialResults);
   // Deletes consumed events
   removeConsumedEvent(partialResults);
   // Removes the terminator from the last stack
@@ -140,10 +140,11 @@ void StacksRule::startComputation(PubPkt* pkt, std::set<PubPkt*>& results) {
   if (pkt->decRefCount()) {
     delete pkt;
   }
+  return results;
 }
 
-void StacksRule::processPkt(PubPkt* pkt, MatchingHandler* mh,
-                            std::set<PubPkt*>& results, int index) {
+std::set<PubPkt*> StacksRule::processPkt(PubPkt* pkt, MatchingHandler* mh,
+                                         int index) {
   std::map<int, std::set<int>>::iterator aggIt =
       mh->matchingAggregates.find(index);
   if (aggIt != mh->matchingAggregates.end()) {
@@ -170,9 +171,10 @@ void StacksRule::processPkt(PubPkt* pkt, MatchingHandler* mh,
       }
     }
     if (lastStack) {
-      startComputation(pkt, results);
+      return startComputation(pkt);
     }
   }
+  return {};
 }
 
 void StacksRule::parametricAddToStack(PubPkt* pkt,
@@ -256,9 +258,10 @@ void StacksRule::addAggregate(int eventType, Constraint constraints[],
   aggregates.push_back(std::move(aggr));
 }
 
-void StacksRule::getWinEvents(std::list<PartialEvent>& results, int index,
-                              TimeMs tsUp, CompKind mode,
-                              PartialEvent& partialEvent) {
+std::list<PartialEvent> StacksRule::getWinEvents(int index, TimeMs tsUp,
+                                                 CompKind mode,
+                                                 PartialEvent& partialEvent) {
+
   bool useComplexParameters = false;
 
   std::vector<PubPkt*>& recPkts = receivedPkts[index];
@@ -266,19 +269,19 @@ void StacksRule::getWinEvents(std::list<PartialEvent>& results, int index,
   Stack& stack = stacks[index];
 
   if (stackSize == 0) {
-    return;
+    return {};
   }
   // Extracts the minimum and maximum element to process.
   // Returns immediately if they cannot be found.
   std::vector<PubPkt*>::iterator first =
       getBeginPacket(recPkts, tsUp - stack.getWindow());
   if (first == recPkts.end() || (*first)->getTimeStamp() >= tsUp) {
-    return;
+    return {};
   }
 
   std::vector<PubPkt*>::iterator last = getEndPacket(recPkts, tsUp);
   if (first >= last) {
-    return;
+    return {};
   }
   // Position the iterator to the last valid element
   --last;
@@ -294,6 +297,7 @@ void StacksRule::getWinEvents(std::list<PartialEvent>& results, int index,
     std::swap(first, last);
   }
 
+  std::list<PartialEvent> results;
   while (true) {
     PubPkt* pkt = *first;
     if (!useComplexParameters ||
@@ -332,6 +336,7 @@ void StacksRule::getWinEvents(std::list<PartialEvent>& results, int index,
       }
     }
   }
+  return results;
 }
 
 bool StacksRule::checkNegation(int negIndex, PartialEvent& partialResult) {
@@ -402,7 +407,8 @@ std::list<PartialEvent> StacksRule::getPartialResults(PubPkt* pkt) {
       int refState = referenceState[state];
       TimeMs maxTimeStamp = event.indexes[refState]->getTimeStamp();
       CompKind kind = stacks[state].getKind();
-      getWinEvents(currentEvents, state, maxTimeStamp, kind, event);
+      currentEvents.splice(currentEvents.end(),
+                           getWinEvents(state, maxTimeStamp, kind, event));
     }
     // Swaps current and previous results
     std::swap(prevEvents, currentEvents);
@@ -467,8 +473,9 @@ void StacksRule::removePartialEventsNotMatchingParameters(
       partialEvents.end());
 }
 
-void StacksRule::createComplexEvents(std::list<PartialEvent>& partialEvents,
-                                     std::set<PubPkt*>& results) {
+std::set<PubPkt*> StacksRule::createComplexEvents(
+    std::list<PartialEvent>& partialEvents) {
+  std::set<PubPkt*> results;
   for (auto& pe : partialEvents) {
     PubPkt* genPkt = NULL;
     if (compositeEventId >= 0) {
@@ -481,6 +488,7 @@ void StacksRule::createComplexEvents(std::list<PartialEvent>& partialEvents,
     }
     results.insert(genPkt);
   }
+  return results;
 }
 
 void StacksRule::removeConsumedEvent(std::list<PartialEvent>& partialEvents) {

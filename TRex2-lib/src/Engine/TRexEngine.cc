@@ -73,7 +73,9 @@ void* processor(void* parShared) {
           }
         }
         if (lastState) {
-          s->stacksRule->find(i)->second->startComputation(s->pkt, s->result);
+          set<PubPkt*> newPackets =
+              s->stacksRule->find(i)->second->startComputation(s->pkt);
+          s->result.insert(newPackets.begin(), newPackets.end());
         }
       }
     }

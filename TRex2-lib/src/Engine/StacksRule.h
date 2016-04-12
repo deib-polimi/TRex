@@ -74,14 +74,34 @@ public:
   /**
    * Adds the given packet to stack 0 and starts
    * the computation of composite events.
+   *
+   * @deprecated use `std::set<PubPkt*> startComputation(PubPkt* pkt)`
    */
-  void startComputation(PubPkt* pkt, std::set<PubPkt*>& results);
+  void startComputation(PubPkt* pkt, std::set<PubPkt*>& results) {
+    results = startComputation(pkt);
+  }
+
+  /**
+   * Adds the given packet to stack 0 and starts
+   * the computation of composite events.
+   */
+  std::set<PubPkt*> startComputation(PubPkt* pkt);
+
+  /**
+   * Process pkt: used only for testing purpose
+   *
+   * @deprecated use `std::set<PubPkt*> processPkt(
+   *      PubPkt* pkt, MatchingHandler* mh, int index)`
+   */
+  void processPkt(PubPkt* pkt, MatchingHandler* mh, std::set<PubPkt*>& results,
+                  int index) {
+    results = processPkt(pkt, mh, index);
+  }
 
   /**
    * Process pkt: used only for testing purpose
    */
-  void processPkt(PubPkt* pkt, MatchingHandler* mh, std::set<PubPkt*>& results,
-                  int index);
+  std::set<PubPkt*> processPkt(PubPkt* pkt, MatchingHandler* mh, int index);
 
 private:
   // The id of the rule
@@ -166,9 +186,8 @@ private:
    * Returns the events that satisfy the stack window with the given from the
    * given time stamp
    */
-  inline void getWinEvents(std::list<PartialEvent>& partialEvents, int index,
-                           TimeMs tsUp, CompKind mode,
-                           PartialEvent& partialEvent);
+  std::list<PartialEvent> getWinEvents(int index, TimeMs tsUp, CompKind mode,
+                                       PartialEvent& partialEvent);
 
   /**
    * Return true for the presence of negation (according to parameters)
@@ -183,8 +202,7 @@ private:
   /**
    * Computes complex events and adds them to the results set
    */
-  inline void createComplexEvents(std::list<PartialEvent>& partialEvents,
-                                  std::set<PubPkt*>& results);
+  std::set<PubPkt*> createComplexEvents(std::list<PartialEvent>& partialEvents);
 
   /**
    * Removes events that have been consumed
