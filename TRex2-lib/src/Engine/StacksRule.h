@@ -94,7 +94,7 @@ private:
   std::map<int, Stack*> stacks;
   // Set of parameters to check at the end
   std::set<Parameter*> endStackParameters;
-  std::map<int, std::set<CPUParameter*>> branchStackComplexParameters;
+  std::map<int, std::set<CPUParameter*> > branchStackComplexParameters;
   // Parameters in the rule to check in the meantime
   // (stack id -> data structure)
   // std::map<int, std::set<Parameter *> > branchStackParameters;
@@ -104,10 +104,10 @@ private:
 
   // Parameters in the rule to check in the meantime
   // (negation id -> data structure)
-  std::map<int, std::set<CPUParameter*>> negationComplexParameters;
+  std::map<int, std::set<CPUParameter*> > negationComplexParameters;
   // Parameters in the rule to check in the meantime
   // (aggregate id -> data structure)
-  std::map<int, std::set<CPUParameter*>> aggregateComplexParameters;
+  std::map<int, std::set<CPUParameter*> > aggregateComplexParameters;
   // Aggregate in the rule (aggregate id -> data structure)
   std::map<int, Aggregate*> aggregates;
   // Negations in the rule (negation id -> data structure)
@@ -130,11 +130,11 @@ private:
   int aggsSize[MAX_RULE_FIELDS];
 
   // Aggregate index -> set of all matching PubPkt
-  std::map<int, std::vector<PubPkt*>> receivedAggs;
+  std::map<int, std::vector<PubPkt*> > receivedAggs;
   // Stack index -> set of all matching PubPkt
-  std::map<int, std::vector<PubPkt*>> receivedPkts;
+  std::map<int, std::vector<PubPkt*> > receivedPkts;
   // Negation index -> set of all matching PubPkt
-  std::map<int, std::vector<PubPkt*>> receivedNegs;
+  std::map<int, std::vector<PubPkt*> > receivedNegs;
 
   // Indexes of events in the consuming clause (set of stack ids)
   std::set<int> consumingIndexes;

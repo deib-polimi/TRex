@@ -53,9 +53,9 @@ bool checkConstraints(PubPkt* event, RulePkt* rule, int state);
  * Returns all the columns matching the incoming event e.
  * Columns indexes are added to the given results list.
  */
-void getMatchingColumns(PubPkt* e, map<int, set<int>>& topics,
+void getMatchingColumns(PubPkt* e, map<int, set<int> >& topics,
                         list<int>& results);
-void getMatchingColumns(int e, map<int, set<int>>& topics, list<int>& results);
+void getMatchingColumns(int e, map<int, set<int> >& topics, list<int>& results);
 
 /**
  * Returns the id of the first element in the given column having a
