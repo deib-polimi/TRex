@@ -55,9 +55,9 @@ public:
   PubPkt* generateCompositeEvent(
       PartialEvent* partialEvent, std::map<int, Aggregate*>& aggregates,
       int aggsSize[MAX_RULE_FIELDS],
-      std::map<int, std::vector<PubPkt*> >& receivedPkts,
-      std::map<int, std::vector<PubPkt*> >& receivedAggs,
-      std::map<int, std::set<CPUParameter*> >& aggregateParameters);
+      std::map<int, std::vector<PubPkt*>>& receivedPkts,
+      std::map<int, std::vector<PubPkt*>>& receivedAggs,
+      std::map<int, std::set<CPUParameter*>>& aggregateParameters);
 
 private:
   int loccount;
@@ -76,9 +76,9 @@ private:
   inline int computeIntValue(
       PartialEvent* partialEvent, std::map<int, Aggregate*>& aggregates,
       int aggsSize[MAX_RULE_FIELDS],
-      std::map<int, std::vector<PubPkt*> >& receivedPkts,
-      std::map<int, std::vector<PubPkt*> >& receivedAggs,
-      std::map<int, std::set<CPUParameter*> >& aggregateParameters,
+      std::map<int, std::vector<PubPkt*>>& receivedPkts,
+      std::map<int, std::vector<PubPkt*>>& receivedAggs,
+      std::map<int, std::set<CPUParameter*>>& aggregateParameters,
       OpTree* opTree);
 
   /**
@@ -88,9 +88,9 @@ private:
   inline float computeFloatValue(
       PartialEvent* partialEvent, std::map<int, Aggregate*>& aggregates,
       int aggsSize[MAX_RULE_FIELDS],
-      std::map<int, std::vector<PubPkt*> >& receivedPkts,
-      std::map<int, std::vector<PubPkt*> >& receivedAggs,
-      std::map<int, std::set<CPUParameter*> >& aggregateParameters,
+      std::map<int, std::vector<PubPkt*>>& receivedPkts,
+      std::map<int, std::vector<PubPkt*>>& receivedAggs,
+      std::map<int, std::set<CPUParameter*>>& aggregateParameters,
       OpTree* opTree);
 
   /**
@@ -100,9 +100,9 @@ private:
   inline bool computeBoolValue(
       PartialEvent* partialEvent, std::map<int, Aggregate*>& aggregates,
       int aggsSize[MAX_RULE_FIELDS],
-      std::map<int, std::vector<PubPkt*> >& receivedPkts,
-      std::map<int, std::vector<PubPkt*> >& receivedAggs,
-      std::map<int, std::set<CPUParameter*> >& aggregateParameters,
+      std::map<int, std::vector<PubPkt*>>& receivedPkts,
+      std::map<int, std::vector<PubPkt*>>& receivedAggs,
+      std::map<int, std::set<CPUParameter*>>& aggregateParameters,
       OpTree* opTree);
 
   /**
@@ -112,9 +112,9 @@ private:
   inline void computeStringValue(
       PartialEvent* partialEvent, std::map<int, Aggregate*>& aggregates,
       int aggsSize[MAX_RULE_FIELDS],
-      std::map<int, std::vector<PubPkt*> >& receivedPkts,
-      std::map<int, std::vector<PubPkt*> >& receivedAggs,
-      std::map<int, std::set<CPUParameter*> >& aggregateParameters,
+      std::map<int, std::vector<PubPkt*>>& receivedPkts,
+      std::map<int, std::vector<PubPkt*>>& receivedAggs,
+      std::map<int, std::set<CPUParameter*>>& aggregateParameters,
       OpTree* opTree, char* result);
 
   /**
@@ -126,9 +126,9 @@ private:
   inline float computeAggregate(
       int index, PartialEvent* partialEvent,
       std::map<int, Aggregate*>& aggregates, int aggsSize[MAX_RULE_FIELDS],
-      std::map<int, std::vector<PubPkt*> >& receivedPkts,
-      std::map<int, std::vector<PubPkt*> >& receivedAggs,
-      std::map<int, std::set<CPUParameter*> >& aggregateParameters);
+      std::map<int, std::vector<PubPkt*>>& receivedPkts,
+      std::map<int, std::vector<PubPkt*>>& receivedAggs,
+      std::map<int, std::set<CPUParameter*>>& aggregateParameters);
 
   /**
    * Returns true if the packet satisfies all parameters, and false otherwise

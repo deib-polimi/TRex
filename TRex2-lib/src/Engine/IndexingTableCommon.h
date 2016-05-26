@@ -44,9 +44,9 @@ typedef struct TablePredicateStruct {
  * It is filled with the set of matching states, aggregates, and negations.
  */
 typedef struct MatchingHandlerStruct {
-  std::map<int, std::set<int> > matchingStates;
-  std::map<int, std::set<int> > matchingAggregates;
-  std::map<int, std::set<int> > matchingNegations;
+  std::map<int, std::set<int>> matchingStates;
+  std::map<int, std::set<int>> matchingAggregates;
+  std::map<int, std::set<int>> matchingNegations;
 } MatchingHandler;
 
 #endif
