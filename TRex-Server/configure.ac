@@ -1,10 +1,11 @@
 AC_INIT([TRexServer], [1.0], [daniele.rogora@gmail.com])
 AM_INIT_AUTOMAKE([subdir-objects foreign -Wall])
 CXXFLAGS="-O3"
-AC_CONFIG_MACRO_DIR([m4])
+AX_CXX_COMPILE_STDCXX(11, noext, mandatory)
 AM_PROG_AR
 AC_PROG_CC
 AC_PROG_CXX
+AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_LIBTOOL
 AC_LANG_PUSH([C++])
 AC_CONFIG_HEADERS([config.h])

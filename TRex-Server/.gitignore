@@ -13,7 +13,9 @@
 /install-sh
 /libtool
 /ltmain.sh
-/m4/
+/m4/*
+!/m4/ax_cxx_compile_stdcxx.m4
+!/m4/boost.m4
 /missing
 /stamp-h?
 

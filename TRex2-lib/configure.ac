@@ -19,7 +19,7 @@ AC_ARG_ENABLE([cuda],
 
 	      using_cuda=$enableval
 
-	      NVCCFLAGS="-Xcompiler -fPIC -O3 -m64"
+	      NVCCFLAGS="-Xcompiler -fPIC -O3 -m64 -D_MWAITXINTRIN_H_INCLUDED -D_FORCE_INLINES"
 
 	      # Search for compiler
 	      AC_CHECK_PROG([cuda_compiler], [nvcc], yes, no) 
