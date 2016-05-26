@@ -28,7 +28,9 @@ namespace keywords = boost::log::keywords;
 namespace expr = boost::log::expressions;
 
 #	if BOOST_VERSION < 105500
-	using boost::empty_deleter = boost::log::utility::empty_deleter;
+namespace boost {
+	using empty_deleter = log::empty_deleter;
+}
 #	endif
 
 // init static logger

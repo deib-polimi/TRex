@@ -43,7 +43,7 @@ private:
 	class MarshallerVisitor : public boost::static_visitor<concept::util::CharVectorPtr>{
 		PacketMarshaller &parent;
 	public:
-		MarshallerVisitor(PacketMarshaller parent): parent(parent) { }
+		MarshallerVisitor(PacketMarshaller& parent): parent(parent) { }
 
 		concept::util::CharVectorPtr operator()(RulePkt * pkt) const;
 		concept::util::CharVectorPtr operator()(PubPkt * pkt) const;

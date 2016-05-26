@@ -29,6 +29,8 @@ Makefile.in
 *.l[ao]
 *.o
 
+/src/TRexServer
+
 # IDE
 /.settings
 /.idea
