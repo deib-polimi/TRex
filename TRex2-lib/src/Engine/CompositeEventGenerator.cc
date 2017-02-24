@@ -19,6 +19,7 @@
 //
 
 #include "CompositeEventGenerator.h"
+#include <limits>
 
 using namespace std;
 
@@ -302,12 +303,16 @@ inline float CompositeEventGenerator::computeAggregate(
   }
   int index1 =
       getFirstValidElement(receivedAggs[index], aggsSize[index], minTS);
-  if (index1 < 0)
-    return 0;
+  if (index1 < 0) {
+      if (agg->fun==COUNT) return 0;
+      else return std::numeric_limits<float>::quiet_NaN();
+  }
   int index2 =
       getLastValidElement(receivedAggs[index], aggsSize[index], maxTS, index1);
-  if (index2 < 0)
-    index2 = index1;
+  if (index2 < 0) {
+      if (agg->fun==COUNT) return 0;
+      else return std::numeric_limits<float>::quiet_NaN();
+  }
   AggregateFun fun = agg->fun;
   char* name = agg->name;
   float sum = 0;
@@ -354,20 +359,14 @@ inline float CompositeEventGenerator::computeAggregate(
   }
   if (fun == SUM)
     return sum;
-  if (fun == MAX) {
-    cout << "MAX: " << max << endl;
+  if (fun == MAX)
     return max;
-  }
   if (fun == MIN)
     return min;
   if (fun == COUNT)
     return count;
-  if (fun == AVG) {
-    if (count == 0)
-      return 0;
-    else
-      return sum / count;
-  }
+  if (fun == AVG)
+    return sum / count;
   return 0;
 }
 
