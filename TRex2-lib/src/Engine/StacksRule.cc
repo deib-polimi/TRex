@@ -264,9 +264,7 @@ void StacksRule::addParameter(int index1, char* name1, int index2, char* name2,
   strcpy(tmp->name1, name1);
   strcpy(tmp->name2, name2);
   if (type == STATE) {
-    if (pkt->isInTheSameSequence(index1, index2) /*&& index2>0*/) {
-    } else
-      endStackParameters.insert(tmp);
+    endStackParameters.insert(tmp);
   }
 }
 
